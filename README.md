@@ -52,7 +52,7 @@ Exemplo: git commit -m `Adiciona introdução com contexto do problema`
 
 ## Authors
 
-- [Carlos Eduardo]([https://www.github.com/octokatherine](https://github.com/carlosedusp05))
+- [Carlos Eduardo](https://github.com/carlosedusp05)
 - [David Lucas](https://www.github.com/octokatherine)
 - [Gustavo De Paula](https://github.com/GustavoDePaula14)
 - [Kauan Antunes](https://github.com/KauanAntunesLima)
