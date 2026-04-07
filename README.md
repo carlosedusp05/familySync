@@ -1,13 +1,13 @@
 ![Logo](./docs/img/logo_family_sync-Photoroom%204.png)
 
 
-# Template para TCC - Repositório Oficial
+# FamilySync - Repositório Oficial
 
-Este repositório serve como modelo (template) para organização e versionamento do Trabalho de Conclusão de Curso. Utilize esta estrutura para manter seu projeto organizado e facilitar o acompanhamento do orientador.
+Este repositório serve como organizador de tarefas onde estarão declaradas todas as atividades e progresso do nosso projeto. Todos os colaboradores devem estar cientes e ativos no decorrer do produto.
 
-## Sobre este Template
+## Sobre este projeto
 
-Este template foi desenvolvido para padronizar a organização dos TCCs das turmas de Desenvolvimento de Sistemas. 
+O projeto consiste no desenvolvimento de uma aplicação destinada à gestão familiar organizada. De forma que a rotina da família seja feita de maneira produtiva e eficiente, esse o sistema trabalha como auxiliador da família.
 
 ### Disciplina: Trabalho de Conclusão de Curso
 Semestre: 2026/1
