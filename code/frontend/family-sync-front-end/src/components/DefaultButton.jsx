@@ -1,17 +1,34 @@
-function DefaultButton(props) {
+import logoutIcon from "../assets/logout.svg";
+
+function DefaultButton({
+  theme,
+  text,
+  horizontal,
+  vertical,
+  border,
+  logout_image,
+}) {
+  const backgroundColor = theme ? "bg-orange" : "bg-yellow-cream";
+  const textColor = theme ? "text-white" : "text-orange";
+  const IsExistBorder = border ? "border border-orange" : "";
+  const HaveLogout = logout_image ? (
+    <img src={logoutIcon} alt="sair" className="w-12.5 h-15" />
+  ) : null;
+
   return (
     <button
-      className="bg-orange text-white rounded-[15px]
+      className={`${backgroundColor} ${textColor} ${IsExistBorder} rounded-[15px]
         text-[20px] font-bold cursor-pointer
         duration-300 ease-out hover:-translate-y-0.5
         transition-all active:scale-90 active:brightness-90
-        shadow-lg"
-      style={{ 
-      paddingBlock: props.vertical, 
-      paddingInline: props.horizontal 
-    }}
+        shadow-lg flex justify-center content-center items-center gap-3.5`}
+      style={{
+        paddingBlock: vertical,
+        paddingInline: horizontal,
+      }}
     >
-      {props.text}
+      {HaveLogout}
+      {text}
     </button>
   );
 }
