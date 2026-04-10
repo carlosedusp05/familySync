@@ -24,6 +24,13 @@ function App() {
         border={true}
         logout_image={true}
       />
+      <DefaultButton
+        text="Confirmar"
+        horizontal="70px"
+        vertical="16px"
+        theme={true}
+        most_radius={true}
+      />
     </div>
   );
 }
