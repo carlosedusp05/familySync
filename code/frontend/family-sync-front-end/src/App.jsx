@@ -1,8 +1,10 @@
 import DefaultButton from "./components/DefaultButton";
+import DefaultTextField from "./components/DefaultTextField";
+import eyeIcon from "./assets/Eye.png";
 
 function App() {
   return (
-    <div>
+    <div className="flex gap-20">
       <DefaultButton
         text="Login"
         horizontal="70px"
