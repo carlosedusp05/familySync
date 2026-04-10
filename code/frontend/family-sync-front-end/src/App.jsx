@@ -1,9 +1,9 @@
-import OrangeButton from "./components/OrangeButton";
+import DefaultButton from "./components/DefaultButton";
 
 function App() {
   return (
     <div>
-      <OrangeButton text="Login" />
+      <DefaultButton text="Login" horizontal="70px" vertical="16px"/>
     </div>
   );
 }
