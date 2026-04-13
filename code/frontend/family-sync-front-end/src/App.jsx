@@ -1,10 +1,12 @@
 import DefaultButton from "./components/DefaultButton";
+import CardLogin from "./components/CardLogin";
 import DefaultTextField from "./components/DefaultTextField";
-import eyeIcon from "./assets/Eye.png";
+import CardRememberPass from "./components/CardRememberPass";
+import { eyeIcon } from "./assets";
 
 function App() {
   return (
-    <div className="flex gap-20">
+    <div className="flex gap-20 flex-wrap">
       <DefaultButton
         text="Login"
         horizontal="70px"
@@ -33,6 +35,18 @@ function App() {
         theme={true}
         most_radius={true}
       />
+
+      <div className="w-[30%] h-[30%] flex justify-center items-center">
+        <DefaultTextField
+          placeholder="BAH TCHÊ"
+          type="text"
+          src={eyeIcon}
+          alt="oio"
+        />
+      </div>
+
+      <CardLogin />
+      <CardRememberPass />
     </div>
   );
 }

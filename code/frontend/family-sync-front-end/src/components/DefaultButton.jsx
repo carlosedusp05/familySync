@@ -1,4 +1,4 @@
-import logoutIcon from "../assets/logout.svg";
+import { logoutIcon } from "../assets";
 
 function DefaultButton({
   theme = true,
@@ -30,7 +30,7 @@ function DefaultButton({
       }}
     >
       {HaveLogout}
-      {text}
+      <span className="truncate max-w-32.5">{text}</span>
     </button>
   );
 }
