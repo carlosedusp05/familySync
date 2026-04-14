@@ -16,11 +16,12 @@ function DefaultButton({
     <img src={logoutIcon} alt="sair" className="w-12.5 h-15" />
   ) : null;
   const border_radius = most_radius ? "rounded-[40px]" : "rounded-[15px]";
+  const minor_text = text.length < 4 ? "text-[40px] mt-[-5px]" : "text-[20px]";
 
   return (
     <button
       className={`${backgroundColor} ${textColor} ${IsExistBorder} ${border_radius}
-        text-[20px] font-bold cursor-pointer
+        font-bold cursor-pointer
         duration-300 ease-out hover:-translate-y-0.5
         transition-all active:scale-90 active:brightness-90
         shadow-lg flex justify-center content-center items-center gap-3.5`}
@@ -30,7 +31,11 @@ function DefaultButton({
       }}
     >
       {HaveLogout}
-      <span className="truncate max-w-32.5">{text}</span>
+      <span
+        className={`flex items-center ${minor_text} justify-center truncate max-w-32.5`}
+      >
+        {text}
+      </span>
     </button>
   );
 }

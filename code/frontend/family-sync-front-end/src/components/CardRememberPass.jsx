@@ -6,7 +6,7 @@ import { eyeIcon } from "../assets";
 function CardRememberPass() {
   return (
     <DefaultCard>
-      <h1 className="text-orange-dark font-bold text-4xl">
+      <h1 className="text-orange-dark font-bold text-4xl w-[288px]">
         Esqueci minha senha
       </h1>
       <div className=" h-[60%] flex justify-center items-center flex-wrap">

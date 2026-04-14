@@ -2,6 +2,8 @@ import DefaultButton from "./components/DefaultButton";
 import CardLogin from "./components/CardLogin";
 import DefaultTextField from "./components/DefaultTextField";
 import CardRememberPass from "./components/CardRememberPass";
+import AccountRegister from "./components/AccountRegister";
+import AccountEdit from "./components/AccountEdit";
 import { eyeIcon } from "./assets";
 
 function App() {
@@ -47,6 +49,8 @@ function App() {
 
       <CardLogin />
       <CardRememberPass />
+      <AccountRegister />
+      <AccountEdit />
     </div>
   );
 }

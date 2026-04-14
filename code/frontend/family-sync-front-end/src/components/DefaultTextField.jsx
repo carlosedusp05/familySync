@@ -8,7 +8,7 @@ function DefaultTextField(props) {
       />
       {props.src && (
         <img
-          className="w-10 h-10 font-bold"
+          className="w-10 h-10 font-bold cursor-pointer"
           src={props.src}
           alt={props.alt}
           draggable="false"
