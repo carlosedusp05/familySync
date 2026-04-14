@@ -4,6 +4,7 @@ import DefaultTextField from "./components/DefaultTextField";
 import CardRememberPass from "./components/CardRememberPass";
 import AccountRegister from "./components/AccountRegister";
 import AccountEdit from "./components/AccountEdit";
+import SideBarNavegation from "./components/SidebarNavigation";
 import { eyeIcon } from "./assets";
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
       <CardRememberPass />
       <AccountRegister />
       <AccountEdit />
+      <SideBarNavegation currentPage="lista" />
     </div>
   );
 }
