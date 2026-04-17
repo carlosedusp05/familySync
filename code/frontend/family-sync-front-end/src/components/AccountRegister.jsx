@@ -7,7 +7,7 @@ import { eyeIcon } from "../assets";
 function AccountRegister() {
   return (
     <DefaultCard slim_card={true}>
-      <div className=" p-15 flex justify-center items-center">
+      <div className="flex justify-center items-center">
         <div className="relative">
           <IconPerfil is_orange={true} />
 
@@ -23,7 +23,7 @@ function AccountRegister() {
         </div>
       </div>
       <h1 className="text-orange font-bold text-4xl">Eu</h1>
-      <div className=" w-[90%] flex justify-center items-center flex-wrap gap-6">
+      <div className=" w-[80%] flex justify-center items-center flex-wrap gap-6">
         <MultTextField
           text_fields={[
             { placeholder: "Nome", type: "text" },
