@@ -1,12 +1,13 @@
-import logoutIcon from "../assets/logout.svg";
+import { logoutIcon } from "../assets";
 
 function DefaultButton({
-  theme,
-  text,
-  horizontal,
-  vertical,
-  border,
-  logout_image,
+  theme = true,
+  text = "",
+  horizontal = "40px",
+  vertical = "40px",
+  border = false,
+  most_radius = false,
+  logout_image = false,
 }) {
   const backgroundColor = theme ? "bg-orange" : "bg-yellow-cream";
   const textColor = theme ? "text-white" : "text-orange";
@@ -14,11 +15,13 @@ function DefaultButton({
   const HaveLogout = logout_image ? (
     <img src={logoutIcon} alt="sair" className="w-12.5 h-15" />
   ) : null;
+  const border_radius = most_radius ? "rounded-[50%]" : "rounded-[15px]";
+  const minor_text = text.length < 4 ? "text-[40px] mt-[-5px]" : "text-[20px]";
 
   return (
     <button
-      className={`${backgroundColor} ${textColor} ${IsExistBorder} rounded-[15px]
-        text-[20px] font-bold cursor-pointer
+      className={`${backgroundColor} ${textColor} ${IsExistBorder} ${border_radius}
+        font-bold cursor-pointer
         duration-300 ease-out hover:-translate-y-0.5
         transition-all active:scale-90 active:brightness-90
         shadow-lg flex justify-center content-center items-center gap-3.5`}
@@ -28,7 +31,11 @@ function DefaultButton({
       }}
     >
       {HaveLogout}
-      {text}
+      <span
+        className={`flex items-center ${minor_text} justify-center truncate max-w-32.5`}
+      >
+        {text}
+      </span>
     </button>
   );
 }

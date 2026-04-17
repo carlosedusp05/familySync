@@ -1,13 +1,18 @@
 function DefaultTextField(props) {
   return (
-    <div className="flex px-5 h-10 w-full border-orange border rounded-2xl justify-center items-center  text-orange">
+    <div className="flex p-10 h-18 w-full border-orange border rounded-4xl justify-center items-center text-orange">
       <input
         type={props.type}
-        className="w-full h-full border-none focus:outline-none focus:ring-0"
+        className="w-[85%] h-full border-none focus:outline-none focus:ring-0 text-2xl"
         placeholder={props.placeholder}
       />
       {props.src && (
-        <img className="w-10 h-10 font-bold" src={props.src} alt={props.alt} />
+        <img
+          className="w-10 h-10 font-bold cursor-pointer"
+          src={props.src}
+          alt={props.alt}
+          draggable="false"
+        />
       )}
     </div>
   );
