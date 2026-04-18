@@ -17,7 +17,7 @@ function AccountRegister() {
         </div>
       </div>
       <h1 className="text-orange text-3xl -mt-6">Eu</h1>
-      <div className=" w-full flex justify-center items-center flex-wrap gap-6">
+      <div className=" w-full flex justify-center items-center flex-wrap gap-5">
         <MultTextField
           text_fields={[
             { placeholder: "Nome", type: "text" },

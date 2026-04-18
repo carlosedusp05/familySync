@@ -8,12 +8,15 @@
 // import { eyeIcon } from "./assets";
 
 import LoginScreen from "./screens/LoginScreen";
+import InicioScreen from "./screens/InicioScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 
 function App() {
   // return <RegisterScreen />;
 
-  return <LoginScreen />;
+  return <InicioScreen />;
+
+  // return <LoginScreen />;
 
   // <div className="flex gap-20 flex-wrap">
   //   <DefaultButton

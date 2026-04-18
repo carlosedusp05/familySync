@@ -11,6 +11,7 @@ import infoIcon from "./info.svg";
 import plusIcon from "./plus.svg";
 import settingsIcon from "./settings.svg";
 import imageBackground from "./background1.svg";
+import imageBackground2 from "./background2.svg";
 import emailIcon from "./email.svg";
 
 export {
@@ -28,4 +29,5 @@ export {
   settingsIcon,
   imageBackground,
   emailIcon,
+  imageBackground2,
 };

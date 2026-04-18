@@ -24,9 +24,9 @@ function DefaultButton({
       className={`${backgroundColor} ${textColor} ${IsExistBorder} ${border_radius} 
         py-2 px-4 
         md:py-3 md:px-8 
-        lg:py-4 lg:px-10
+        lg:py-4 lg:px-10 
         /* Altura controlada */
-        h-12 md:h-14 w-full 
+        h-12 md:h-14 w-full
         font-bold cursor-pointer
         duration-300 ease-out hover:-translate-y-0.5
         transition-all active:scale-90 active:brightness-90
