@@ -12,13 +12,7 @@ function AccountRegister() {
           <IconPerfil is_orange={true} />
 
           <div className="absolute -bottom-2 -right-2 flex items-center justify-center">
-            <DefaultButton
-              text="+"
-              horizontal="15px"
-              vertical="0px"
-              theme={true}
-              most_radius={true}
-            />
+            <DefaultButton text="+" theme={true} most_radius={true} />
           </div>
         </div>
       </div>
@@ -46,20 +40,9 @@ function AccountRegister() {
         />
       </div>
 
-      <div className="flex gap-18 ">
-        <DefaultButton
-          text="Cancelar"
-          horizontal="60px"
-          vertical="16px"
-          theme={false}
-          border={true}
-        />
-        <DefaultButton
-          text="Cadastrar"
-          horizontal="56.5px"
-          vertical="16px"
-          theme={true}
-        />
+      <div className="flex w-[80%] px-10 h-14 gap-30">
+        <DefaultButton text="Cancelar" theme={false} border={true} />
+        <DefaultButton text="Cadastrar" theme={true} />
       </div>
     </DefaultCard>
   );

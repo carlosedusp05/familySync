@@ -3,8 +3,6 @@ import { logoutIcon } from "../assets";
 function DefaultButton({
   theme = true,
   text = "",
-  horizontal = "40px",
-  vertical = "40px",
   border = false,
   most_radius = false,
   logout_image = false,
@@ -16,24 +14,22 @@ function DefaultButton({
     <img src={logoutIcon} alt="sair" className="w-12.5 h-15" />
   ) : null;
   const border_radius = most_radius ? "rounded-[50%]" : "rounded-[15px]";
-  const minor_text = text.length < 4 ? "text-[40px] mt-[-5px]" : "text-[20px]";
+  const minor_text =
+    text.length < 4
+      ? "text-2xl md:text-[2.5rem] leading-none"
+      : "text-base md:text-xl lg:text-[1.2rem]";
 
   return (
     <button
       className={`${backgroundColor} ${textColor} ${IsExistBorder} ${border_radius}
+        h-full w-full
         font-bold cursor-pointer
         duration-300 ease-out hover:-translate-y-0.5
         transition-all active:scale-90 active:brightness-90
-        shadow-lg flex justify-center content-center items-center gap-3.5`}
-      style={{
-        paddingBlock: vertical,
-        paddingInline: horizontal,
-      }}
+        shadow-lg flex justify-center content-center items-center gap-3.5 flex-1`}
     >
       {HaveLogout}
-      <span
-        className={`flex items-center ${minor_text} justify-center truncate max-w-32.5`}
-      >
+      <span className={`flex items-center ${minor_text} justify-center`}>
         {text}
       </span>
     </button>
