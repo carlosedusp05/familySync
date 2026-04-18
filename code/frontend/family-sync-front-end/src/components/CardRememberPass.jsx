@@ -9,7 +9,7 @@ function CardRememberPass() {
       <h1 className="text-orange-dark font-bold text-4xl w-[288px]">
         Esqueci minha senha
       </h1>
-      <div className=" h-[60%] flex justify-center items-center flex-wrap">
+      <div className=" h-[60%] flex justify-center items-center flex-wrap gap-6">
         <DefaultTextField
           placeholder="Código do e-mail"
           type="text"
@@ -30,19 +30,9 @@ function CardRememberPass() {
         />
       </div>
 
-      <div className="flex gap-18 ">
-        <DefaultButton
-          text="Cancelar"
-          horizontal="60px"
-          vertical="16px"
-          theme={false}
-        />
-        <DefaultButton
-          text="Trocar Senha"
-          horizontal="40px"
-          vertical="16px"
-          theme={true}
-        />
+      <div className="grid grid-cols-2 gap-23 w-full mt-2 px-2">
+        <DefaultButton text="Cancelar" theme={false} border={true} />
+        <DefaultButton text="Trocar Senha" theme={true} />
       </div>
     </DefaultCard>
   );
