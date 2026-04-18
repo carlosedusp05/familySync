@@ -11,9 +11,9 @@ import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 
 function App() {
-  return <RegisterScreen />;
+  // return <RegisterScreen />;
 
-  // return <LoginScreen />;
+  return <LoginScreen />;
 
   // <div className="flex gap-20 flex-wrap">
   //   <DefaultButton

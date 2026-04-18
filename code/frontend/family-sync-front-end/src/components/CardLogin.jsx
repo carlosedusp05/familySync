@@ -9,7 +9,7 @@ function CardLogin() {
     <DefaultCard>
       <IconFamilySync is_small={true} />
       <h1 className="text-orange-dark font-bold text-4xl">Login</h1>
-      <div className=" h-[40%] flex justify-center items-center flex-wrap">
+      <div className=" h-[40%] flex gap-10 justify-center items-center flex-wrap">
         <DefaultTextField
           placeholder="Email"
           type="text"
@@ -24,7 +24,7 @@ function CardLogin() {
         />
       </div>
 
-      <div>
+      <div className="flex  flex-col gap-1">
         <DefaultButton
           text="Entrar"
           horizontal="100px"
