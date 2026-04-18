@@ -1,6 +1,6 @@
 function DefaultTextField(props) {
   return (
-    <div className="flex p-10 h-18 w-full border-orange border rounded-4xl justify-center items-center text-orange">
+    <div className="flex px-3 h-15 w-full border-orange border rounded-4xl justify-center items-center text-orange">
       <input
         type={props.type}
         className="w-[85%] h-full border-none focus:outline-none focus:ring-0 text-2xl"

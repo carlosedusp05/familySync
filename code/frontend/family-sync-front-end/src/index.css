@@ -18,9 +18,3 @@
   --color-default: #ffab77;
   --color-black: #000000;
 }
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}

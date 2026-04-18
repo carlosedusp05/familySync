@@ -2,22 +2,22 @@ import DefaultCard from "./DefaultCard";
 import IconPerfil from "./IconPerfil";
 import DefaultButton from "./DefaultButton";
 import MultTextField from "./MultTextField";
-import { eyeIcon } from "../assets";
+import { eyeIcon, plusIcon } from "../assets";
 
 function AccountRegister() {
   return (
-    <DefaultCard slim_card={true}>
+    <DefaultCard>
       <div className="flex justify-center items-center">
         <div className="relative">
           <IconPerfil is_orange={true} />
 
-          <div className="absolute -bottom-2 -right-2 flex items-center justify-center">
-            <DefaultButton text="+" theme={true} most_radius={true} />
+          <div className="absolute -bottom-2 -right-2 flex items-center justify-center bg-orange p-2 rounded-[50%]">
+            <img className="h-7" src={plusIcon} alt="Adicionar Imagem" />
           </div>
         </div>
       </div>
       <h1 className="text-orange font-bold text-4xl">Eu</h1>
-      <div className=" w-[80%] flex justify-center items-center flex-wrap gap-6">
+      <div className=" w-full flex justify-center items-center flex-wrap gap-6">
         <MultTextField
           text_fields={[
             { placeholder: "Nome", type: "text" },
@@ -40,7 +40,7 @@ function AccountRegister() {
         />
       </div>
 
-      <div className="flex w-[80%] px-10 h-14 gap-30">
+      <div className="flex items-center justify-center px-10 h-14 gap-[10%] w-full">
         <DefaultButton text="Cancelar" theme={false} border={true} />
         <DefaultButton text="Cadastrar" theme={true} />
       </div>
