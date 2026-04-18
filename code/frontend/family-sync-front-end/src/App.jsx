@@ -4,6 +4,7 @@
 // import CardRememberPass from "./components/CardRememberPass";
 // import AccountRegister from "./components/AccountRegister";
 // import AccountEdit from "./components/AccountEdit";
+import RememberPassScreen from "./screens/RememberPassScreen";
 // import SideBarNavegation from "./components/SidebarNavigation";
 // import { eyeIcon } from "./assets";
 
@@ -14,9 +15,7 @@ import RegisterScreen from "./screens/RegisterScreen";
 function App() {
   // return <RegisterScreen />;
 
-  return <InicioScreen />;
-
-  // return <LoginScreen />;
+  return <RememberPassScreen />;
 
   // <div className="flex gap-20 flex-wrap">
   //   <DefaultButton
