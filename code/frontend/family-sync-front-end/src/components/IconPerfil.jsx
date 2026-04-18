@@ -6,12 +6,12 @@ function IconPerfil({ is_orange }) {
 
   return (
     <div
-      className={`rounded-[50%] p-3 flex items-center justify-center ${style}`}
+      className={`rounded-full p-4 flex items-center justify-center transition-all duration-300  ${style}`}
     >
       <img
         src={color}
-        alt=" Icon Perfil"
-        className="max-w-full max-h-full"
+        alt="Icon Perfil"
+        className="w-full h-full object-contain"
         draggable="false"
       />
     </div>

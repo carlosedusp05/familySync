@@ -16,7 +16,7 @@ function AccountRegister() {
           </div>
         </div>
       </div>
-      <h1 className="text-orange font-bold text-4xl">Eu</h1>
+      <h1 className="text-orange text-3xl -mt-6">Eu</h1>
       <div className=" w-full flex justify-center items-center flex-wrap gap-6">
         <MultTextField
           text_fields={[
@@ -40,7 +40,7 @@ function AccountRegister() {
         />
       </div>
 
-      <div className="flex items-center justify-center px-10 h-14 gap-[10%] w-full">
+      <div className="flex items-center justify-center px-10 h-14 gap-[25%] w-full">
         <DefaultButton text="Cancelar" theme={false} border={true} />
         <DefaultButton text="Cadastrar" theme={true} />
       </div>

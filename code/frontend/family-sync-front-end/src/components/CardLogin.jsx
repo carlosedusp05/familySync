@@ -25,22 +25,12 @@ function CardLogin() {
       </div>
 
       <div className="flex  flex-col gap-1">
-        <DefaultButton
-          text="Entrar"
-          horizontal="100px"
-          vertical="16px"
-          theme={true}
-        />
+        <DefaultButton text="Entrar" theme={true} />
 
         <a className="text-orange text-[14px] cursor-pointer">
           Esqueceu a senha?
         </a>
-        <DefaultButton
-          text="Cadastrar"
-          horizontal="84px"
-          vertical="16px"
-          theme={false}
-        />
+        <DefaultButton text="Cadastrar" theme={false} border={true} />
       </div>
     </DefaultCard>
   );
