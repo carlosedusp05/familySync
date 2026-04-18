@@ -10,12 +10,7 @@ function CardRememberPass() {
         Esqueci minha senha
       </h1>
       <div className=" h-[60%] flex justify-center items-center flex-wrap gap-6">
-        <DefaultTextField
-          placeholder="Código do e-mail"
-          type="text"
-          src={eyeIcon}
-          alt="Input Código do e-mail"
-        />
+        <DefaultTextField placeholder="Código do e-mail" type="text" />
         <DefaultTextField
           placeholder="Senha"
           type="text"
