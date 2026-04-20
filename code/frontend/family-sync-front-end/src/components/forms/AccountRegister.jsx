@@ -1,15 +1,15 @@
-import DefaultCard from "./DefaultCard";
-import IconPerfil from "./IconPerfil";
-import DefaultButton from "./DefaultButton";
-import MultTextField from "./MultTextField";
-import { eyeIcon, plusIcon } from "../assets";
+import DefaultCard from "../ui/DefaultCard";
+import IconPerfil from "../icons/IconPerfil";
+import DefaultButton from "../ui/DefaultButton";
+import MultTextField from "../ui/MultTextField";
+import { eyeIcon, plusIcon } from "../../assets";
 
 function AccountRegister() {
   return (
     <DefaultCard>
       <div className="flex justify-center items-center">
         <div className="relative">
-          <IconPerfil is_orange={true} />
+          <IconPerfil is_white_backgroud={true} />
 
           <div className="absolute -bottom-2 -right-2 flex items-center justify-center bg-orange p-2 rounded-[50%]">
             <img className="h-7" src={plusIcon} alt="Adicionar Imagem" />

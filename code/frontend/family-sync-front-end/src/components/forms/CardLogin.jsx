@@ -1,8 +1,8 @@
-import IconFamilySync from "./IconFamilySync";
-import DefaultTextField from "./DefaultTextField";
-import DefaultButton from "./DefaultButton";
-import DefaultCard from "./DefaultCard";
-import { eyeIcon, emailIcon } from "../assets";
+import IconFamilySync from "../icons/IconFamilySync";
+import DefaultTextField from "../ui/DefaultTextField";
+import DefaultButton from "../ui/DefaultButton";
+import DefaultCard from "../ui/DefaultCard";
+import { eyeIcon, emailIcon } from "../../assets";
 
 function CardLogin() {
   return (

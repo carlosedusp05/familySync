@@ -5,8 +5,7 @@
 // import AccountRegister from "./components/AccountRegister";
 // import AccountEdit from "./components/AccountEdit";
 import RememberPassScreen from "./screens/RememberPassScreen";
-// import SideBarNavegation from "./components/SidebarNavigation";
-// import { eyeIcon } from "./assets";
+import CardNotication from "./components/ui/ItemNotication";
 
 import LoginScreen from "./screens/LoginScreen";
 import InicioScreen from "./screens/InicioScreen";
@@ -17,7 +16,16 @@ function App() {
 
   // return <RememberPassScreen />;
 
-  return <InicioScreen />;
+  return (
+    <div className="bg-black">
+      <ItemNotication
+        title="goiaba"
+        text="xsadsccccccadddccccccccczxnhcsb cguggcfdvbhdbbvchx hvc xvchjxb chhjvccccccccccccccccccccccccccccccccccccc hcx bhjjjjhb chb hjjjjjj chhcbbhdhbvbfhdvbvfhabhdfbvhjb cdsacsda"
+        time="10/02/2029"
+      />
+      ;
+    </div>
+  );
 
   // <div className="flex gap-20 flex-wrap">
   //   <DefaultButton

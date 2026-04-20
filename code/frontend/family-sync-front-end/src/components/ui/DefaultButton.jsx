@@ -1,4 +1,4 @@
-import { logoutIcon } from "../assets";
+import { logoutIcon } from "../../assets";
 
 function DefaultButton({
   theme = true,

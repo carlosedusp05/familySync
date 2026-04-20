@@ -1,6 +1,6 @@
-import BackgroundImage from "../components/BackgroundImage";
+import BackgroundImage from "../components/ui/BackgroundImage";
 import { imageBackground } from "../assets";
-import CardLogin from "../components/CardLogin";
+import CardLogin from "../components/forms/CardLogin";
 
 function LoginScreen() {
   return (

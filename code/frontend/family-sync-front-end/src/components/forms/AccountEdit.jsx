@@ -1,8 +1,8 @@
-import DefaultCard from "./DefaultCard";
-import IconPerfil from "./IconPerfil";
-import DefaultButton from "./DefaultButton";
-import MultTextField from "./MultTextField";
-import { editIcon } from "../assets";
+import DefaultCard from "../ui/DefaultCard";
+import IconPerfil from "../icons/IconPerfil";
+import DefaultButton from "../ui/DefaultButton";
+import MultTextField from "../ui/MultTextField";
+import { editIcon } from "../../assets";
 
 function AccountEdit() {
   return (

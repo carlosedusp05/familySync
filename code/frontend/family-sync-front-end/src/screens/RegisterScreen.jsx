@@ -1,6 +1,6 @@
-import BackgroundImage from "../components/BackgroundImage";
+import BackgroundImage from "../components/ui/BackgroundImage";
 import { imageBackground } from "../assets";
-import AccountRegister from "../components/AccountRegister";
+import AccountRegister from "../components/forms/AccountRegister";
 
 function RegisterScreen() {
   return (

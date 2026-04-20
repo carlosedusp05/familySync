@@ -1,6 +1,7 @@
-import IconFamilySync from "../components/IconFamilySync";
-import DefaultButton from "../components/DefaultButton";
-import BackgroundImage from "../components/BackgroundImage";
+import IconFamilySync from "../components/icons/IconFamilySync";
+import DefaultButton from "../components/ui/DefaultButton";
+import BackgroundImage from "../components/ui/BackgroundImage";
+import DefaultHeader from "../components/layout/DefaultHeader";
 import { imageBackground2 } from "../assets";
 
 function InicioScreen() {
@@ -11,13 +12,7 @@ function InicioScreen() {
         alt={"Imagem Fundo"}
         blur_or_glass={"glass"}
       />
-      <header className="w-full h-[10%] flex justify-between items-center bg-white py-12 px-25">
-        <IconFamilySync is_small={true} />
-        <div className="flex gap-15 ">
-          <DefaultButton text="LOGIN" />
-          <DefaultButton text="CADASTRAR" />
-        </div>
-      </header>
+      <DefaultHeader disconnected={true}></DefaultHeader>
       <main className="flex  px-40 w-full justify-between h-[90%] items-center">
         <p className="text-white font-bold text-2xl w-[20%]">
           Brio é a quantidade de energia que se disponibiliza ao agir para fazer

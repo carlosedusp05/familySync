@@ -1,6 +1,6 @@
-import BackgroundImage from "../components/BackgroundImage";
+import BackgroundImage from "../components/ui/BackgroundImage";
 import { imageBackground } from "../assets";
-import CardRememberPass from "../components/CardRememberPass";
+import CardRememberPass from "../components/forms/CardRememberPass";
 
 function RememberPassScreen() {
   return (

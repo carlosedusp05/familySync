@@ -1,8 +1,8 @@
-import { perfilIconOrange, perfilIconWhite } from "../assets";
+import { perfilIconOrange, perfilIconWhite } from "../../assets";
 
-function IconPerfil({ is_orange }) {
-  const color = is_orange ? perfilIconOrange : perfilIconWhite;
-  const style = is_orange ? "border border-default" : "bg-orange-dark";
+function IconPerfil({ is_white_backgroud }) {
+  const color = is_white_backgroud ? perfilIconOrange : perfilIconWhite;
+  const style = is_white_backgroud ? "border border-default" : "bg-orange-dark";
 
   return (
     <div

@@ -1,7 +1,7 @@
-import DefaultCard from "./DefaultCard";
-import DefaultTextField from "./DefaultTextField";
-import DefaultButton from "./DefaultButton";
-import { eyeIcon } from "../assets";
+import DefaultCard from "../ui/DefaultCard";
+import DefaultTextField from "../ui/DefaultTextField";
+import DefaultButton from "../ui/DefaultButton";
+import { eyeIcon } from "../../assets";
 
 function CardRememberPass() {
   return (

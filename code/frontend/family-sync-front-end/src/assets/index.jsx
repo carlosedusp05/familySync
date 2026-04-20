@@ -13,6 +13,7 @@ import settingsIcon from "./settings.svg";
 import imageBackground from "./background1.svg";
 import imageBackground2 from "./background2.svg";
 import emailIcon from "./email.svg";
+import notificationsIcon from "./notifications.svg";
 
 export {
   eyeIcon,
@@ -30,4 +31,5 @@ export {
   imageBackground,
   emailIcon,
   imageBackground2,
+  notificationsIcon,
 };

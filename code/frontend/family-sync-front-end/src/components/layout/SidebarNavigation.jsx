@@ -6,7 +6,7 @@ import {
   infoIcon,
   plusIcon,
   settingsIcon,
-} from "../assets";
+} from "../../assets";
 
 function SideBarNavegation({ currentPage }) {
   return (
