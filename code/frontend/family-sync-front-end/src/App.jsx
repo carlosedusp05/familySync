@@ -15,7 +15,9 @@ import RegisterScreen from "./screens/RegisterScreen";
 function App() {
   // return <RegisterScreen />;
 
-  return <RememberPassScreen />;
+  // return <RememberPassScreen />;
+
+  return <InicioScreen />;
 
   // <div className="flex gap-20 flex-wrap">
   //   <DefaultButton
