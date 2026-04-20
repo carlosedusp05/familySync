@@ -1,4 +1,4 @@
-import ImgSidebar from "./ImgSidebar";
+import ImgSidebar from "../icons/ImgSidebar";
 import {
   listIcon,
   piggyBank,

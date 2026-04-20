@@ -10,22 +10,14 @@ import CardNotication from "./components/ui/ItemNotication";
 import LoginScreen from "./screens/LoginScreen";
 import InicioScreen from "./screens/InicioScreen";
 import RegisterScreen from "./screens/RegisterScreen";
+import MainLayout from "./layouts/Mainlayout";
 
 function App() {
   // return <RegisterScreen />;
 
   // return <RememberPassScreen />;
 
-  return (
-    <div className="bg-black">
-      <ItemNotication
-        title="goiaba"
-        text="xsadsccccccadddccccccccczxnhcsb cguggcfdvbhdbbvchx hvc xvchjxb chhjvccccccccccccccccccccccccccccccccccccc hcx bhjjjjhb chb hjjjjjj chhcbbhdhbvbfhdvbvfhabhdfbvhjb cdsacsda"
-        time="10/02/2029"
-      />
-      ;
-    </div>
-  );
+  return <MainLayout />;
 
   // <div className="flex gap-20 flex-wrap">
   //   <DefaultButton
@@ -69,6 +61,14 @@ function App() {
   //   <AccountRegister />
   //   <AccountEdit />
   //   <SideBarNavegation currentPage="lista" />
+  // <div className="bg-black">
+  //     <ItemNotication
+  //       title="goiaba"
+  //       text="xsadsccccccadddccccccccczxnhcsb cguggcfdvbhdbbvchx hvc xvchjxb chhjvccccccccccccccccccccccccccccccccccccc hcx bhjjjjhb chb hjjjjjj chhcbbhdhbvbfhdvbvfhabhdfbvhjb cdsacsda"
+  //       time="10/02/2029"
+  //     />
+  //     ;
+  //   </div>
   // </div>
 }
 
