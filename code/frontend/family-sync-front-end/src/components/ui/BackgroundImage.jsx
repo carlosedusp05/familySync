@@ -1,9 +1,9 @@
 function BackgroundImage(props) {
   return (
-    <div className="-z-1 fixed inset-0 overflow-hidden bg-white">
+    <div className="-z-1 fixed inset-0 overflow-hidden bg-white ">
       <img
-        className={`w-screen h-screen object-cover scale-102 ${
-          props.blur_or_glass === "blur" ? "blur-sm" : ""
+        className={`w-screen h-screen object-cover ${
+          props.blur_or_glass === "blur" ? "blur-[1px]" : ""
         }`}
         src={props.src}
         alt={props.alt}

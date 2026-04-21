@@ -11,7 +11,7 @@ function MainLayout() {
       <div className="flex flex-1 w-full">
         <SidebarNavigation />
 
-        <div className="w-[95%] h-full">
+        <div className="w-screen h-full">
           <BackgroundImage
             src={imageBackground}
             alt={"Imagem Fundo"}

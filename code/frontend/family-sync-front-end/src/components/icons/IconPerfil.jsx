@@ -11,7 +11,7 @@ function IconPerfil({ is_white_backgroud }) {
       <img
         src={color}
         alt="Icon Perfil"
-        className="w-full h-full object-contain"
+        className="w-10 h-10 object-contain"
         draggable="false"
       />
     </div>
