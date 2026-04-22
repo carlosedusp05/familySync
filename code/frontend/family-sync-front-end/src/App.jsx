@@ -19,6 +19,8 @@ function App() {
 
   return <MainLayout />;
 
+  // return <InicioScreen />;
+
   // <div className="flex gap-20 flex-wrap">
   //   <DefaultButton
   //     text="Login"
