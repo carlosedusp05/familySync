@@ -15,17 +15,11 @@ import PrincipalScreen from "./screens/PrincipalScreen";
 
 function App() {
   // return <RegisterScreen />;
-
   // return <RememberPassScreen />;
-
   // return <MainLayout />;
-
   return <PrincipalScreen />;
-
   // return <InicioScreen />;
-
   // return <LoginScreen />;
-
   // <div className="flex gap-20 flex-wrap">
   //   <DefaultButton
   //     text="Login"
