@@ -17,7 +17,7 @@ function MainLayout({ children }) {
             alt={"Imagem Fundo"}
             blur_or_glass={"glass"}
           />
-          <div className="relative z-10">{children}</div>
+          <div className="relative z-10 h-full">{children}</div>
         </main>
       </div>
     </div>

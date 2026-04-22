@@ -12,6 +12,7 @@ import InicioScreen from "./screens/InicioScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import MainLayout from "./layouts/Mainlayout";
 import PrincipalScreen from "./screens/PrincipalScreen";
+import ListaScreen from "./screens/ListaScreen";
 
 function App() {
   // return <RegisterScreen />;
@@ -20,7 +21,7 @@ function App() {
 
   // return <MainLayout />;
 
-  return <PrincipalScreen />;
+  return <ListaScreen />;
 
   // return <InicioScreen />;
 
