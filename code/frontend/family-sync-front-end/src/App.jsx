@@ -20,11 +20,11 @@ function App() {
 
   // return <MainLayout />;
 
-  // return <PrincipalScreen />;
+  return <PrincipalScreen />;
 
   // return <InicioScreen />;
 
-  return <LoginScreen />;
+  // return <LoginScreen />;
 
   // <div className="flex gap-20 flex-wrap">
   //   <DefaultButton

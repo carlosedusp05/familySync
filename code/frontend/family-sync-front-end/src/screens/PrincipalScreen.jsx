@@ -2,6 +2,7 @@ import { imageBackground } from "../assets";
 import DefaultHeader from "../components/layout/DefaultHeader";
 import BackgroundImage from "../components/ui/BackgroundImage";
 import DefaultCard from "../components/ui/DefaultCard";
+import LargeCard from "../components/ui/LargeCard";
 
 function PrincipalScreen() {
   return (
@@ -12,7 +13,9 @@ function PrincipalScreen() {
         blur_or_glass={"blur"}
       />
       <DefaultHeader />
-      <DefaultCard />
+      <div className="w-full flex justify-center items-center h-full ">
+        <LargeCard />
+      </div>
     </div>
   );
 }

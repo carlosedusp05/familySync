@@ -1,0 +1,129 @@
+import MainLayout from "../layouts/Mainlayout";
+import MultNoticationField from "../components/ui/MultiNotificationField";
+
+function NotificationsScreen() {
+  return (
+    <MainLayout>
+      <div className="w-full h-[calc(100vh)] overflow-y-auto pb-10 pt-6">
+        <div className="flex justify-center items-center flex-wrap gap-2 w-[70%] mx-auto">
+          <MultNoticationField
+            notifications={[
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+              {
+                title: "Petrogames roubou a manga",
+                text: "Ele articulou isso ao alterar cada integridade da realidade por si a eles. Sem medo de ser feliz",
+                time: "22/04/2026",
+              },
+            ]}
+          />
+        </div>
+      </div>
+    </MainLayout>
+  );
+}
+
+export default NotificationsScreen;

@@ -1,12 +1,11 @@
 import { logoIcon } from "../../assets";
 
-function IconFamilySync({ is_small = false }) {
-  const size = is_small ? "w-40 h-auto" : "w-70 h-auto";
+function IconFamilySync() {
   return (
     <img
       src={logoIcon}
       alt="Logotipo FamilySync"
-      className={size}
+      className="w-100 h-auto"
       draggable="false"
     ></img>
   );
