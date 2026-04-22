@@ -8,19 +8,17 @@ function MainLayout({ children }) {
     <div className="flex flex-col w-full h-screen overflow-hidden">
       <DefaultHeader />
 
-      <div className="flex flex-1 w-full">
+      <div className="flex flex-1 w-full overflow-hidden">
         <SidebarNavigation />
 
-        <div className="w-screen h-full">
+        <main className="flex-1 h-full overflow-y-auto relative">
           <BackgroundImage
             src={imageBackground}
             alt={"Imagem Fundo"}
             blur_or_glass={"glass"}
           />
-          <div className="flex items-center justify-center h-full">
-            {children}
-          </div>
-        </div>
+          <div className="relative z-10">{children}</div>
+        </main>
       </div>
     </div>
   );

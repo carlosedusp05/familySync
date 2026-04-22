@@ -10,7 +10,7 @@ import {
 
 function SideBarNavegation({ currentPage }) {
   return (
-    <div className="h-screen p-1 gap-3 bg-orange relative top-0 left-0 flex flex-col items-center justify-center g-3">
+    <div className="p-4 gap-10 bg-orange flex flex-col items-center justify-center g-3">
       <ImgSidebar
         isPage={currentPage === "lista"}
         src={listIcon}

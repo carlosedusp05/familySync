@@ -4,7 +4,12 @@ function ImgSidebar(props) {
     <div
       className={`${background} w-full h-28 bg-amber-300 flex justify-center items-center p-8 rounded-2xl`}
     >
-      <img className="h-16 w-16 " src={props.src} alt={props.alt} />
+      <img
+        className="h-18 w-18"
+        src={props.src}
+        alt={props.alt}
+        draggable={false}
+      />
     </div>
   );
 }
