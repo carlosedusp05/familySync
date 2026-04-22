@@ -11,17 +11,20 @@ import LoginScreen from "./screens/LoginScreen";
 import InicioScreen from "./screens/InicioScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import MainLayout from "./layouts/Mainlayout";
-import NotificationsScreen from "./screens/NotificationsScreen";
-import ListaScreen from "./screens/ListaScreen";
+import PrincipalScreen from "./screens/PrincipalScreen";
 
 function App() {
   // return <RegisterScreen />;
 
   // return <RememberPassScreen />;
 
-  return <ListaScreen />;
+  // return <MainLayout />;
+
+  return <PrincipalScreen />;
 
   // return <InicioScreen />;
+
+  // return <LoginScreen />;
 
   // <div className="flex gap-20 flex-wrap">
   //   <DefaultButton
