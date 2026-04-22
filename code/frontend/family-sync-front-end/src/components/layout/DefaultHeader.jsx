@@ -5,7 +5,6 @@ import { notificationsIcon } from "../../assets";
 
 function DefaultHeader({ disconnected }) {
   const size = disconnected ? "h-16" : "h-28";
-  const imgsize = disconnected ? true : false;
   const children = disconnected ? (
     <div className="flex gap-15 ">
       <DefaultButton text="LOGIN" />
@@ -27,9 +26,9 @@ function DefaultHeader({ disconnected }) {
 
   return (
     <header
-      className={`w-full ${size} flex justify-between items-center bg-white px-12`}
+      className={`w-full ${size} flex justify-between py-10 items-center bg-white px-12`}
     >
-      <IconFamilySync is_small={imgsize} />
+      <IconFamilySync />
       {children}
     </header>
   );

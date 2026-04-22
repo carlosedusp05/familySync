@@ -20,6 +20,8 @@ function App() {
 
   return <NotificationsScreen />;
 
+  // return <InicioScreen />;
+
   // <div className="flex gap-20 flex-wrap">
   //   <DefaultButton
   //     text="Login"
