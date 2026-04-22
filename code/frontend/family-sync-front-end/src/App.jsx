@@ -12,13 +12,14 @@ import InicioScreen from "./screens/InicioScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import MainLayout from "./layouts/Mainlayout";
 import NotificationsScreen from "./screens/NotificationsScreen";
+import ListaScreen from "./screens/ListaScreen";
 
 function App() {
   // return <RegisterScreen />;
 
   // return <RememberPassScreen />;
 
-  return <NotificationsScreen />;
+  return <ListaScreen />;
 
   // return <InicioScreen />;
 
