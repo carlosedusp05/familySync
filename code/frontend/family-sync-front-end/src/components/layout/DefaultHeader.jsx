@@ -1,7 +1,7 @@
 import IconFamilySync from "../icons/IconFamilySync";
 import IconPerfil from "../icons/IconPerfil";
 import DefaultButton from "../ui/DefaultButton";
-import { notificationsIcon } from "../../assets";
+import { notificationsIcon } from "../../assets/index";
 
 function DefaultHeader({ disconnected }) {
   const size = disconnected ? "h-16" : "h-28";

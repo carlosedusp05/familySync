@@ -1,4 +1,3 @@
-import IconFamilySync from "../components/icons/IconFamilySync";
 import DefaultButton from "../components/ui/DefaultButton";
 import BackgroundImage from "../components/ui/BackgroundImage";
 import DefaultHeader from "../components/layout/DefaultHeader";
@@ -18,7 +17,7 @@ function InicioScreen() {
           Brio é a quantidade de energia que se disponibiliza ao agir para fazer
           o melhor e sentir contentamento com a própria prática.
         </p>
-        <div className="flex flex-col w-[20%] gap-7 P-5 ">
+        <div className="flex flex-col w-[20%] gap-7 p-5 ">
           <p className="text-white font-bold text-[1.2rem] w-[95%]">
             O FamilySync é um ecossistema digital projetado para ser o "centro
             de comando" de uma residência. Ele utiliza tecnologia

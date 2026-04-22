@@ -4,7 +4,7 @@ import AccountRegister from "../components/forms/AccountRegister";
 
 function RegisterScreen() {
   return (
-    <div className="h-screen w-screen flex justify-center items-center">
+    <div className="h-screen w-full flex justify-center items-center">
       <BackgroundImage
         src={imageBackground}
         alt={"Imagem Fundo"}
