@@ -12,11 +12,11 @@ function DefaultHeader({ disconnected }) {
       <DefaultButton text="CADASTRAR" />
     </div>
   ) : (
-    <div className="flex gap-6 items-center justify-center">
+    <div className="flex gap-12 items-center justify-center">
       <IconPerfil is_white_backgroud={false} />
-      <div className="bg-orange-dark flex items-center justify-center h-fit p-2 rounded-lg">
+      <div className="bg-orange-dark flex items-center justify-center h-fit p-4 rounded-lg">
         <img
-          className="w-6 h-6"
+          className="w-8 h-8"
           src={notificationsIcon}
           alt="Notificações"
           draggable={false}
@@ -27,7 +27,7 @@ function DefaultHeader({ disconnected }) {
 
   return (
     <header
-      className={`w-full ${size}  flex justify-between items-center bg-white px-8`}
+      className={`w-full ${size} flex justify-between items-center bg-white px-12`}
     >
       <IconFamilySync is_small={imgsize} />
       {children}
