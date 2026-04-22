@@ -16,17 +16,13 @@ import ListaScreen from "./screens/ListaScreen";
 
 function App() {
   // return <RegisterScreen />;
-
   // return <RememberPassScreen />;
-
   // return <MainLayout />;
 
   return <ListaScreen />;
 
   // return <InicioScreen />;
-
   // return <LoginScreen />;
-
   // <div className="flex gap-20 flex-wrap">
   //   <DefaultButton
   //     text="Login"
