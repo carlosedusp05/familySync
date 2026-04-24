@@ -19,7 +19,8 @@ function App() {
   // return <RememberPassScreen />;
   // return <MainLayout />;
 
-  return <ListaScreen />;
+  // return <ListaScreen />;
+  return <PrincipalScreen />;
 
   // return <InicioScreen />;
   // return <LoginScreen />;
