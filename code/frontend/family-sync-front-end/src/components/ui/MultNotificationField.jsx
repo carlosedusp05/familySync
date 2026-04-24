@@ -1,6 +1,6 @@
 import ItemNotification from "./ItemNotication";
 
-function MultTextField({ notifications = [] }) {
+function MultNotificationField({ notifications = [] }) {
   return notifications.map((notification, index) => {
     return (
       <ItemNotification
@@ -13,4 +13,4 @@ function MultTextField({ notifications = [] }) {
   });
 }
 
-export default MultTextField;
+export default MultNotificationField;

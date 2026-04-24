@@ -14,6 +14,11 @@ import imageBackground from "./background1.svg";
 import imageBackground2 from "./background2.svg";
 import emailIcon from "./email.svg";
 import notificationsIcon from "./notifications.svg";
+import editIconWhite from "./pencil_white.svg";
+import checkIcon from "./checked_icon.svg";
+import searchIcon from "./search_icon.svg";
+import favoriteIcon from "./favorite_icon.svg";
+import unfavoriteIcon from "./unfavorite_icon.svg";
 
 export {
   eyeIcon,
@@ -22,6 +27,7 @@ export {
   perfilIconOrange,
   perfilIconWhite,
   editIcon,
+  editIconWhite,
   listIcon,
   piggyBank,
   calendarIcon,
@@ -32,4 +38,8 @@ export {
   emailIcon,
   imageBackground2,
   notificationsIcon,
+  checkIcon,
+  searchIcon,
+  favoriteIcon,
+  unfavoriteIcon,
 };

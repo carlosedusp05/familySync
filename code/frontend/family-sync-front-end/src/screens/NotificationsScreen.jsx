@@ -1,5 +1,5 @@
 import MainLayout from "../layouts/Mainlayout";
-import MultNoticationField from "../components/ui/MultiNotificationField";
+import MultNoticationField from "../components/ui/MultNotificationField";
 
 function NotificationsScreen() {
   return (
