@@ -278,6 +278,7 @@ function ListaScreen() {
                 another_text_size="text-[50px]"
                 another_color="bg-orange-dark"
                 another_padding="pb-2 px-6"
+                another_text_weight="font-medium"
                 most_radius={true}
               />
             </div>

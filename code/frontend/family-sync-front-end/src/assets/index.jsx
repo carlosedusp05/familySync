@@ -20,6 +20,8 @@ import searchIcon from "./search_icon.svg";
 import favoriteIcon from "./favorite_icon.svg";
 import unfavoriteIcon from "./unfavorite_icon.svg";
 import trashIcon from "./trash_icon.svg";
+import dollarIcon from "./dollar_icon.svg";
+import sortDownIcon from "./sort_down.svg";
 
 export {
   eyeIcon,
@@ -44,4 +46,6 @@ export {
   favoriteIcon,
   unfavoriteIcon,
   trashIcon,
+  dollarIcon,
+  sortDownIcon,
 };

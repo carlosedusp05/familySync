@@ -13,13 +13,14 @@ import RegisterScreen from "./screens/RegisterScreen";
 import MainLayout from "./layouts/Mainlayout";
 import PrincipalScreen from "./screens/PrincipalScreen";
 import ListaScreen from "./screens/ListaScreen";
+import FinancierScreen from "./screens/FinancierScreen";
 
 function App() {
   // return <RegisterScreen />;
   // return <RememberPassScreen />;
   // return <MainLayout />;
 
-  return <ListaScreen />;
+  return <FinancierScreen />;
 
   // return <InicioScreen />;
   // return <LoginScreen />;
