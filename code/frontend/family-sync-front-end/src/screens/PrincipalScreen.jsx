@@ -161,7 +161,7 @@ function PrincipalScreen(props) {
                   </h2>
                 </div>
               </div>
-              <div className="flex items-center justify-center col-span-3 h-[90%] bg-brown-dark">
+              <div className="flex flex-col items-center justify-center col-span-3 h-[90%] bg-brown-dark">
                 <div className="flex items-center justify-center gap-2">
                   <img className="h-25" src={infoIcon} alt="Info Icon" />
                   <h2 className="text-white text-4xl font-bold">
