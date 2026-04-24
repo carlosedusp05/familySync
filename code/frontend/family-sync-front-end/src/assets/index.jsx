@@ -19,6 +19,7 @@ import checkIcon from "./checked_icon.svg";
 import searchIcon from "./search_icon.svg";
 import favoriteIcon from "./favorite_icon.svg";
 import unfavoriteIcon from "./unfavorite_icon.svg";
+import trashIcon from "./trash_icon.svg";
 
 export {
   eyeIcon,
@@ -42,4 +43,5 @@ export {
   searchIcon,
   favoriteIcon,
   unfavoriteIcon,
+  trashIcon,
 };

@@ -4,7 +4,7 @@ import DefaultButton from "../components/ui/DefaultButton";
 import { editIconWhite } from "../assets";
 import MultItemsList from "../components/ui/MultItemsList";
 import SearchBar from "../components/ui/SearchBar";
-import ListContainer from "../components/ui/ListContainer";
+import MultLists from "../components/ui/MultLists";
 import { useState } from "react";
 
 function ListaScreen() {
@@ -33,6 +33,168 @@ function ListaScreen() {
     { name: "Suco de Uva 1L", price: 12.9, units: 2 },
     { name: "Iogurte Natural", price: 3.9, units: 4 },
     { name: "Esponja de Aço", price: 5.5, units: 1 },
+  ];
+  const myLists = [
+    {
+      id: 1,
+      name: "Mercado Mensal",
+      total_spent: "R$ 450,00",
+      percentage_now: "75%",
+      author: "Felipe",
+      isFavorite: false,
+    },
+    {
+      id: 2,
+      name: "Assinaturas de Streaming",
+      total_spent: "R$ 120,00",
+      percentage_now: "30%",
+      author: "Ana",
+      isFavorite: false,
+    },
+    {
+      id: 3,
+      name: "Reserva de Emergência",
+      total_spent: "R$ 2.500,00",
+      percentage_now: "90%",
+      author: "Felipe",
+      isFavorite: true, // Este vai começar no topo!
+    },
+    {
+      id: 4,
+      name: "Academia e Suplementos",
+      total_spent: "R$ 300,00",
+      percentage_now: "15%",
+      author: "Carlos",
+      isFavorite: false,
+    },
+    {
+      id: 5,
+      name: "Aluguel e Condomínio",
+      total_spent: "R$ 1.800,00",
+      percentage_now: "100%",
+      author: "Sistema",
+      isFavorite: false,
+    },
+    {
+      id: 6,
+      name: "Manutenção do Carro",
+      total_spent: "R$ 850,00",
+      percentage_now: "45%",
+      author: "Felipe",
+      isFavorite: false,
+    },
+    {
+      id: 7,
+      name: "Restaurantes e Lazer",
+      total_spent: "R$ 600,00",
+      percentage_now: "82%",
+      author: "Ana",
+      isFavorite: false,
+    },
+    {
+      id: 8,
+      name: "Curso de Inglês",
+      total_spent: "R$ 250,00",
+      percentage_now: "10%",
+      author: "Felipe",
+      isFavorite: false,
+    },
+    {
+      id: 9,
+      name: "Contas de Luz/Água",
+      total_spent: "R$ 310,00",
+      percentage_now: "60%",
+      author: "Felipe",
+      isFavorite: false,
+    },
+    {
+      id: 10,
+      name: "Farmácia e Saúde",
+      total_spent: "R$ 145,00",
+      percentage_now: "20%",
+      author: "Ana",
+      isFavorite: false,
+    },
+    {
+      id: 11,
+      name: "Material de Escritório",
+      total_spent: "R$ 85,00",
+      percentage_now: "5%",
+      author: "Carlos",
+      isFavorite: false,
+    },
+    {
+      id: 12,
+      name: "Investimentos (Ações)",
+      total_spent: "R$ 1.000,00",
+      percentage_now: "55%",
+      author: "Felipe",
+      isFavorite: false,
+    },
+    {
+      id: 13,
+      name: "Férias e Viagens",
+      total_spent: "R$ 4.200,00",
+      percentage_now: "40%",
+      author: "Ana",
+      isFavorite: true,
+    },
+    {
+      id: 14,
+      name: "Ração do Pet",
+      total_spent: "R$ 190,00",
+      percentage_now: "70%",
+      author: "Carlos",
+      isFavorite: false,
+    },
+    {
+      id: 15,
+      name: "Presentes de Aniversário",
+      total_spent: "R$ 220,00",
+      percentage_now: "12%",
+      author: "Felipe",
+      isFavorite: false,
+    },
+    {
+      id: 16,
+      name: "Internet Fibra",
+      total_spent: "R$ 110,00",
+      percentage_now: "100%",
+      author: "Sistema",
+      isFavorite: false,
+    },
+    {
+      id: 17,
+      name: "Roupas e Acessórios",
+      total_spent: "R$ 350,00",
+      percentage_now: "25%",
+      author: "Ana",
+      isFavorite: false,
+    },
+    {
+      id: 18,
+      name: "Games e Hardware",
+      total_spent: "R$ 1.200,00",
+      percentage_now: "95%",
+      author: "Felipe",
+      isFavorite: false,
+    },
+    {
+      id: 19,
+      name: "Ferramentas e Hobby",
+      total_spent: "R$ 400,00",
+      percentage_now: "33%",
+      author: "Carlos",
+      isFavorite: false,
+    },
+    {
+      id: 20,
+      name: "Doações",
+      total_spent: "R$ 100,00",
+      percentage_now: "50%",
+      author: "Sistema",
+      isFavorite: false,
+    },
   ];
 
   const [selectedItems, setSelectedItems] = useState([]);
@@ -119,8 +281,8 @@ function ListaScreen() {
                 most_radius={true}
               />
             </div>
-            <div className="h-[80%] w-full bg-amber-400">
-              <ListContainer />
+            <div className="h-[80%] w-full">
+              <MultLists lists={myLists} />
             </div>
           </div>
         </LargeCard>

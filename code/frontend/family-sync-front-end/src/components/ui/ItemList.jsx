@@ -16,7 +16,7 @@ function ItemList({ name, price = 0, units = 0, isSelected, onToggle }) {
       <h1 className="text-brown-dark text-[22px] font-semibold text-center flex-1 leading-tight truncate">
         {name}
       </h1>
-      <div className="flex items-center justify-center gap-12 w-full">
+      <div className="flex items-center justify-between gap-12 w-full px-20">
         <div className="bg-orange-dark px-3 py-1 rounded-full font-black text-white text-[18px] flex items-center shrink-0 whitespace-nowrap">
           {units} x {formattedPrice}
         </div>
