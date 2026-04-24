@@ -20,7 +20,12 @@ function App() {
   // return <RememberPassScreen />;
   // return <MainLayout />;
 
+<<<<<<< HEAD
   return <FinancierScreen />;
+=======
+  // return <ListaScreen />;
+  return <PrincipalScreen />;
+>>>>>>> 21d2eb3d71772807555f3b72c94d8d52c1456c3d
 
   // return <InicioScreen />;
   // return <LoginScreen />;
