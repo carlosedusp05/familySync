@@ -8,13 +8,15 @@ import RememberPassScreen from "./screens/RememberPassScreen";
 import CardNotication from "./components/ui/ItemNotication";
 
 import LoginScreen from "./screens/LoginScreen";
-import StartScreen from "./screens/StartScreen";
+import InicioScreen from "./screens/InicioScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import MainLayout from "./layouts/Mainlayout";
-import MainScreen from "./screens/MainScreen";
-import ListScreen from "./screens/ListScreen";
+import PrincipalScreen from "./screens/PrincipalScreen";
+import ListaScreen from "./screens/ListaScreen";
 import FinancierScreen from "./screens/FinancierScreen";
 import AddExpenses from "./screens/AddExpenses";
+import CalendarScreen from "./screens/CalendarScreen";
+import ItemEvents from "./components/ui/ItemEvents";
 
 function App() {
   // return <RegisterScreen />;
@@ -23,8 +25,13 @@ function App() {
 
   return <AddExpenses />;
 
+  // return <FinancierScreen />;
+  // return <PrincipalScreen />;
+  // return <CalendarScreen />;
   // return <InicioScreen />;
   // return <LoginScreen />;
+  // return <ItemEvents />;
+
   // <div className="flex gap-20 flex-wrap">
   //   <DefaultButton
   //     text="Login"
