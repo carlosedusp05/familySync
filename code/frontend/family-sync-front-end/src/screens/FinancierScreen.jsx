@@ -6,13 +6,13 @@ import { editIcon, dollarIcon, sortDownIcon } from "../assets";
 function FinancierScreen() {
   return (
     <MainLayout>
-      <div className="flex items-center justify-center py-12 h-full">
+      <div className="flex flex-col gap-4 items-center justify-center py-12 h-full">
         <LargeCard
-          size={"h-[80%] w-[50%]"}
+          size={"h-[70%] w-[60%]"}
           color="bg-gray"
           display={"flex justify-center"}
         >
-          <div className="w-full min-h-20 flex flex-col  items-center bg-gray-light p-10 rounded-2xl shadow-inner">
+          <div className="w-full min-h-20 flex flex-col  items-center bg-gray-light pt-10 rounded-2xl shadow-inner">
             <div className="flex items-center gap-2">
               <img
                 src={dollarIcon}
@@ -41,13 +41,62 @@ function FinancierScreen() {
               </button>
             </div>
 
-            <div className="h-[70%] w-[80%] bg-blue-700 p-20 my-5"></div>
-            <div className="w-auto h-auto flex justify-center items-center gap-80">
-              <DefaultButton text="Editar" another_size="h-12 w-30" />
-              <DefaultButton text="Incluir" another_size="h-12 w-30" />
+            <div className="h-[80%] w-full my-5">
+              <div className="w-full flex items-center justify-between px-50">
+                <span className="text-3xl text-orange">Dia</span>
+                <span className="text-3xl text-orange">Semana</span>
+                <span className="underline decoration-5 text-3xl text-orange font-bold">
+                  Mês
+                </span>
+                <span className="text-3xl text-orange">Ano</span>
+              </div>
+              <div className="w-full h-[90%] mt-[2%] flex items-center flex-row px-15 gap-4">
+                <li className="text-[20px] flex flex-col gap-4 pb-8">
+                  <ol>5000</ol>
+                  <ol>5000</ol>
+                  <ol>5000</ol>
+                  <ol>5000</ol>
+                  <ol>5000</ol>
+                  <ol>5000</ol>
+                  <ol>5000</ol>
+                  <ol>5000</ol>
+                  <ol>5000</ol>
+                  <ol>5000</ol>
+                </li>
+                <div className=" w-full h-full flex items-end justify-between px-30 -mt-14">
+                  <div className="w-[10%] h-full flex flex-col items-center justify-end">
+                    <div className="w-full h-[50%] bg-[linear-gradient(to_right,#FD8338_0%,#FD8338_63%,#994D1F_100%)] shadow-lg/20"></div>
+                    <h2 className="text-2xl">água</h2>
+                  </div>
+                  <div className="w-[10%] h-full flex flex-col items-center justify-end">
+                    <div className="w-full h-[70%] bg-[linear-gradient(to_right,#FD8338_0%,#FD8338_63%,#994D1F_100%)] shadow-lg/20"></div>
+                    <h2 className="text-2xl">água</h2>
+                  </div>
+                  <div className="w-[10%] h-full flex flex-col items-center justify-end">
+                    <div className="w-full h-[80%] bg-[linear-gradient(to_right,#FD8338_0%,#FD8338_63%,#994D1F_100%)] shadow-lg/20"></div>
+                    <h2 className="text-2xl">água</h2>
+                  </div>
+                  <div className="w-[10%] h-full flex flex-col items-center justify-end">
+                    <div className="w-full h-[30%] bg-[linear-gradient(to_right,#FD8338_0%,#FD8338_63%,#994D1F_100%)] shadow-lg/20"></div>
+                    <h2 className="text-2xl">água</h2>
+                  </div>
+                  <div className="w-[10%] h-full flex flex-col items-center justify-end">
+                    <div className="w-full h-[10%] bg-[linear-gradient(to_right,#FD8338_0%,#FD8338_63%,#994D1F_100%)] shadow-lg/20"></div>
+                    <h2 className="text-2xl">água</h2>
+                  </div>
+                  <div className="w-[10%] h-full flex flex-col items-center justify-end">
+                    <div className="w-full h-[40%] bg-[linear-gradient(to_right,#FD8338_0%,#FD8338_63%,#994D1F_100%)] shadow-lg/20"></div>
+                    <h2 className="text-2xl">água</h2>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </LargeCard>
+        <div className="w-auto h-auto flex justify-center items-center gap-80">
+          <DefaultButton text="Editar" another_size="h-12 w-37" />
+          <DefaultButton text="Incluir" another_size="h-12 w-37" />
+        </div>
       </div>
     </MainLayout>
   );
