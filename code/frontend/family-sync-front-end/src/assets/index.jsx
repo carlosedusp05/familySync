@@ -22,6 +22,14 @@ import unfavoriteIcon from "./unfavorite_icon.svg";
 import trashIcon from "./trash_icon.svg";
 import dollarIcon from "./dollar_icon.svg";
 import sortDownIcon from "./sort_down.svg";
+import shoppingIcon from "./shopping_icon.svg";
+import lightIcon from "./light_icon.svg";
+import waterIcon from "./water_icon.svg";
+import homeIcon from "./home_icon.svg";
+import healthIcon from "./health_icon.svg";
+import bookIcon from "./book_icon.svg";
+import mealIcon from "./meal_icon.svg";
+import partyIcon from "./party_icon.svg";
 
 export {
   eyeIcon,
@@ -48,4 +56,12 @@ export {
   trashIcon,
   dollarIcon,
   sortDownIcon,
+  shoppingIcon,
+  lightIcon,
+  waterIcon,
+  homeIcon,
+  healthIcon,
+  bookIcon,
+  mealIcon,
+  partyIcon,
 };
