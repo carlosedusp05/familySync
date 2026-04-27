@@ -22,6 +22,7 @@ import unfavoriteIcon from "./unfavorite_icon.svg";
 import trashIcon from "./trash_icon.svg";
 import dollarIcon from "./dollar_icon.svg";
 import sortDownIcon from "./sort_down.svg";
+import pencilTerracotaIcon from "./pencilTerracotaIcon.svg";
 
 export {
   eyeIcon,
@@ -48,4 +49,5 @@ export {
   trashIcon,
   dollarIcon,
   sortDownIcon,
+  pencilTerracotaIcon,
 };
