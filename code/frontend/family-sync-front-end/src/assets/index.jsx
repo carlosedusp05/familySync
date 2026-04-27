@@ -22,7 +22,6 @@ import unfavoriteIcon from "./unfavorite_icon.svg";
 import trashIcon from "./trash_icon.svg";
 import dollarIcon from "./dollar_icon.svg";
 import sortDownIcon from "./sort_down.svg";
-<<<<<<< HEAD
 import shoppingIcon from "./shopping_icon.svg";
 import lightIcon from "./light_icon.svg";
 import waterIcon from "./water_icon.svg";
@@ -31,9 +30,7 @@ import healthIcon from "./health_icon.svg";
 import bookIcon from "./book_icon.svg";
 import mealIcon from "./meal_icon.svg";
 import partyIcon from "./party_icon.svg";
-=======
 import pencilTerracotaIcon from "./pencilTerracotaIcon.svg";
->>>>>>> 2e8a379d9a9797e6a2f6e13f304885dd33ee8b89
 
 export {
   eyeIcon,
@@ -60,7 +57,6 @@ export {
   trashIcon,
   dollarIcon,
   sortDownIcon,
-<<<<<<< HEAD
   shoppingIcon,
   lightIcon,
   waterIcon,
@@ -69,7 +65,5 @@ export {
   bookIcon,
   mealIcon,
   partyIcon,
-=======
   pencilTerracotaIcon,
->>>>>>> 2e8a379d9a9797e6a2f6e13f304885dd33ee8b89
 };
