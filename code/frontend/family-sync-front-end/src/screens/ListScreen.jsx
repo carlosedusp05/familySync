@@ -7,7 +7,7 @@ import SearchBar from "../components/ui/SearchBar";
 import MultLists from "../components/ui/MultLists";
 import { useState } from "react";
 
-function ListaScreen() {
+function ListScreen() {
   const initialItems = [
     { name: "Arroz 5kg", price: 29.9, units: 1 },
     { name: "Feijão Carioca", price: 8.5, units: 2 },
@@ -292,4 +292,4 @@ function ListaScreen() {
   );
 }
 
-export default ListaScreen;
+export default ListScreen;

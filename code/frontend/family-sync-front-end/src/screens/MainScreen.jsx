@@ -11,7 +11,7 @@ import DefaultHeader from "../components/layout/DefaultHeader";
 import BackgroundImage from "../components/ui/BackgroundImage";
 import LargeCard from "../components/ui/LargeCard";
 
-function PrincipalScreen(props) {
+function MainScreen(props) {
   return (
     <div className="flex flex-col w-full h-screen overflow-hidden">
       <BackgroundImage
@@ -178,4 +178,4 @@ function PrincipalScreen(props) {
   );
 }
 
-export default PrincipalScreen;
+export default MainScreen;

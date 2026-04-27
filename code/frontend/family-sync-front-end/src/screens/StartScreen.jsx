@@ -3,7 +3,7 @@ import BackgroundImage from "../components/ui/BackgroundImage";
 import DefaultHeader from "../components/layout/DefaultHeader";
 import { imageBackground2 } from "../assets";
 
-function InicioScreen() {
+function StartScreen() {
   return (
     <div className="h-screen w-full">
       <BackgroundImage
@@ -31,4 +31,4 @@ function InicioScreen() {
   );
 }
 
-export default InicioScreen;
+export default StartScreen;

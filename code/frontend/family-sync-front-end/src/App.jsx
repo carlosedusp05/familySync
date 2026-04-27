@@ -8,11 +8,11 @@ import RememberPassScreen from "./screens/RememberPassScreen";
 import CardNotication from "./components/ui/ItemNotication";
 
 import LoginScreen from "./screens/LoginScreen";
-import InicioScreen from "./screens/InicioScreen";
+import StartScreen from "./screens/StartScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import MainLayout from "./layouts/Mainlayout";
-import PrincipalScreen from "./screens/PrincipalScreen";
-import ListaScreen from "./screens/ListaScreen";
+import MainScreen from "./screens/MainScreen";
+import ListScreen from "./screens/ListScreen";
 import FinancierScreen from "./screens/FinancierScreen";
 
 function App() {
