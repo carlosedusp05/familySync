@@ -30,7 +30,7 @@ import healthIcon from "./health_icon.svg";
 import bookIcon from "./book_icon.svg";
 import mealIcon from "./meal_icon.svg";
 import partyIcon from "./party_icon.svg";
-import pencilTerracotaIcon from "./pencilTerracotaIcon.svg";
+import pencilTerracotaIcon from "./pencil_terracota.svg";
 
 export {
   eyeIcon,
