@@ -11,27 +11,26 @@ import LoginScreen from "./screens/LoginScreen";
 import InicioScreen from "./screens/InicioScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import MainLayout from "./layouts/Mainlayout";
-import PrincipalScreen from "./screens/PrincipalScreen";
-import ListaScreen from "./screens/ListaScreen";
+import StartScreen from "./screens/StartScreen";
 import FinancierScreen from "./screens/FinancierScreen";
 import AddExpenses from "./screens/AddExpenses";
 import CalendarScreen from "./screens/CalendarScreen";
 import ItemEvents from "./components/ui/ItemEvents";
+import AddFamilyScreen from "./screens/AddFamilyScreen";
 
 function App() {
   // return <RegisterScreen />;
   // return <RememberPassScreen />;
   // return <MainLayout />;
-
-  return <AddExpenses is_edit_expenses={false} />;
-
+  // return <AddExpenses />;
   // return <FinancierScreen />;
-  // return <PrincipalScreen />;
+  // return <StartScreen />;
   // return <CalendarScreen />;
   // return <InicioScreen />;
   // return <LoginScreen />;
   // return <ItemEvents />;
-
+  // return <AddExpenses/>
+  return <AddFamilyScreen />;
   // <div className="flex gap-20 flex-wrap">
   //   <DefaultButton
   //     text="Login"
