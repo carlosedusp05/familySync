@@ -23,7 +23,7 @@ function App() {
   // return <RememberPassScreen />;
   // return <MainLayout />;
 
-  return <AddExpenses />;
+  return <AddExpenses is_edit_expenses={false} />;
 
   // return <FinancierScreen />;
   // return <PrincipalScreen />;

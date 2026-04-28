@@ -1,6 +1,7 @@
 import MainLayout from "../layouts/Mainlayout";
 import LargeCard from "../components/ui/LargeCard";
 import DefaultButton from "../components/ui/DefaultButton";
+import { useState } from "react";
 import {
   waterIcon,
   homeIcon,
@@ -12,18 +13,26 @@ import {
   partyIcon,
 } from "../assets";
 
-function AddExpenses() {
+function AddExpenses({ is_edit_expenses }) {
+  const [selectedIcon, setIcon] = useState(null);
+
+  const toggleIcon = (id) => {
+    setIcon((iconId) => (iconId === id ? null : id));
+  };
+
   return (
     <MainLayout>
       <div className="flex flex-col gap-4 items-center justify-center py-12 h-full">
         <LargeCard
           size={"h-[80%] w-[55%]"}
-          color="bg-white"
           display={"flex justify-center"}
+          color={"bg-gradient-to-t from-[#F0D7C7]/94 to-white"}
           not_pop_up={true}
         >
-          <div className="w-full min-h-20 flex flex-col  items-center pt-4 shadow-inner gap-5">
-            <h1 className="text-4xl font-light">Adicionar gastos</h1>
+          <div className="w-full min-h-20 flex flex-col  items-center pt-8 shadow-inner gap-5">
+            <h1 className="text-4xl">
+              {is_edit_expenses ? "Editar gastos" : "Adicionar gastos"}
+            </h1>
             <div className="flex justify-center items-end pt-5 w-full -mr-20 gap-4">
               <input
                 type="text"
@@ -37,10 +46,15 @@ function AddExpenses() {
                 className="w-[70%] rounded-4xl indent-10 outline-none border border-orange text-3xl bg-white p-2"
                 placeholder="Procure por seu Icone Aqui..."
               />
-              <div className="flex flex-wrap justify-center w-[70%] h-[80%] gap-x-10 gap-y-0 p-8 mt-10">
+              <div className="flex flex-wrap justify-center w-[60%] h-[50%] gap-x-10 gap-y-3 p-8 mt-10">
                 <div
-                  className="h-25 w-25 border-8 border-orange-dark rounded-full p-1 cursor-pointer hover:-translate-y-0.5
-                            transition-all active:scale-90 active:brightness-90"
+                  className={`${
+                    selectedIcon === "shopping"
+                      ? "bg-[#FF6200]/25"
+                      : "bg-transparent"
+                  } border-8 border-orange-dark rounded-full p-1 cursor-pointer hover:-translate-y-0.5
+                            transition-all active:scale-90 active:brightness-90 grow basis-[calc(25%-2.5rem)] max-w-[25%]`}
+                  onClick={() => toggleIcon("shopping")}
                 >
                   <img
                     src={shoppingIcon}
@@ -50,30 +64,45 @@ function AddExpenses() {
                   />
                 </div>
                 <div
-                  className="h-25 w-25 border-8 border-orange-dark rounded-full p-1 cursor-pointer hover:-translate-y-0.5
-                            transition-all active:scale-90 active:brightness-90"
+                  className={`${
+                    selectedIcon === "light"
+                      ? "bg-[#FF6200]/25"
+                      : "bg-transparent"
+                  } border-8 border-orange-dark rounded-full p-1 cursor-pointer hover:-translate-y-0.5
+                            transition-all active:scale-90 active:brightness-90 grow basis-[calc(25%-2.5rem)] max-w-[25%]`}
+                  onClick={() => toggleIcon("light")}
                 >
                   <img
                     src={lightIcon}
-                    alt="Icone de Luz"
+                    alt="Icone de Light"
                     className="w-full h-full"
                     draggable={false}
                   />
                 </div>
                 <div
-                  className="h-25 w-25 border-8 border-orange-dark rounded-full p-1 cursor-pointer hover:-translate-y-0.5
-                            transition-all active:scale-90 active:brightness-90"
+                  className={`${
+                    selectedIcon === "water"
+                      ? "bg-[#FF6200]/25"
+                      : "bg-transparent"
+                  } border-8 border-orange-dark rounded-full p-1 cursor-pointer hover:-translate-y-0.5
+                            transition-all active:scale-90 active:brightness-90 grow basis-[calc(25%-2.5rem)] max-w-[25%]`}
+                  onClick={() => toggleIcon("water")}
                 >
                   <img
                     src={waterIcon}
-                    alt="Icone de Água"
+                    alt="Icone de Water"
                     className="w-full h-full"
                     draggable={false}
                   />
                 </div>
                 <div
-                  className="h-25 w-25 border-8 border-orange-dark rounded-full p-1 cursor-pointer hover:-translate-y-0.5
-                            transition-all active:scale-90 active:brightness-90"
+                  className={`${
+                    selectedIcon === "home"
+                      ? "bg-[#FF6200]/25"
+                      : "bg-transparent"
+                  } border-8 border-orange-dark rounded-full p-1 cursor-pointer hover:-translate-y-0.5
+                            transition-all active:scale-90 active:brightness-90 grow basis-[calc(25%-2.5rem)] max-w-[25%]`}
+                  onClick={() => toggleIcon("home")}
                 >
                   <img
                     src={homeIcon}
@@ -83,8 +112,13 @@ function AddExpenses() {
                   />
                 </div>
                 <div
-                  className="h-25 w-25 border-8 border-orange-dark rounded-full p-1 cursor-pointer hover:-translate-y-0.5
-                            transition-all active:scale-90 active:brightness-90"
+                  className={`${
+                    selectedIcon === "health"
+                      ? "bg-[#FF6200]/25"
+                      : "bg-transparent"
+                  } border-8 border-orange-dark rounded-full p-1 cursor-pointer hover:-translate-y-0.5
+                            transition-all active:scale-90 active:brightness-90 grow basis-[calc(25%-2.5rem)] max-w-[25%]`}
+                  onClick={() => toggleIcon("health")}
                 >
                   <img
                     src={healthIcon}
@@ -94,8 +128,13 @@ function AddExpenses() {
                   />
                 </div>
                 <div
-                  className="h-25 w-25 border-8 border-orange-dark rounded-full p-1 cursor-pointer hover:-translate-y-0.5
-                            transition-all active:scale-90 active:brightness-90"
+                  className={`${
+                    selectedIcon === "book"
+                      ? "bg-[#FF6200]/25"
+                      : "bg-transparent"
+                  } border-8 border-orange-dark rounded-full p-1 cursor-pointer hover:-translate-y-0.5
+                            transition-all active:scale-90 active:brightness-90 grow basis-[calc(25%-2.5rem)] max-w-[25%]`}
+                  onClick={() => toggleIcon("book")}
                 >
                   <img
                     src={bookIcon}
@@ -105,23 +144,33 @@ function AddExpenses() {
                   />
                 </div>
                 <div
-                  className="h-25 w-25 border-8 border-orange-dark rounded-full p-1 cursor-pointer hover:-translate-y-0.5
-                            transition-all active:scale-90 active:brightness-90"
+                  className={`${
+                    selectedIcon === "meal"
+                      ? "bg-[#FF6200]/25"
+                      : "bg-transparent"
+                  } border-8 border-orange-dark rounded-full p-1 cursor-pointer hover:-translate-y-0.5
+                            transition-all active:scale-90 active:brightness-90 grow basis-[calc(25%-2.5rem)] max-w-[25%]`}
+                  onClick={() => toggleIcon("meal")}
                 >
                   <img
                     src={mealIcon}
-                    alt="Icone de Almoço"
+                    alt="Icone de Meal"
                     className="w-full h-full"
                     draggable={false}
                   />
                 </div>
                 <div
-                  className="h-25 w-25 border-8 border-orange-dark rounded-full p-1 cursor-pointer hover:-translate-y-0.5
-                            transition-all active:scale-90 active:brightness-90"
+                  className={`${
+                    selectedIcon === "party"
+                      ? "bg-[#FF6200]/25"
+                      : "bg-transparent"
+                  } border-8 border-orange-dark rounded-full p-1 cursor-pointer hover:-translate-y-0.5
+                            transition-all active:scale-90 active:brightness-90 grow basis-[calc(25%-2.5rem)] max-w-[25%]`}
+                  onClick={() => toggleIcon("party")}
                 >
                   <img
                     src={partyIcon}
-                    alt="Icone de Festa"
+                    alt="Icone de Party"
                     className="w-full h-full"
                     draggable={false}
                   />
@@ -134,7 +183,10 @@ function AddExpenses() {
                 another_size="h-12 w-37"
                 theme={false}
               />
-              <DefaultButton text="Adicionar" another_size="h-12 w-37" />
+              <DefaultButton
+                text={is_edit_expenses ? "Confirmar" : "Adicionar"}
+                another_size="h-12 w-37"
+              />
             </div>
           </div>
         </LargeCard>
