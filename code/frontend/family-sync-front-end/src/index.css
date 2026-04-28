@@ -18,3 +18,47 @@
   --color-default: #ffab77;
   --color-black: #000000;
 }
+
+/* Calendário Estilização */
+
+.fc {
+  background: transparent !important;
+  border: none;
+}
+
+/* dias */
+.fc-daygrid-day {
+  background: transparent !important;
+  border: 1px solid var(--color-terracota) !important;
+}
+
+.fc-toolbar-title {
+  color: var(--color-terracota) !important;
+  font-weight: bold !important;
+}
+
+.fc-button {
+  background-color: #f97316 !important;
+  border: none !important;
+}
+
+.fc-button:hover {
+  background-color: #ea580c !important;
+}
+
+.fc-day-today {
+  background-color: #fed7aa !important;
+}
+
+.fc-col-header-cell {
+  color: var(--color-terracota);
+  font-weight: bold;
+}
+
+.fc-theme-standard th {
+  border: 1px solid var(--color-terracota);
+  border-right: none;
+}
+.fc-theme-standard .fc-scrollgrid {
+  border: 1px solid var(--color-terracota);
+}
