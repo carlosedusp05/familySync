@@ -1,8 +1,18 @@
-import { perfilIconOrange, perfilIconWhite } from "../../assets";
+import { perfilIconOrange, perfilIconWhite, familyIcon } from "../../assets";
 
-function IconPerfil({ is_white_backgroud }) {
-  const color = is_white_backgroud ? perfilIconOrange : perfilIconWhite;
-  const style = is_white_backgroud ? "border border-default" : "bg-orange-dark";
+function IconPerfil({ is_white_backgroud, is_family_icon, another_size }) {
+  const color = is_family_icon
+    ? familyIcon
+    : is_white_backgroud
+    ? perfilIconOrange
+    : perfilIconWhite;
+  const style = is_family_icon
+    ? "bg-white"
+    : is_white_backgroud
+    ? "border border-default"
+    : "bg-orange-dark";
+
+  const size = another_size ? another_size : "w-10 h-10";
 
   return (
     <div
@@ -11,7 +21,7 @@ function IconPerfil({ is_white_backgroud }) {
       <img
         src={color}
         alt="Icon Perfil"
-        className="w-10 h-10 object-contain"
+        className={`${size} object-contain`}
         draggable="false"
       />
     </div>

@@ -17,14 +17,15 @@ import FinancierScreen from "./screens/FinancierScreen";
 import AddExpenses from "./screens/AddExpenses";
 import CalendarScreen from "./screens/CalendarScreen";
 import ItemEvents from "./components/ui/ItemEvents";
+import ManageFamily from "./screens/ManageFamily";
 
 function App() {
   // return <RegisterScreen />;
   // return <RememberPassScreen />;
   // return <MainLayout />;
 
-  return <AddExpenses is_edit_expenses={false} />;
-
+  // return <AddExpenses is_edit_expenses={false} />;
+  return <ManageFamily />;
   // return <FinancierScreen />;
   // return <PrincipalScreen />;
   // return <CalendarScreen />;
