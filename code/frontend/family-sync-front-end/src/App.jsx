@@ -24,7 +24,6 @@ function App() {
   // return <RegisterScreen />;
   // return <RememberPassScreen />;
   // return <MainLayout />;
-
   // return <AddExpenses is_edit_expenses={false} />;
   // return <ManageFamily />
   // return <AddExpenses />;
@@ -35,7 +34,7 @@ function App() {
   // return <LoginScreen />;
   // return <ItemEvents />;
   // return <AddExpenses/>
-  return <AddFamilyScreen />;
+  // return <AddFamilyScreen />;
   // <div className="flex gap-20 flex-wrap">
   //   <DefaultButton
   //     text="Login"

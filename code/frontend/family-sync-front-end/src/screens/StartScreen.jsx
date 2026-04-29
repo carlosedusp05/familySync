@@ -106,7 +106,7 @@ function PrincipalScreen(props) {
                 {/* Div Icon */}
                 <div className="flex items-center gap-2 text-orange-dark text-4xl font-bold">
                   <img
-                    className="h-20"
+                    className="h-25"
                     src={calendarIcon}
                     alt="Calendar Icon"
                   />
@@ -126,9 +126,9 @@ function PrincipalScreen(props) {
             {/* Grid Div 2 */}
             <div className="grid grid-cols-11 gap-4 h-full -mt-[3%]">
               {/* Div Gerenciamento Financeiro */}
-              <div className="flex flex-col col-span-4 gap-5 items-center rounded-2xl color bg-terracota p-5 h-[90%]">
+              <div className="flex flex-col col-span-4 gap-5 items-center rounded-2xl color bg-terracota p-5 h-[80%]">
                 {/* Div Desenho */}
-                <div className="flex gap-[4.36%] bg-default w-full h-[50%] items-end rounded-2xl">
+                <div className="flex gap-[4.81%] bg-default w-full h-[50%] items-end rounded-2xl">
                   <div className="w-12 rounded-bl-2xl bg-brown-dark h-[30%]"></div>
                   <div className="w-12 bg-brown-dark h-[40%]"></div>
                   <div className="w-12 bg-brown-dark h-[90%]"></div>
@@ -140,14 +140,14 @@ function PrincipalScreen(props) {
                 </div>
                 {/* Div Icon */}
                 <div className="flex gap-3 items-center text-3xl text-white font-semibold">
-                  <img className="h-2s0" src={piggyBank} alt="Piggy Icon" />
-                  <h2 className="text-4xl">
+                  <img className="h-24" src={piggyBank} alt="Piggy Icon" />
+                  <h2 className="text-5xl">
                     Gerenciamento <br /> Financeiro
                   </h2>
                 </div>
                 {/* Div Gerenciador Familiar*/}
               </div>
-              <div className="flex col-span-4 h-[90%] bg-yellow-cream rounded-2xl">
+              <div className="flex col-span-4 h-[80%] bg-yellow-cream rounded-2xl">
                 <div className="h-full flex p-5 rounded-l-2xl items-center justify-center bg-orange">
                   <img
                     className="h-25"
@@ -161,7 +161,8 @@ function PrincipalScreen(props) {
                   </h2>
                 </div>
               </div>
-              <div className="flex flex-col items-center justify-center col-span-3 h-[90%] bg-brown-dark rounded-2xl gap-3">
+              {/* DIv Informações Familiares */}
+              <div className="flex flex-col items-center justify-center col-span-3 h-[80%] bg-brown-dark rounded-2xl gap-3">
                 <div className="flex items-center justify-center gap-2">
                   <img className="h-25" src={infoIcon} alt="Info Icon" />
                   <h2 className="text-white text-4xl font-bold">
