@@ -2,7 +2,7 @@ import MainLayout from "../layouts/Mainlayout";
 import DefaultButton from "../components/ui/DefaultButton";
 import InputWhite from "../components/ui/InputWhite";
 import IconPerfil from "../components/icons/IconPerfil";
-import FamiliarCard from "../components/ui/FamiliarCard";
+import MultFamiliars from "../components/ui/MultiFamiliars";
 import { pencilTerracotaIcon, saveIcon } from "../assets";
 import { useRef } from "react";
 
@@ -48,7 +48,20 @@ function ManageFamily() {
               </div>
             </div>
             <h1>Membros</h1>
-            <FamiliarCard />
+            <MultFamiliars
+              familiars={[
+                { id: 1, name: "João Pedro", degree_of_relatives: "Pai" },
+                { id: 2, name: "Maria Alice", degree_of_relatives: "Mãe" },
+                { id: 3, name: "Lucas Gabriel", degree_of_relatives: "Filho" },
+                { id: 4, name: "Ana Beatriz", degree_of_relatives: "Filha" },
+                { id: 5, name: "Ricardo Alves", degree_of_relatives: "Avô" },
+                { id: 6, name: "Sônia Maria", degree_of_relatives: "Avó" },
+                { id: 7, name: "Bruno Henrique", degree_of_relatives: "Tio" },
+                { id: 8, name: "Carla Fernanda", degree_of_relatives: "Tia" },
+                { id: 9, name: "Felipe Augusto", degree_of_relatives: "Primo" },
+                { id: 10, name: "Juliana Costa", degree_of_relatives: "Prima" },
+              ]}
+            />
           </div>
           <div className=" flex flex-col flex-2 gap-10 px-4">
             <div className="flex-5 bg-yellow-cream rounded-[60px] px-15 pt-10 relative">
