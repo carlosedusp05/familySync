@@ -18,6 +18,7 @@ import CalendarScreen from "./screens/CalendarScreen";
 import ItemEvents from "./components/ui/ItemEvents";
 import ManageFamily from "./screens/ManageFamily";
 import AddFamilyScreen from "./screens/AddFamilyScreen";
+import InfoFamiliarScreen from "./screens/InfoFamiliarScreen";
 
 function App() {
   // return <RegisterScreen />;
@@ -25,7 +26,7 @@ function App() {
   // return <MainLayout />;
 
   // return <AddExpenses is_edit_expenses={false} />;
-  return <ManageFamily />;
+  return <InfoFamiliarScreen />;
   // return <AddExpenses />;
   // return <FinancierScreen />;
   // return <StartScreen />;
