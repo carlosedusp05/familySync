@@ -26,7 +26,7 @@ function App() {
   // return <MainLayout />;
 
   // return <AddExpenses is_edit_expenses={false} />;
-  return <InfoFamiliarScreen />;
+  return <FinancierScreen />;
   // return <AddExpenses />;
   // return <FinancierScreen />;
   // return <StartScreen />;
