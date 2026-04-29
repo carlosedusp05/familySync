@@ -17,7 +17,7 @@ function ManageFamily() {
 
   return (
     <MainLayout>
-      <div className="flex flex-col gap-4 items-center justify-center py-12 h-full">
+      <div className="flex flex-col gap-4 items-center justify-center py-8 h-full">
         <div className="w-[80%] h-full flex gap-8">
           <div className="h-full flex-1 bg-yellow-cream rounded-[60px] flex flex-col items-center pt-20 text-center text-5xl font-bold text-orange gap-5">
             <div className="relative w-[45%] aspect-square bg-white border-4 border-orange rounded-full flex items-center justify-center">

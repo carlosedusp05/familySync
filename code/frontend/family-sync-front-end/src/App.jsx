@@ -19,13 +19,14 @@ import ItemEvents from "./components/ui/ItemEvents";
 import ManageFamily from "./screens/ManageFamily";
 import AddFamilyScreen from "./screens/AddFamilyScreen";
 import InfoFamiliarScreen from "./screens/InfoFamiliarScreen";
+import ListScreen from "./screens/ListScreen";
 
 function App() {
   // return <RegisterScreen />;
   // return <RememberPassScreen />;
   // return <MainLayout />;
   // return <AddExpenses is_edit_expenses={false} />;
-  return <FinancierScreen />;
+  return <RegisterScreen />;
   // return <ManageFamily />
   // return <AddExpenses />;
   // return <FinancierScreen />;
