@@ -26,7 +26,7 @@ function App() {
   // return <MainLayout />;
 
   // return <AddExpenses is_edit_expenses={false} />;
-  return <InfoFamiliarScreen />;
+  // return <ManageFamily />
   // return <AddExpenses />;
   // return <FinancierScreen />;
   // return <StartScreen />;
@@ -35,7 +35,7 @@ function App() {
   // return <LoginScreen />;
   // return <ItemEvents />;
   // return <AddExpenses/>
-  // return <AddFamilyScreen />;
+  return <AddFamilyScreen />;
   // <div className="flex gap-20 flex-wrap">
   //   <DefaultButton
   //     text="Login"
