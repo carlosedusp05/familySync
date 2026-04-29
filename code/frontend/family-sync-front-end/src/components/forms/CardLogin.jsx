@@ -6,10 +6,10 @@ import { eyeIcon, emailIcon } from "../../assets";
 
 function CardLogin() {
   return (
-    <DefaultCard>
+    <DefaultCard h={"h-[50%]"}>
       <IconFamilySync is_small={true} />
-      <h1 className="text-orange-dark font-bold text-4xl">Login</h1>
-      <div className=" h-[70%] flex gap-10 justify-center items-center flex-wrap">
+      <h2 className="text-orange-dark font-bold text-6xl">Login</h2>
+      <div className=" w-[88%] flex flex-col gap-8 justify-center items-center">
         <DefaultTextField
           placeholder="Email"
           type="text"
@@ -24,7 +24,7 @@ function CardLogin() {
         />
       </div>
 
-      <div className="flex  flex-col gap-1">
+      <div className="flex w-[40%] flex-col gap-1">
         <DefaultButton text="Entrar" theme={true} />
 
         <a className="text-orange text-[14px] cursor-pointer">

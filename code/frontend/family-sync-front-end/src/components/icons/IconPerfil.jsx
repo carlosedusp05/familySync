@@ -4,13 +4,13 @@ function IconPerfil({ is_white_backgroud, is_family_icon, another_size }) {
   const color = is_family_icon
     ? familyIcon
     : is_white_backgroud
-    ? perfilIconOrange
-    : perfilIconWhite;
+      ? perfilIconOrange
+      : perfilIconWhite;
   const style = is_family_icon
     ? "bg-white"
     : is_white_backgroud
-    ? "border border-default"
-    : "bg-orange-dark";
+      ? "border border-default"
+      : "bg-orange-dark";
 
   const size = another_size ? another_size : "w-10 h-10";
 

@@ -24,9 +24,9 @@ function App() {
   // return <RegisterScreen />;
   // return <RememberPassScreen />;
   // return <MainLayout />;
-
   // return <AddExpenses is_edit_expenses={false} />;
   return <FinancierScreen />;
+  // return <ManageFamily />
   // return <AddExpenses />;
   // return <FinancierScreen />;
   // return <StartScreen />;
