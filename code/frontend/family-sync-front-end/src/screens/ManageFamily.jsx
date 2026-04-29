@@ -2,29 +2,53 @@ import MainLayout from "../layouts/Mainlayout";
 import DefaultButton from "../components/ui/DefaultButton";
 import InputWhite from "../components/ui/InputWhite";
 import IconPerfil from "../components/icons/IconPerfil";
+import FamiliarCard from "../components/ui/FamiliarCard";
 import { pencilTerracotaIcon, saveIcon } from "../assets";
+import { useRef } from "react";
 
 function ManageFamily() {
+  const fileInputRef = useRef(null);
+
+  const handleButtonClick = () => {
+    setTimeout(() => {
+      fileInputRef.current?.click();
+    }, 1);
+  };
+
   return (
     <MainLayout>
       <div className="flex flex-col gap-4 items-center justify-center py-12 h-full">
         <div className="w-[80%] h-full flex gap-8">
-          <div className="h-full flex-1 bg-yellow-cream rounded-[60px] flex justify-center items-start pt-20">
+          <div className="h-full flex-1 bg-yellow-cream rounded-[60px] flex flex-col items-center pt-20 text-center text-5xl font-bold text-orange gap-5">
             <div className="relative w-[45%] aspect-square bg-white border-4 border-orange rounded-full flex items-center justify-center">
               <IconPerfil
                 is_family_icon={true}
                 another_size={"h-full w-full"}
               />
+
               <div className="absolute right-0 bottom-0">
                 <DefaultButton
+                  onClick={handleButtonClick}
                   another_padding={"px-0 pb-2"}
                   another_size={"h-20 w-20"}
                   another_text_size={"text-7xl"}
                   most_radius={true}
                   text="+"
                 />
+
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) console.log("Arquivo selecionado:", file);
+                  }}
+                />
               </div>
             </div>
+            <h1>Membros</h1>
+            <FamiliarCard />
           </div>
           <div className=" flex flex-col flex-2 gap-10 px-4">
             <div className="flex-5 bg-yellow-cream rounded-[60px] px-15 pt-10 relative">
