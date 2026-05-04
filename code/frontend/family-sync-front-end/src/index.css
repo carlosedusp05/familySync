@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+* {
+  -webkit-user-drag: none;
+  user-drag: none;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 @theme {
   --color-white-yellow: #fffcf8;
   --color-white-item: #efefef;
@@ -40,10 +50,11 @@
 .fc-button {
   background-color: #f97316 !important;
   border: none !important;
+  transition: all 0.2s ease;
 }
 
 .fc-button:hover {
-  background-color: #ea580c !important;
+  transform: scale(1.1) !important;
 }
 
 .fc-day-today {

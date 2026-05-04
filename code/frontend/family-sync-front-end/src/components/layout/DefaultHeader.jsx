@@ -12,9 +12,9 @@ function DefaultHeader({ disconnected }) {
   ) : (
     <div className="flex gap-12 items-center justify-center">
       <IconPerfil is_white_backgroud={false} />
-      <div className="bg-orange-dark flex items-center justify-center h-fit p-4 rounded-lg">
+      <div className="bg-orange-dark flex items-center justify-center h-fit p-4 rounded-lg cursor-pointer duration-300 transition-all hover:scale-110">
         <img
-          className="w-8 h-8"
+          className="w-8 h-8 "
           src={notificationsIcon}
           alt="Notificações"
           draggable={false}

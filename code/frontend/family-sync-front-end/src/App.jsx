@@ -26,12 +26,12 @@ function App() {
   // return <RememberPassScreen />;
   // return <MainLayout />;
   // return <AddExpenses is_edit_expenses={false} />;
-  return <RegisterScreen />;
+  // return <RegisterScreen />;
   // return <ManageFamily />
   // return <AddExpenses />;
   // return <FinancierScreen />;
-  // return <StartScreen />;
-  return <CalendarScreen />;
+  return <StartScreen />;
+  // return <CalendarScreen />;
   // return <InicioScreen />;
   // return <LoginScreen />;
   // return <ItemEvents />;

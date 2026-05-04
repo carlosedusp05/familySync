@@ -16,7 +16,7 @@ function IconPerfil({ is_white_backgroud, is_family_icon, another_size }) {
 
   return (
     <div
-      className={`rounded-full p-4 flex items-center justify-center transition-all duration-300  ${style}`}
+      className={`rounded-full p-4 flex items-center justify-center transition-all duration-300  ${style} cursor-pointer hover:scale-110`}
     >
       <img
         src={color}
