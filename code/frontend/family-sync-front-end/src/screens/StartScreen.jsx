@@ -12,6 +12,8 @@ import BackgroundImage from "../components/ui/BackgroundImage";
 import LargeCard from "../components/ui/LargeCard";
 
 function PrincipalScreen(props) {
+  const hover = "transition-all duration-400 hover:scale-103 transition-ease";
+
   return (
     <div className="flex flex-col w-full h-screen overflow-hidden">
       <BackgroundImage
@@ -47,7 +49,9 @@ function PrincipalScreen(props) {
             {/* Grid Div 1*/}
             <div className="grid grid-cols-10 gap-4">
               {/* Div Lista Compartilhada */}
-              <div className="col-span-4 flex items-center justify-center gap-4 h-[80%] bg-orange py-10 rounded-2xl">
+              <div
+                className={`col-span-4 flex items-center justify-center gap-4 h-[80%] bg-orange py-10 rounded-2xl ${hover}`}
+              >
                 <img className="h-27" src={listIcon} alt="Icon List" />
                 <p className="font-bold text-6xl text-white flex-wrap">
                   Lista
@@ -56,7 +60,9 @@ function PrincipalScreen(props) {
                 </p>
               </div>
               {/* Div Calendário */}
-              <div className="flex flex-col col-span-4 rounded-2xl pt-5 px-9 h-[80%]  bg-default gap-4">
+              <div
+                className={`flex flex-col col-span-4 rounded-2xl pt-5 px-9 h-[80%] bg-default gap-4 ${hover}`}
+              >
                 {/* Desenho Calendário */}
                 <div className="flex w-full rounded-2xl overflow-hidden bg-white">
                   {/* Card 1 */}
@@ -114,7 +120,9 @@ function PrincipalScreen(props) {
                 </div>
               </div>
               {/* Div Adicionar Familia */}
-              <div className="flex h-[80%] items-center justify-center col-span-2 p-12 rounded-2xl bg-orange-dark">
+              <div
+                className={`flex h-[80%] items-center justify-center col-span-2 p-12 rounded-2xl bg-orange-dark ${hover}`}
+              >
                 <img
                   className="w-[90%] h-[90%]"
                   src={plusIcon}
@@ -126,7 +134,9 @@ function PrincipalScreen(props) {
             {/* Grid Div 2 */}
             <div className="grid grid-cols-11 gap-4 h-full -mt-[3%]">
               {/* Div Gerenciamento Financeiro */}
-              <div className="flex flex-col col-span-4 gap-5 items-center rounded-2xl color bg-terracota p-5 h-[80%]">
+              <div
+                className={`flex flex-col col-span-4 gap-5 items-center rounded-2xl color bg-terracota p-5 h-[80%] ${hover}`}
+              >
                 {/* Div Desenho */}
                 <div className="flex gap-[4.81%] bg-default w-full h-[50%] items-end rounded-2xl">
                   <div className="w-12 rounded-bl-2xl bg-brown-dark h-[30%]"></div>
@@ -147,7 +157,9 @@ function PrincipalScreen(props) {
                 </div>
                 {/* Div Gerenciador Familiar*/}
               </div>
-              <div className="flex col-span-4 h-[80%] bg-yellow-cream rounded-2xl">
+              <div
+                className={`flex col-span-4 h-[80%] bg-yellow-cream rounded-2xl ${hover}`}
+              >
                 <div className="h-full flex p-5 rounded-l-2xl items-center justify-center bg-orange">
                   <img
                     className="h-25"
@@ -161,8 +173,10 @@ function PrincipalScreen(props) {
                   </h2>
                 </div>
               </div>
-              {/* DIv Informações Familiares */}
-              <div className="flex flex-col items-center justify-center col-span-3 h-[80%] bg-brown-dark rounded-2xl gap-3">
+              {/* Div Informações Familiares */}
+              <div
+                className={`flex flex-col items-center justify-center col-span-3 h-[80%] bg-brown-dark rounded-2xl gap-3 ${hover}`}
+              >
                 <div className="flex items-center justify-center gap-2">
                   <img className="h-25" src={infoIcon} alt="Info Icon" />
                   <h2 className="text-white text-4xl font-bold">

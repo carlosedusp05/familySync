@@ -2,18 +2,22 @@ import { pencilTerracotaIcon } from "../../assets";
 
 function ItemEvents(props) {
   return (
-    <div className="w-[98%] flex flex-col gap-2 rounded-2xl bg-white-yellow relative pl-5 pr-8 py-2">
+    <div className="w-[98%] flex flex-col gap-2 rounded-2xl bg-white-yellow relative pl-5 pr-8 py-2 transition-all duration-400 hover:scale-103">
       <div className="px-10 flex absolute top-0 left-0 bg-terracota py-1 rounded-tl-2xl ">
         <h3 className="text-white flex text-[18px] font-medium">
           {props.title}
         </h3>
       </div>
       <div className="flex justify-end gap-5 items-center">
-        <img src={pencilTerracotaIcon} alt="PencilIcon" />
-        <span className="text-terracota text-[20px] font-medium">
+        <img
+          src={pencilTerracotaIcon}
+          alt="PencilIcon"
+          className="cursor-pointer transition-all duration-400 hover:scale-120"
+        />
+        <span className="text-terracota text-[18px] font-medium">
           {props.hours}
         </span>
-        <span className="text-terracota text-[20px] font-medium">
+        <span className="text-terracota text-[18px] font-medium">
           {props.date}
         </span>
       </div>

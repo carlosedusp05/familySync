@@ -29,7 +29,7 @@ function FinancierScreen() {
         {/* Div Eventos */}
         <div className="w-[50%] h-full flex flex-col p-30 gap-10  items-center">
           <h2 className="text-5xl text-white font-bold">Eventos Marcados</h2>
-          <div className="flex flex-col gap-5 overflow-y-auto max-h-full w-[90%]">
+          <div className="flex flex-col gap-5 overflow-y-auto max-h-full w-[90%] p-5">
             <MultEventsField
               events={[
                 {
