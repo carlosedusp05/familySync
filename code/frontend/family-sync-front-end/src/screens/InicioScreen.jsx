@@ -1,9 +1,18 @@
 import DefaultButton from "../components/ui/DefaultButton";
 import BackgroundImage from "../components/ui/BackgroundImage";
 import DefaultHeader from "../components/layout/DefaultHeader";
+import { useNavigate } from "react-router-dom";
 import { imageBackground2 } from "../assets";
 
 function InicioScreen() {
+  const navigate = useNavigate();
+
+  const prefetchLogin = () => {
+    import("./LoginScreen").catch(() => {
+      console.log("Erro ao pré-carregar a tela");
+    });
+  };
+
   return (
     <div className="h-screen w-full">
       <BackgroundImage
@@ -24,7 +33,11 @@ function InicioScreen() {
             multiplataforma para resolver um dos maiores problemas das famílias
             modernas: a falha de comunicação e a descentralização de tarefas.
           </p>
-          <DefaultButton text="USAR WEBSITE" />
+          <DefaultButton
+            text="USAR WEBSITE"
+            onMouseEnter={prefetchLogin}
+            onClick={() => navigate("/auth/login")}
+          />
         </div>
       </main>
     </div>
