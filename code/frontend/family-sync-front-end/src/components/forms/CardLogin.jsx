@@ -3,9 +3,10 @@ import DefaultTextField from "../ui/DefaultTextField";
 import DefaultButton from "../ui/DefaultButton";
 import DefaultCard from "../ui/DefaultCard";
 import { eyeIcon, emailIcon } from "../../assets";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 
 function CardLogin() {
+  // Routes
   const navigate = useNavigate();
 
   const prefetchLoggedIn = () => {
@@ -33,12 +34,14 @@ function CardLogin() {
       <div className=" w-[88%] flex flex-col gap-8 justify-center items-center">
         <DefaultTextField
           placeholder="Email"
+          onChange={(e) => setEmail(e.target.value)}
           type="text"
           alt="Input Email"
           src={emailIcon}
         />
         <DefaultTextField
           placeholder="Senha"
+          onChange={(e) => setSenha(e.target.value)}
           type="text"
           src={eyeIcon}
           alt="Input Senha"
@@ -65,7 +68,9 @@ function CardLogin() {
           theme={false}
           border={true}
           onMouseEnter={prefetchRegister}
-          onClick={() => navigate("/auth/register")}
+          onClick={() => {
+            navigate("/auth/register");
+          }}
         />
       </div>
     </DefaultCard>
