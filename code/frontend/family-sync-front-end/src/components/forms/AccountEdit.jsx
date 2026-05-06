@@ -3,83 +3,106 @@ import IconPerfil from "../icons/IconPerfil";
 import DefaultButton from "../ui/DefaultButton";
 import MultTextField from "../ui/MultTextField";
 import { editIcon } from "../../assets";
+import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 function AccountEdit() {
-  return (
-    <DefaultCard slim_card={true}>
-      <div className="relative flex justify-center w-fit mx-auto">
-        <IconPerfil is_orange={true} />
+  const fileInputRef = useRef(null);
 
-        <div className="absolute -bottom-2 -right-2">
-          <DefaultButton
-            text="+"
-            horizontal="13.5px"
-            vertical="0px"
-            theme={true}
-            most_radius={true}
+  const handleButtonClick = () => {
+    setTimeout(() => {
+      fileInputRef.current?.click();
+    }, 1);
+  };
+
+  const navigate = useNavigate();
+
+  const prefetchLoggedIn = () => {
+    import("../../screens/StartScreen").catch(() => {
+      console.log("Erro ao pré-carregar a tela");
+    });
+  };
+
+  const prefetchLogout = () => {
+    import("../../screens/InicioScreen").catch(() => {
+      console.log("Erro ao pré-carregar a tela");
+    });
+  };
+
+  return (
+    <div className="h-full w-full flex items-center justify-center relative">
+      <div className="absolute top-10 left-10 ">
+        <DefaultButton
+          text="Sair da conta"
+          logout_image={true}
+          onMouseEnter={prefetchLogout}
+          onClick={() => navigate("/")}
+        />
+      </div>
+      <DefaultCard>
+        <div className="w-30 h-30 relative rounded-full border-2 border-orange flex items-center justify-center bg-white">
+          <IconPerfil is_white_backgroud={true} another_size={"h-70%"} />
+          <div className="absolute -bottom-3 -right-3 flex items-center justify-center rounded-[50%] cursor-pointer">
+            <input
+              className="absolute opacity-0 w-full h-full cursor-pointer hidden"
+              type="file"
+              ref={fileInputRef}
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) console.log("Arquivo selecionado:", file);
+              }}
+            />
+            <DefaultButton
+              onClick={handleButtonClick}
+              another_padding={"px-0 pb-1"}
+              another_size={"h-12 w-12"}
+              another_text_size={"text-3xl"}
+              most_radius={true}
+              text="+"
+            />
+          </div>
+        </div>
+        <h1 className="text-orange text-3xl -mt-6">Eu</h1>
+        <div className=" w-[90%] flex justify-center items-center flex-wrap gap-5">
+          <MultTextField
+            text_fields={[
+              { placeholder: "Nome", type: "text", src: editIcon },
+              { placeholder: "Email", type: "email", src: editIcon },
+              { placeholder: "CPF", type: "text", src: editIcon },
+              { placeholder: "Data Nascimento", type: "text", src: editIcon },
+              {
+                placeholder: "Senha",
+                type: "text",
+                src: editIcon,
+                alt: "Input Senha",
+              },
+              {
+                placeholder: "Confirme a senha",
+                type: "text",
+                src: editIcon,
+                alt: "Input Confirme a senha",
+              },
+            ]}
           />
         </div>
-      </div>
-      <h1 className="text-orange font-bold text-4xl">Eu</h1>
-      <div className=" h-[90%] flex justify-center items-center flex-wrap gap-6">
-        <MultTextField
-          text_fields={[
-            {
-              placeholder: "Nome",
-              type: "text",
-              src: editIcon,
-              alt: "Icon edit Nome",
-            },
-            {
-              placeholder: "Email",
-              type: "email",
-              src: editIcon,
-              alt: "Icon edit Email",
-            },
-            {
-              placeholder: "CPF",
-              type: "text",
-              src: editIcon,
-              alt: "Icon edit CPF",
-            },
-            {
-              placeholder: "Data Nascimento",
-              type: "text",
-              src: editIcon,
-              alt: "Icon edit Data Nascimento",
-            },
-            {
-              placeholder: "Senha",
-              type: "text",
-              src: editIcon,
-              alt: "Icon edit Senha",
-            },
-            {
-              placeholder: "Familia",
-              type: "text",
-              src: editIcon,
-              alt: "Icon edit Familia",
-            },
-          ]}
-        />
-      </div>
 
-      <div className="flex gap-18 ">
-        <DefaultButton
-          text="Cancelar"
-          horizontal="60px"
-          vertical="16px"
-          theme={false}
-          border={true}
-        />
-        <DefaultButton
-          text="Confirmar"
-          horizontal="56.5px"
-          vertical="16px"
-          theme={true}
-        />
-      </div>
-    </DefaultCard>
+        <div className="flex items-center justify-center  h-14 gap-[25%] w-[90%]">
+          <DefaultButton
+            text="Cancelar"
+            theme={false}
+            border={true}
+            onMouseEnter={prefetchLoggedIn}
+            onClick={() => navigate("/dashboard")}
+          />
+          <DefaultButton
+            text="Confirmar"
+            theme={true}
+            onMouseEnter={prefetchLoggedIn}
+            onClick={() => navigate("/dashboard")}
+          />
+        </div>
+      </DefaultCard>
+    </div>
   );
 }
 

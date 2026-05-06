@@ -34,6 +34,7 @@ import pencilTerracotaIcon from "./pencil_terracota.svg";
 import saveIcon from "./save_icon.svg";
 import familyIcon from "./family_icon.svg";
 import loadingOrange from "./orange-loading.json";
+import closeTagIcon from "./close_tag_icon.svg";
 
 export {
   eyeIcon,
@@ -72,4 +73,5 @@ export {
   saveIcon,
   familyIcon,
   loadingOrange,
+  closeTagIcon,
 };
