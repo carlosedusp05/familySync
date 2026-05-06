@@ -1,18 +1,57 @@
 import IconFamilySync from "../icons/IconFamilySync";
 import IconPerfil from "../icons/IconPerfil";
 import DefaultButton from "../ui/DefaultButton";
+import { useNavigate } from "react-router-dom";
 import { notificationsIcon } from "../../assets/index";
 
 function DefaultHeader({ disconnected }) {
+  const navigate = useNavigate();
+
+  const prefetchLogin = () => {
+    import("../../screens/LoginScreen").catch(() => {
+      console.log("Erro ao pré-carregar a tela");
+    });
+  };
+
+  const prefetchRegister = () => {
+    import("../../screens/RegisterScreen").catch(() => {
+      console.log("Erro ao pré-carregar a tela");
+    });
+  };
+
+  const prefetchNotifications = () => {
+    import("../../screens/NotificationsScreen").catch(() => {
+      console.log("Erro ao pré-carregar a tela");
+    });
+  };
+
+  const prefetchLoggedIn = () => {
+    import("../../screens/StartScreen").catch(() => {
+      console.log("Erro ao pré-carregar a tela");
+    });
+  };
+
   const children = disconnected ? (
     <div className="flex gap-15 ">
-      <DefaultButton text="LOGIN" />
-      <DefaultButton text="CADASTRAR" />
+      <DefaultButton
+        text="LOGIN"
+        onMouseEnter={prefetchLogin}
+        onClick={() => navigate("/auth/login")}
+      />
+      <DefaultButton
+        text="CADASTRAR"
+        onMouseEnter={prefetchRegister}
+        onClick={() => navigate("/auth/register")}
+      />
     </div>
   ) : (
     <div className="flex gap-12 items-center justify-center">
       <IconPerfil is_white_backgroud={false} />
-      <div className="bg-orange-dark flex items-center justify-center h-fit p-4 rounded-lg cursor-pointer duration-300 transition-all hover:scale-110">
+      <div
+        className="bg-orange-dark flex items-center justify-center h-fit p-4 rounded-lg cursor-pointer duration-300 transition-all hover:scale-110"
+        onMouseEnter={prefetchNotifications}
+        onClick={() => navigate("/dashboard/notifications")}
+      >
         <img
           className="w-8 h-8 "
           src={notificationsIcon}
@@ -27,7 +66,15 @@ function DefaultHeader({ disconnected }) {
     <header
       className={`w-full flex justify-between py-10 items-center bg-white px-16`}
     >
-      <IconFamilySync />
+      {disconnected ? (
+        <IconFamilySync />
+      ) : (
+        <IconFamilySync
+          onMouseEnter={prefetchLoggedIn}
+          onClick={() => navigate("/dashboard")}
+          className="cursor-pointer"
+        />
+      )}
       {children}
     </header>
   );

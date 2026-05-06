@@ -10,9 +10,48 @@ import {
 import DefaultHeader from "../components/layout/DefaultHeader";
 import BackgroundImage from "../components/ui/BackgroundImage";
 import LargeCard from "../components/ui/LargeCard";
+import { useNavigate } from "react-router-dom";
 
 function PrincipalScreen(props) {
   const hover = "transition-all duration-400 hover:scale-103 transition-ease";
+
+  const navigate = useNavigate();
+
+  const prefetchList = () => {
+    import("./ListScreen").catch(() => {
+      console.log("Erro ao pré-carregar a tela");
+    });
+  };
+
+  const prefetchCalendar = () => {
+    import("./CalendarScreen").catch(() => {
+      console.log("Erro ao pré-carregar a tela");
+    });
+  };
+
+  const prefetchNewFamily = () => {
+    import("./AddFamilyScreen").catch(() => {
+      console.log("Erro ao pré-carregar a tela");
+    });
+  };
+
+  const prefetchFinancier = () => {
+    import("./FinancierScreen").catch(() => {
+      console.log("Erro ao pré-carregar a tela");
+    });
+  };
+
+  const prefetchManageFamily = () => {
+    import("./ManageFamily").catch(() => {
+      console.log("Erro ao pré-carregar a tela");
+    });
+  };
+
+  const prefetchInfoFamiliar = () => {
+    import("./InfoFamiliarScreen").catch(() => {
+      console.log("Erro ao pré-carregar a tela");
+    });
+  };
 
   return (
     <div className="flex flex-col w-full h-screen overflow-hidden">
@@ -50,7 +89,9 @@ function PrincipalScreen(props) {
             <div className="grid grid-cols-10 gap-4">
               {/* Div Lista Compartilhada */}
               <div
-                className={`col-span-4 flex items-center justify-center gap-4 h-[80%] bg-orange py-10 rounded-2xl ${hover}`}
+                className={`col-span-4 flex items-center justify-center gap-4 h-[80%] bg-orange py-10 rounded-2xl ${hover} cursor-pointer`}
+                onMouseEnter={prefetchList}
+                onClick={() => navigate("/dashboard/lists")}
               >
                 <img className="h-27" src={listIcon} alt="Icon List" />
                 <p className="font-bold text-6xl text-white flex-wrap">
@@ -61,7 +102,9 @@ function PrincipalScreen(props) {
               </div>
               {/* Div Calendário */}
               <div
-                className={`flex flex-col col-span-4 rounded-2xl pt-5 px-9 h-[80%] bg-default gap-4 ${hover}`}
+                className={`flex flex-col col-span-4 rounded-2xl pt-5 px-9 h-[80%] bg-default gap-4 ${hover} cursor-pointer`}
+                onMouseEnter={prefetchCalendar}
+                onClick={() => navigate("/dashboard/calendar")}
               >
                 {/* Desenho Calendário */}
                 <div className="flex w-full rounded-2xl overflow-hidden bg-white">
@@ -121,7 +164,9 @@ function PrincipalScreen(props) {
               </div>
               {/* Div Adicionar Familia */}
               <div
-                className={`flex h-[80%] items-center justify-center col-span-2 p-12 rounded-2xl bg-orange-dark ${hover}`}
+                className={`flex h-[80%] items-center justify-center col-span-2 p-12 rounded-2xl bg-orange-dark ${hover} cursor-pointer`}
+                onMouseEnter={prefetchNewFamily}
+                onClick={() => navigate("/dashboard/family/add")}
               >
                 <img
                   className="w-[90%] h-[90%]"
@@ -135,7 +180,9 @@ function PrincipalScreen(props) {
             <div className="grid grid-cols-11 gap-4 h-full -mt-[3%]">
               {/* Div Gerenciamento Financeiro */}
               <div
-                className={`flex flex-col col-span-4 gap-5 items-center rounded-2xl color bg-terracota p-5 h-[80%] ${hover}`}
+                className={`flex flex-col col-span-4 gap-5 items-center rounded-2xl color bg-terracota p-5 h-[80%] ${hover} cursor-pointer`}
+                onMouseEnter={prefetchFinancier}
+                onClick={() => navigate("/dashboard/finance")}
               >
                 {/* Div Desenho */}
                 <div className="flex gap-[4.81%] bg-default w-full h-[50%] items-end rounded-2xl">
@@ -158,7 +205,9 @@ function PrincipalScreen(props) {
                 {/* Div Gerenciador Familiar*/}
               </div>
               <div
-                className={`flex col-span-4 h-[80%] bg-yellow-cream rounded-2xl ${hover}`}
+                className={`flex col-span-4 h-[80%] bg-yellow-cream rounded-2xl ${hover} cursor-pointer`}
+                onMouseEnter={prefetchManageFamily}
+                onClick={() => navigate("/dashboard/family")}
               >
                 <div className="h-full flex p-5 rounded-l-2xl items-center justify-center bg-orange">
                   <img
@@ -175,7 +224,9 @@ function PrincipalScreen(props) {
               </div>
               {/* Div Informações Familiares */}
               <div
-                className={`flex flex-col items-center justify-center col-span-3 h-[80%] bg-brown-dark rounded-2xl gap-3 ${hover}`}
+                className={`flex flex-col items-center justify-center col-span-3 h-[80%] bg-brown-dark rounded-2xl gap-3 ${hover} cursor-pointer`}
+                onMouseEnter={prefetchInfoFamiliar}
+                onClick={() => navigate("/dashboard/family/info")}
               >
                 <div className="flex items-center justify-center gap-2">
                   <img className="h-25" src={infoIcon} alt="Info Icon" />

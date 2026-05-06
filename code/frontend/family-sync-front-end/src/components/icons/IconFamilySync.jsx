@@ -1,13 +1,14 @@
 import { logoIcon } from "../../assets";
 
-function IconFamilySync() {
+function IconFamilySync({ ...props }) {
   return (
     <img
       src={logoIcon}
       alt="Logotipo FamilySync"
-      className="w-100 h-auto"
+      {...props}
+      className={`w-100 h-auto ${props.className || ""}`}
       draggable="false"
-    ></img>
+    />
   );
 }
 

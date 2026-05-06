@@ -33,6 +33,7 @@ import partyIcon from "./party_icon.svg";
 import pencilTerracotaIcon from "./pencil_terracota.svg";
 import saveIcon from "./save_icon.svg";
 import familyIcon from "./family_icon.svg";
+import loadingOrange from "./orange-loading.json";
 
 export {
   eyeIcon,
@@ -70,4 +71,5 @@ export {
   pencilTerracotaIcon,
   saveIcon,
   familyIcon,
+  loadingOrange,
 };

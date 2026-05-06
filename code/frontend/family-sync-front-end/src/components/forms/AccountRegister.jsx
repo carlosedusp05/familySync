@@ -4,6 +4,7 @@ import DefaultButton from "../ui/DefaultButton";
 import MultTextField from "../ui/MultTextField";
 import { eyeIcon, plusIcon } from "../../assets";
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 function AccountRegister() {
   const fileInputRef = useRef(null);
@@ -12,6 +13,14 @@ function AccountRegister() {
     setTimeout(() => {
       fileInputRef.current?.click();
     }, 1);
+  };
+
+  const navigate = useNavigate();
+
+  const prefetchLogin = () => {
+    import("../../screens/LoginScreen").catch(() => {
+      console.log("Erro ao pré-carregar a tela");
+    });
   };
 
   return (
@@ -63,8 +72,19 @@ function AccountRegister() {
       </div>
 
       <div className="flex items-center justify-center  h-14 gap-[25%] w-[90%]">
-        <DefaultButton text="Cancelar" theme={false} border={true} />
-        <DefaultButton text="Cadastrar" theme={true} />
+        <DefaultButton
+          text="Cancelar"
+          theme={false}
+          border={true}
+          onMouseEnter={prefetchLogin}
+          onClick={() => navigate("/auth/login")}
+        />
+        <DefaultButton
+          text="Cadastrar"
+          theme={true}
+          onMouseEnter={prefetchLogin}
+          onClick={() => navigate("/auth/login")}
+        />
       </div>
     </DefaultCard>
   );
