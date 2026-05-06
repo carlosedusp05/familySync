@@ -1,6 +1,6 @@
 import ItemAllergy from "./ItemAllergy";
 
-function MultAllergys({ allergys = [] }) {
+function MultAllergys({ allergys = [], onEditItem }) {
   return (
     <div
       className="flex flex-col items-center gap-4 h-[90%] w-[90%] mx-auto overflow-y-auto pr-3
@@ -14,6 +14,7 @@ function MultAllergys({ allergys = [] }) {
           key={allergy.id || index}
           title={allergy.title}
           desc={allergy.desc}
+          onClick={() => onEditItem(allergy)}
         />
       ))}
     </div>

@@ -12,6 +12,7 @@ function ItemAllergy(props) {
           alt="PencilIcon"
           className="duration-300 ease-out
         transition-all active:scale-90 active:brightness-90"
+          onClick={props.onClick}
           draggable={false}
         />
       </div>

@@ -9,6 +9,7 @@ function DefaultButton({
   another_size,
   another_text_size,
   another_text_weight,
+  another_text_color,
   another_color,
   onClick,
   another_padding,
@@ -16,7 +17,8 @@ function DefaultButton({
   const backgroundColor =
     another_color || (theme ? "bg-orange" : "bg-yellow-cream");
 
-  const textColor = theme ? "text-white" : "text-orange";
+  const textColor =
+    another_text_color || (theme ? "text-white" : "text-orange");
   const IsExistBorder = border ? "border border-orange" : "";
   const HaveLogout = logout_image ? (
     <img src={logoutIcon} alt="sair" className="w-12.5 h-15" />

@@ -2,12 +2,13 @@ import { useState } from "react";
 import MainLayout from "../layouts/Mainlayout";
 import DefaultButton from "../components/ui/DefaultButton";
 import MultAllergys from "../components/ui/MultAllergy";
-import ModalAddInfo from "../components/ui/ModalAddInfo";
+import ModalInfo from "../components/ui/ModalInfo";
 
 function InfoFamiliarScreen() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedInfo, setSelectedInfo] = useState(null);
 
-  const mockAllergies = [
+  const [allergies, setAllergies] = useState([
     {
       id: 1,
       title: "Alergia a Glúten",
@@ -58,12 +59,25 @@ function InfoFamiliarScreen() {
       title: "Corantes Artificiais",
       desc: "Sensibilidade a corantes como Tartrazina (Amarelo 5).",
     },
-  ];
+  ]);
+
+  const handleOpenModal = (info = null) => {
+    setSelectedInfo(info);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedInfo(null);
+  };
+
+  const handleDelete = (id) => {
+    setAllergies((prev) => prev.filter((item) => item.id !== id));
+  };
 
   return (
     <MainLayout>
       <div className="flex flex-row gap-4 items-center justify-center py-12 h-full">
-        {/* Painel Esquerdo (Lista) */}
         <div className="h-full w-[60%] bg-black/20 backdrop-blur-md border border-white/10 shadow-lg rounded-3xl p-8 overflow-hidden flex flex-col">
           <div className="w-full p-5 flex justify-end">
             <DefaultButton
@@ -73,15 +87,17 @@ function InfoFamiliarScreen() {
               another_text_weight={"font-normal"}
               another_padding={""}
               another_color={"bg-orange-dark"}
-              onClick={() => setIsModalOpen(true)} // Abre o Modal
+              onClick={() => handleOpenModal()}
             />
           </div>
           <div className="overflow-y-auto flex-1 pr-2">
-            <MultAllergys allergys={mockAllergies} />
+            <MultAllergys
+              allergys={allergies}
+              onEditItem={(item) => handleOpenModal(item)}
+            />
           </div>
         </div>
 
-        {/* Painel Direito (Membros) */}
         <div className="w-70 h-full bg-[#EED9CE]/40 backdrop-blur-lg border border-white/10 p-6 flex flex-col items-center gap-6 shadow-[-10px_0_30px_0_rgba(0,0,0,0.1)] rounded-[40px]">
           <div className="flex flex-col items-center gap-6 w-full">
             <div className="flex flex-col items-center gap-1 w-full group cursor-pointer">
@@ -106,10 +122,11 @@ function InfoFamiliarScreen() {
         </div>
       </div>
 
-      {/* Chamada do Modal */}
-      <ModalAddInfo
+      <ModalInfo
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleCloseModal}
+        data={selectedInfo}
+        onDelete={handleDelete}
       />
     </MainLayout>
   );
