@@ -29,6 +29,19 @@
   --color-black: #000000;
 }
 
+@layer base {
+  input:-webkit-autofill {
+    -webkit-text-fill-color: #ff8133 !important;
+
+    -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+  }
+
+  /* Garante que o estado de focus também respeite a cor */
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #1f2937 !important;
+  }
+}
+
 /* Calendário Estilização */
 
 .fc {
