@@ -4,8 +4,9 @@ import DefaultButton from "../ui/DefaultButton";
 import DefaultCard from "../ui/DefaultCard";
 import { eyeIcon, emailIcon } from "../../assets";
 import { data, useNavigate } from "react-router-dom";
+import ErrorForms from "../ui/ErrorForms";
 
-function CardLogin() {
+function CardLogin({ setEmail, setSenha, handleSubmit, erro }) {
   // Routes
   const navigate = useNavigate();
 
@@ -29,7 +30,7 @@ function CardLogin() {
 
   return (
     <DefaultCard h={"h-[50%]"}>
-      <IconFamilySync is_small={true} />
+      <IconFamilySync />
       <h2 className="text-orange-dark font-bold text-4xl">Login</h2>
       <div className=" w-[88%] flex flex-col gap-8 justify-center items-center">
         <DefaultTextField
@@ -42,18 +43,21 @@ function CardLogin() {
         <DefaultTextField
           placeholder="Senha"
           onChange={(e) => setSenha(e.target.value)}
-          type="text"
+          type="password"
           src={eyeIcon}
           alt="Input Senha"
+          isPassword={true}
         />
       </div>
+
+      <ErrorForms erro={erro}></ErrorForms>
 
       <div className="flex w-[40%] flex-col gap-1">
         <DefaultButton
           text="Entrar"
           theme={true}
           onMouseEnter={prefetchLoggedIn}
-          onClick={() => navigate("/dashboard")}
+          onClick={handleSubmit}
         />
 
         <a

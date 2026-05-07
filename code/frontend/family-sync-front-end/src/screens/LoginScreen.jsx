@@ -14,15 +14,19 @@ function LoginScreen() {
     try {
       setErro("");
 
+      console.log(email);
+
       const dados = { email, senha };
 
       const validacao = validateFields(dados);
-      if (!validacao) {
+      if (validacao !== true) {
         setErro(validacao);
         return;
       }
 
       const response = await userService.loginUser(dados);
+
+      navigate("/dashboard");
     } catch (error) {
       // Arrumar Gestão de Erro Depois
       setErro("E-mail ou Senha Incorretos!");
@@ -36,13 +40,20 @@ function LoginScreen() {
         alt={"Imagem Fundo"}
         blur_or_glass={"blur"}
       />
-      <CardLogin />
+      <CardLogin
+        setEmail={setEmail}
+        setSenha={setSenha}
+        handleSubmit={handleSubmit}
+        erro={erro}
+      />
     </div>
   );
 }
 
 function validateFields(dados) {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  console.log(dados);
 
   if (
     dados.email == "" ||
@@ -51,11 +62,8 @@ function validateFields(dados) {
     !regex.test(dados.email)
   ) {
     return "Email inválido";
-  } else if (
-    dados.senha == "" ||
-    dados.senha == null ||
-    dados.senha.length > 50
-  ) {
+  }
+  if (dados.senha == "" || dados.senha == null || dados.senha.length > 100) {
     return "Senha inválida";
   } else {
     return true;
