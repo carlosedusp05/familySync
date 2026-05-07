@@ -10,7 +10,7 @@ function MultAllergys({ allergys = [], onEditItem, onEditClick }) {
       {allergys.map((allergy, index) => (
         <ItemAllergy
           key={allergy.id}
-          title={allergy.title}
+          title={truncateText(allergy.title || "", 60)}
           desc={truncateText(allergy.desc || "", 80)}
           onClick={() => onEditItem(allergy)}
           onEditClick={() => onEditClick(allergy)}

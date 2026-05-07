@@ -30,8 +30,6 @@ function ModalInfo({
       setTitle(data?.title || "");
       setDescription(data?.desc || "");
 
-      // Se for novo item (!isEdit), já vem aberto para escrever.
-      // Se for item existente (isEdit), vem bloqueado para o usuário clicar no lápis.
       setEditableFields({
         title: !isEdit,
         description: !isEdit,
@@ -94,6 +92,7 @@ function ModalInfo({
         </div>
 
         <div className="flex flex-col gap-4">
+          {/* TÍTULO ESTILIZADO CONFORME O ANTIGO */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 px-1">
               <label className="text-[#5D2A11] text-[18px] font-semibold">
@@ -113,9 +112,10 @@ function ModalInfo({
               )}
             </div>
 
-            <div className="relative flex items-center">
-              <div className="inline-grid items-center min-w-[15%] max-w-full">
-                <span className="invisible col-start-1 row-start-1 px-1 text-[28px] font-bold whitespace-pre-wrap border-b-2 border-transparent">
+            <div className="relative flex items-center w-full">
+              <div className="inline-grid items-center w-full max-w-full overflow-hidden">
+                {/* Span invisível para ditar a altura e quebra do grid */}
+                <span className="invisible col-start-1 row-start-1 px-1 text-[18px] font-medium whitespace-pre-wrap break-words border-b-2 border-transparent">
                   {title || "Título (ex: Alergia a Glúten severa)"}
                 </span>
 
@@ -132,19 +132,17 @@ function ModalInfo({
                         setErrors((prev) => ({ ...prev, title: false }));
                     }}
                     placeholder="Título (ex: Alergia a Glúten severa)"
-                    className={`col-start-1 row-start-1 w-full py-2 px-1 outline-none transition-all
-                    ${errors.title ? "border-b-2 border-red-500" : editableFields.title ? "border-b-2 border-[#5D2A11]/30" : "border-b-2 border-transparent"}
-                    bg-transparent text-[#5D2A11] text-[26px] font-bold`}
+                    className={`col-start-1 row-start-1 w-full py-2 px-1 outline-none transition-all bg-transparent text-[#5D2A11] text-[18px] font-medium
+                    ${errors.title ? "border-b-2 border-red-500" : editableFields.title ? "border-b-2 border-[#5D2A11]/30" : "border-b-2 border-transparent"}`}
                     style={{ textIndent: "5px" }}
                   />
                 ) : (
-                  <h1 className="col-start-1 row-start-1 text-[#5D2A11] text-[28px] font-bold px-1 whitespace-pre-wrap">
+                  <h1 className="col-start-1 row-start-1 text-[#5D2A11] text-[18px] font-medium px-1 whitespace-pre-wrap break-words leading-normal w-full border-b-2 border-transparent">
                     {title}
                   </h1>
                 )}
               </div>
             </div>
-
             {errors.title && (
               <span className="text-red-500 text-xs mt-1 block px-1">
                 O título é obrigatório.
@@ -152,6 +150,7 @@ function ModalInfo({
             )}
           </div>
 
+          {/* DESCRIÇÃO */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between px-1">
               <div className="flex items-center gap-2">
@@ -171,7 +170,6 @@ function ModalInfo({
                   </button>
                 )}
               </div>
-
               {editableFields.description && isGlobalEditFlow && (
                 <span
                   className={`text-xs ${description.length >= 950 ? "text-red-500 font-bold" : "text-[#5D2A11]/50"}`}
@@ -189,9 +187,8 @@ function ModalInfo({
                 readOnly={!editableFields.description}
                 onChange={(e) => {
                   setDescription(e.target.value);
-                  if (errors.description && e.target.value.trim() !== "") {
+                  if (errors.description && e.target.value.trim() !== "")
                     setErrors((prev) => ({ ...prev, description: false }));
-                  }
                 }}
                 placeholder="Descrição detalhada..."
                 rows="5"
@@ -200,13 +197,12 @@ function ModalInfo({
                 ${errors.description ? "border-2 border-red-500" : editableFields.description ? "border border-[#5D2A11]/10 bg-white/50" : "bg-[#E0E0E0]/50"}`}
               />
             ) : (
-              <div className="bg-[#5D2A11]/5 p-6 rounded-2xl min-h-37.5">
-                <p className="text-[#5D2A11] text-[20px] leading-relaxed whitespace-pre-wrap">
+              <div className="bg-[#5D2A11]/5 p-6 rounded-2xl min-h-[150px] w-full">
+                <p className="text-[#5D2A11] text-[20px] leading-relaxed whitespace-pre-wrap break-words">
                   {description}
                 </p>
               </div>
             )}
-
             {errors.description && (
               <span className="text-red-500 text-xs mt-1 px-1">
                 A descrição é obrigatória.
@@ -215,6 +211,7 @@ function ModalInfo({
           </div>
         </div>
 
+        {/* BOTÕES */}
         <div className="flex w-full gap-3 mt-4 justify-end items-center h-14">
           {!isConfirmingDelete ? (
             <>
