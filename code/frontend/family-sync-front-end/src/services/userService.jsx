@@ -105,7 +105,7 @@ const listUsersByFamily = async function (idFamily) {
   }
 };
 
-export const userServicce = {
+export const userService = {
   getUsers,
   getUserById,
   createUser,

@@ -1,7 +1,7 @@
 import BackgroundImage from "../components/ui/BackgroundImage";
 import { imageBackground } from "../assets";
 import CardLogin from "../components/forms/CardLogin";
-import { loginUser } from "../../services/userService";
+import { userService } from "../services/userService";
 import { useState } from "react";
 
 function LoginScreen() {
@@ -22,7 +22,7 @@ function LoginScreen() {
         return;
       }
 
-      const response = await loginUser(dados);
+      const response = await userService.loginUser(dados);
     } catch (error) {
       // Arrumar Gestão de Erro Depois
       setErro("E-mail ou Senha Incorretos!");
