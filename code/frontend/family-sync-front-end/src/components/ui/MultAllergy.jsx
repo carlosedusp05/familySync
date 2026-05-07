@@ -1,20 +1,19 @@
 import ItemAllergy from "./ItemAllergy";
 
-function MultAllergys({ allergys = [], onEditItem }) {
+function MultAllergys({ allergys = [], onEditItem, onEditClick }) {
+  const truncateText = (text, limit) => {
+    return text.length > limit ? text.substring(0, limit) + "..." : text;
+  };
+
   return (
-    <div
-      className="flex flex-col items-center gap-4 h-[90%] w-[90%] mx-auto overflow-y-auto pr-3
-      [&::-webkit-scrollbar]:w-2
-      [&::-webkit-scrollbar-track]:bg-transparent
-      [&::-webkit-scrollbar-thumb]:bg-[#282828]
-      [&::-webkit-scrollbar-thumb]:rounded-md"
-    >
+    <div className="flex flex-col items-center gap-4 h-[90%] w-[90%] mx-auto overflow-y-auto pr-3">
       {allergys.map((allergy, index) => (
         <ItemAllergy
-          key={allergy.id || index}
+          key={allergy.id}
           title={allergy.title}
-          desc={allergy.desc}
+          desc={truncateText(allergy.desc || "", 80)}
           onClick={() => onEditItem(allergy)}
+          onEditClick={() => onEditClick(allergy)}
         />
       ))}
     </div>

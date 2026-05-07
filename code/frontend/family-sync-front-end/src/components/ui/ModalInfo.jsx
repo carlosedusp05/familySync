@@ -2,18 +2,21 @@ import { useState, useEffect, useRef } from "react";
 import { pencilTerracotaIcon } from "../../assets";
 import DefaultButton from "./DefaultButton";
 
-function ModalInfo({ isOpen, onClose, data = null, onDelete }) {
+function ModalInfo({
+  isOpen,
+  onClose,
+  data = null,
+  onDelete,
+  onSave,
+  isInitialEdit,
+}) {
   const isEdit = Boolean(data);
-
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [participants, setParticipants] = useState([]);
-  const [inputValue, setInputValue] = useState("");
+  const [errors, setErrors] = useState({ title: false, description: false });
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
-
   const [editableFields, setEditableFields] = useState({
     title: false,
-    participants: false,
     description: false,
   });
 
@@ -23,14 +26,14 @@ function ModalInfo({ isOpen, onClose, data = null, onDelete }) {
   useEffect(() => {
     if (isOpen) {
       setIsConfirmingDelete(false);
+      setErrors({ title: false, description: false });
       setTitle(data?.title || "");
-      setDescription(data?.description || "");
-      setParticipants(data?.participants || []);
-      setInputValue("");
+      setDescription(data?.desc || "");
 
+      // Se for novo item (!isEdit), já vem aberto para escrever.
+      // Se for item existente (isEdit), vem bloqueado para o usuário clicar no lápis.
       setEditableFields({
         title: !isEdit,
-        participants: !isEdit,
         description: !isEdit,
       });
     }
@@ -48,6 +51,25 @@ function ModalInfo({ isOpen, onClose, data = null, onDelete }) {
     });
   };
 
+  const handleSave = () => {
+    const currentTitle = title || "";
+    const currentDesc = description || "";
+
+    const titleError = !currentTitle.trim();
+    const descError = !currentDesc.trim();
+
+    setErrors({ title: titleError, description: descError });
+
+    if (!titleError && !descError) {
+      onSave({
+        title: currentTitle,
+        description: currentDesc,
+      });
+    }
+  };
+
+  const isGlobalEditFlow = !isEdit || isInitialEdit;
+
   return (
     <div className="fixed inset-0 z-9999 flex items-center justify-center p-4">
       <div
@@ -58,14 +80,16 @@ function ModalInfo({ isOpen, onClose, data = null, onDelete }) {
       <div className="relative bg-[#FEF6E4] w-full max-w-7xl p-8 rounded-[40px] shadow-2xl border border-white/20 flex flex-col gap-6 animate-scale-up">
         <div className="flex flex-col gap-2">
           <h2 className="text-brown-dark text-3xl font-bold">
-            {isEdit
-              ? "Detalhes da Informação"
-              : "Adicionar informação familiar"}
+            {isGlobalEditFlow
+              ? isEdit
+                ? "Editar Informação"
+                : "Adicionar informação familiar"
+              : "Visualizar Informação"}
           </h2>
           <p className="text-[#5D2A11]/60">
-            {isEdit
-              ? "Visualize ou edite os detalhes desta condição."
-              : "Preencha os detalhes da nova alergia ou condição médica."}
+            {isGlobalEditFlow
+              ? "Clique no ícone de lápis para liberar a edição dos campos."
+              : "Visualize os detalhes registrados abaixo."}
           </p>
         </div>
 
@@ -75,7 +99,7 @@ function ModalInfo({ isOpen, onClose, data = null, onDelete }) {
               <label className="text-[#5D2A11] text-[18px] font-semibold">
                 Título da informação
               </label>
-              {isEdit && (
+              {isGlobalEditFlow && isEdit && (
                 <button
                   onClick={() => toggleEdit("title", titleRef)}
                   className="transition-transform hover:scale-110"
@@ -83,7 +107,7 @@ function ModalInfo({ isOpen, onClose, data = null, onDelete }) {
                   <img
                     src={pencilTerracotaIcon}
                     alt="Editar"
-                    className={`w-7 h-7 transition-all ${editableFields.title ? "opacity-100" : "opacity-60"}`}
+                    className={`w-7 h-7 transition-all ${editableFields.title ? "opacity-100" : "opacity-40"}`}
                   />
                 </button>
               )}
@@ -91,62 +115,103 @@ function ModalInfo({ isOpen, onClose, data = null, onDelete }) {
 
             <div className="relative flex items-center">
               <div className="inline-grid items-center min-w-[15%] max-w-full">
-                <span className="invisible col-start-1 row-start-1 px-1 text-[18px] font-medium whitespace-pre border-b-2 border-transparent">
+                <span className="invisible col-start-1 row-start-1 px-1 text-[28px] font-bold whitespace-pre-wrap border-b-2 border-transparent">
                   {title || "Título (ex: Alergia a Glúten severa)"}
                 </span>
-                <input
-                  ref={titleRef}
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  readOnly={!editableFields.title}
-                  placeholder="Título (ex: Alergia a Glúten severa)"
-                  className={`col-start-1 row-start-1 w-full py-2 px-1 outline-none transition-all placeholder:text-[#5D2A11]/40
-                    ${
-                      editableFields.title
-                        ? "border-b-2 border-[#5D2A11]/30 bg-transparent focus:border-orange-dark rounded-none"
-                        : "bg-transparent text-[#5D2A11] text-[18px] font-medium border-b-2 border-transparent"
-                    }`}
-                  style={{ textIndent: "5px" }}
-                />
+
+                {isGlobalEditFlow ? (
+                  <input
+                    ref={titleRef}
+                    type="text"
+                    value={title}
+                    maxLength={100}
+                    readOnly={!editableFields.title}
+                    onChange={(e) => {
+                      setTitle(e.target.value);
+                      if (errors.title && e.target.value.trim() !== "")
+                        setErrors((prev) => ({ ...prev, title: false }));
+                    }}
+                    placeholder="Título (ex: Alergia a Glúten severa)"
+                    className={`col-start-1 row-start-1 w-full py-2 px-1 outline-none transition-all
+                    ${errors.title ? "border-b-2 border-red-500" : editableFields.title ? "border-b-2 border-[#5D2A11]/30" : "border-b-2 border-transparent"}
+                    bg-transparent text-[#5D2A11] text-[26px] font-bold`}
+                    style={{ textIndent: "5px" }}
+                  />
+                ) : (
+                  <h1 className="col-start-1 row-start-1 text-[#5D2A11] text-[28px] font-bold px-1 whitespace-pre-wrap">
+                    {title}
+                  </h1>
+                )}
               </div>
             </div>
+
+            {errors.title && (
+              <span className="text-red-500 text-xs mt-1 block px-1">
+                O título é obrigatório.
+              </span>
+            )}
           </div>
 
           <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2 px-1">
-              <label className="text-[#5D2A11] text-[18px] font-semibold">
-                Detalhes
-              </label>
-              {isEdit && (
-                <button
-                  onClick={() => toggleEdit("description", descRef)}
-                  className="transition-transform hover:scale-110"
+            <div className="flex items-center justify-between px-1">
+              <div className="flex items-center gap-2">
+                <label className="text-[#5D2A11] text-[18px] font-semibold">
+                  Detalhes
+                </label>
+                {isGlobalEditFlow && isEdit && (
+                  <button
+                    onClick={() => toggleEdit("description", descRef)}
+                    className="transition-transform hover:scale-110"
+                  >
+                    <img
+                      src={pencilTerracotaIcon}
+                      alt="Editar"
+                      className={`w-7 h-7 transition-all ${editableFields.description ? "opacity-100" : "opacity-40"}`}
+                    />
+                  </button>
+                )}
+              </div>
+
+              {editableFields.description && isGlobalEditFlow && (
+                <span
+                  className={`text-xs ${description.length >= 950 ? "text-red-500 font-bold" : "text-[#5D2A11]/50"}`}
                 >
-                  <img
-                    src={pencilTerracotaIcon}
-                    alt="Editar"
-                    className={`w-7 h-7 transition-all ${editableFields.description ? "opacity-100" : "opacity-60"}`}
-                  />
-                </button>
+                  {description.length} / 1000
+                </span>
               )}
             </div>
 
-            <textarea
-              ref={descRef}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              readOnly={!editableFields.description}
-              placeholder="Descrição detalhada sobre sintomas, precauções e tratamento emergencial..."
-              rows="5"
-              style={{ textIndent: "5px" }}
-              className={`w-full p-4 rounded-2xl outline-none transition-colors resize-none placeholder:text-[#5D2A11]/40
-                ${
-                  editableFields.description
-                    ? "border border-[#5D2A11]/10 bg-white/50 focus:border-orange-dark"
-                    : "bg-[#E0E0E0]/80 text-[#5D2A11] text-[18px] border border-transparent"
-                }`}
-            />
+            {isGlobalEditFlow ? (
+              <textarea
+                ref={descRef}
+                value={description}
+                maxLength={1000}
+                readOnly={!editableFields.description}
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  if (errors.description && e.target.value.trim() !== "") {
+                    setErrors((prev) => ({ ...prev, description: false }));
+                  }
+                }}
+                placeholder="Descrição detalhada..."
+                rows="5"
+                style={{ textIndent: "5px" }}
+                className={`w-full p-4 rounded-2xl outline-none transition-colors resize-none text-[#5D2A11] text-[18px]
+                ${errors.description ? "border-2 border-red-500" : editableFields.description ? "border border-[#5D2A11]/10 bg-white/50" : "bg-[#E0E0E0]/50"}`}
+              />
+            ) : (
+              <div className="bg-[#5D2A11]/5 p-6 rounded-2xl min-h-37.5">
+                <p className="text-[#5D2A11] text-[20px] leading-relaxed whitespace-pre-wrap">
+                  {description}
+                </p>
+              </div>
+            )}
+
+            {errors.description && (
+              <span className="text-red-500 text-xs mt-1 px-1">
+                A descrição é obrigatória.
+              </span>
+            )}
           </div>
         </div>
 
@@ -158,26 +223,27 @@ function ModalInfo({ isOpen, onClose, data = null, onDelete }) {
                 another_text_color="text-zinc-700"
                 another_text_size="text-[20px]"
                 another_size="h-14 w-50"
-                text="Cancelar"
+                text={isGlobalEditFlow ? "Cancelar" : "Fechar"}
                 onClick={onClose}
               />
-              <DefaultButton
-                text={isEdit ? "Salvar Edição" : "Salvar Informação"}
-                another_text_size="text-[20px]"
-                another_size="h-14 w-50"
-                onClick={() => {
-                  console.log("Salvo:", { title, description });
-                  onClose();
-                }}
-              />
-              {isEdit && (
-                <DefaultButton
-                  text="Excluir"
-                  another_color="bg-red-light"
-                  another_text_size="text-[20px]"
-                  another_size="h-14 w-50"
-                  onClick={() => setIsConfirmingDelete(true)}
-                />
+              {isGlobalEditFlow && (
+                <>
+                  <DefaultButton
+                    text={isEdit ? "Salvar Edição" : "Salvar Informação"}
+                    another_text_size="text-[20px]"
+                    another_size="h-14 w-50"
+                    onClick={handleSave}
+                  />
+                  {isEdit && (
+                    <DefaultButton
+                      text="Excluir"
+                      another_color="bg-red-light"
+                      another_text_size="text-[20px]"
+                      another_size="h-14 w-50"
+                      onClick={() => setIsConfirmingDelete(true)}
+                    />
+                  )}
+                </>
               )}
             </>
           ) : (
