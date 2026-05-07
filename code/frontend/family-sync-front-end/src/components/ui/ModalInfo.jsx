@@ -115,7 +115,7 @@ function ModalInfo({
             <div className="relative flex items-center w-full">
               <div className="inline-grid items-center w-full max-w-full overflow-hidden">
                 {/* Span invisível para ditar a altura e quebra do grid */}
-                <span className="invisible col-start-1 row-start-1 px-1 text-[18px] font-medium whitespace-pre-wrap break-words border-b-2 border-transparent">
+                <span className="invisible col-start-1 row-start-1 px-1 text-[18px] font-medium whitespace-pre-wrap wrap-break-word border-b-2 border-transparent">
                   {title || "Título (ex: Alergia a Glúten severa)"}
                 </span>
 
@@ -137,7 +137,7 @@ function ModalInfo({
                     style={{ textIndent: "5px" }}
                   />
                 ) : (
-                  <h1 className="col-start-1 row-start-1 text-[#5D2A11] text-[18px] font-medium px-1 whitespace-pre-wrap break-words leading-normal w-full border-b-2 border-transparent">
+                  <h1 className="col-start-1 row-start-1 text-[#5D2A11] text-[18px] font-medium px-1 whitespace-pre-wrap wrap-break-word leading-normal w-full border-b-2 border-transparent">
                     {title}
                   </h1>
                 )}
@@ -197,8 +197,8 @@ function ModalInfo({
                 ${errors.description ? "border-2 border-red-500" : editableFields.description ? "border border-[#5D2A11]/10 bg-white/50" : "bg-[#E0E0E0]/50"}`}
               />
             ) : (
-              <div className="bg-[#5D2A11]/5 p-6 rounded-2xl min-h-[150px] w-full">
-                <p className="text-[#5D2A11] text-[20px] leading-relaxed whitespace-pre-wrap break-words">
+              <div className="bg-[#5D2A11]/5 p-6 rounded-2xl min-h-37.5 w-full">
+                <p className="text-[#5D2A11] text-[20px] leading-relaxed whitespace-pre-wrap wrap-break-word">
                   {description}
                 </p>
               </div>
