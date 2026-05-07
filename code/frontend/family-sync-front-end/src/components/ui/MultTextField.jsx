@@ -9,6 +9,8 @@ function MultTextField({ text_fields = [] }) {
         placeholder={text_field.placeholder}
         src={text_field.src}
         alt={text_field.alt}
+        isPassword={text_field.isPassword}
+        onChange={text_field.onChange}
       />
     );
   });

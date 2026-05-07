@@ -2,11 +2,21 @@ import DefaultCard from "../ui/DefaultCard";
 import IconPerfil from "../icons/IconPerfil";
 import DefaultButton from "../ui/DefaultButton";
 import MultTextField from "../ui/MultTextField";
+import ErrorForms from "../ui/ErrorForms";
 import { eyeIcon, plusIcon } from "../../assets";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-function AccountRegister() {
+function AccountRegister({
+  setNome,
+  setEmail,
+  setCpf,
+  setDataNascimento,
+  setSenha,
+  setRepetirSenha,
+  handleSubmit,
+  erro,
+}) {
   const fileInputRef = useRef(null);
 
   const handleButtonClick = () => {
@@ -24,7 +34,7 @@ function AccountRegister() {
   };
 
   return (
-    <DefaultCard>
+    <DefaultCard h={"pb-30"}>
       <div className="w-30 h-30 relative rounded-full border-2 border-orange flex items-center justify-center bg-white">
         <IconPerfil is_white_backgroud={true} another_size={"h-70%"} />
         <div className="absolute -bottom-3 -right-3 flex items-center justify-center rounded-[50%] cursor-pointer">
@@ -51,40 +61,67 @@ function AccountRegister() {
       <div className=" w-[90%] flex justify-center items-center flex-wrap gap-5">
         <MultTextField
           text_fields={[
-            { placeholder: "Nome", type: "text" },
-            { placeholder: "Email", type: "email" },
-            { placeholder: "CPF", type: "text" },
-            { placeholder: "Data Nascimento", type: "text" },
+            {
+              placeholder: "Nome",
+              type: "text",
+              alt: "Input Nome",
+              onChange: (e) => setNome(e.target.value),
+            },
+            {
+              placeholder: "Email",
+              type: "email",
+              alt: "Input Email",
+              onChange: (e) => setEmail(e.target.value),
+            },
+            {
+              placeholder: "CPF",
+              type: "text",
+              alt: "Input CPF",
+              onChange: (e) => setCpf(e.target.value),
+            },
+            {
+              placeholder: "Data Nascimento",
+              type: "date",
+              alt: "Input Data de Nascimento",
+              onChange: (e) => setDataNascimento(e.target.value),
+            },
             {
               placeholder: "Senha",
-              type: "text",
+              type: "password",
+              onChange: (e) => setSenha(e.target.value),
               src: eyeIcon,
               alt: "Input Senha",
+              isPassword: true,
             },
             {
               placeholder: "Confirme a senha",
-              type: "text",
+              type: "password",
+              onChange: (e) => setRepetirSenha(e.target.value),
               src: eyeIcon,
               alt: "Input Confirme a senha",
+              isPassword: true,
             },
           ]}
         />
       </div>
 
-      <div className="flex items-center justify-center  h-14 gap-[25%] w-[90%]">
-        <DefaultButton
-          text="Cancelar"
-          theme={false}
-          border={true}
-          onMouseEnter={prefetchLogin}
-          onClick={() => navigate("/auth/login")}
-        />
-        <DefaultButton
-          text="Cadastrar"
-          theme={true}
-          onMouseEnter={prefetchLogin}
-          onClick={() => navigate("/auth/login")}
-        />
+      <div className="flex items-center justify-center flex-col h-14 pt-15 gap-3 w-[90%]">
+        <ErrorForms erro={erro}></ErrorForms>
+        <div className="flex h-14 gap-15 items-center justify-center">
+          <DefaultButton
+            text="Cancelar"
+            theme={false}
+            border={true}
+            onMouseEnter={prefetchLogin}
+            onClick={() => navigate("/auth/login")}
+          />
+          <DefaultButton
+            text="Cadastrar"
+            theme={true}
+            onMouseEnter={prefetchLogin}
+            onClick={handleSubmit}
+          />
+        </div>
       </div>
     </DefaultCard>
   );

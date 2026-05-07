@@ -14,8 +14,6 @@ function LoginScreen() {
     try {
       setErro("");
 
-      console.log(email);
-
       const dados = { email, senha };
 
       const validacao = validateFields(dados);
@@ -55,15 +53,10 @@ function validateFields(dados) {
 
   console.log(dados);
 
-  if (
-    dados.email == "" ||
-    dados.email == null ||
-    dados.email.length > 100 ||
-    !regex.test(dados.email)
-  ) {
+  if (!dados.email || dados.email.length > 100 || !regex.test(dados.email)) {
     return "Email inválido";
   }
-  if (dados.senha == "" || dados.senha == null || dados.senha.length > 100) {
+  if (!dados.senha || dados.senha.length > 100) {
     return "Senha inválida";
   } else {
     return true;

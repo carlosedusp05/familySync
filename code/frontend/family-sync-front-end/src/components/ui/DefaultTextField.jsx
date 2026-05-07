@@ -4,7 +4,8 @@ function DefaultTextField(props) {
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+    // setShowPassword(!showPassword);
+    setShowPassword((prev) => !prev);
   };
 
   return (
