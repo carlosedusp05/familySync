@@ -1,6 +1,6 @@
 function ErrorForms({ erro }) {
   let hidden = "";
-  if (erro == "") {
+  if (!erro) {
     hidden = "hidden";
   } else {
     hidden = "";
