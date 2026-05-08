@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8080";
+const API_URL = "https://tcc-back-q3kw.onrender.com/v1/familysync/";
 
 export const infoService = {
   async getInfos() {

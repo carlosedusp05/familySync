@@ -17,7 +17,6 @@ function CardLogin({
 }) {
   const navigate = useNavigate();
 
-  // Estado para controlar a alternância
   const [mostrarSenha, setMostrarSenha] = useState(false);
 
   const togglePasswordVisibility = () => {

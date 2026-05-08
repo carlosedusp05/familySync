@@ -4,6 +4,8 @@ import AccountRegister from "../components/forms/AccountRegister";
 import { useState } from "react";
 import { userService } from "../services/userService";
 import { useNavigate } from "react-router-dom";
+// 1. Importe a biblioteca crypto-js
+import CryptoJS from "crypto-js";
 
 function RegisterScreen() {
   const navigate = useNavigate();
@@ -57,12 +59,14 @@ function RegisterScreen() {
         return;
       }
 
+      const senhaHasheada = CryptoJS.SHA256(senha).toString(CryptoJS.enc.Hex);
+
       const dadosBackend = {
         nome: nome,
         email: email,
         cpf: cpf.replace(/\D/g, ""),
         data_nascimento: dataNascimento,
-        senha: senha,
+        senha: senhaHasheada,
       };
 
       const response = await userService.createUser(dadosBackend);
@@ -120,14 +124,22 @@ function RegisterScreen() {
 
 function validationFields(dados) {
   const errors = {};
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  if (!dados.nome || dados.nome.length > 100 || !isNaN(dados.nome)) {
-    errors.nome = "Nome inválido";
+  const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  const regexSenha =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/;
+
+  if (!dados.nome || dados.nome.trim().length < 3 || !isNaN(dados.nome)) {
+    errors.nome = "Insira um nome válido (mínimo 3 caracteres)";
   }
 
-  if (!dados.email || dados.email.length > 100 || !regex.test(dados.email)) {
-    errors.email = "Email inválido";
+  if (!dados.email) {
+    errors.email = "O e-mail é obrigatório";
+  } else if (!regexEmail.test(dados.email)) {
+    errors.email = "Insira um formato de e-mail válido";
+  } else if (dados.email.length > 100) {
+    errors.email = "O e-mail deve ter no máximo 100 caracteres";
   }
 
   if (!validarCpf(dados.cpf)) {
@@ -135,11 +147,18 @@ function validationFields(dados) {
   }
 
   if (!dados.dataNascimento || !validarData(dados.dataNascimento)) {
-    errors.dataNascimento = "Data inválida";
+    errors.dataNascimento = "Data de nascimento inválida ou futura";
   }
 
-  if (!dados.senha || dados.senha.length > 100) {
-    errors.senha = "Senha inválida";
+  if (!dados.senha) {
+    errors.senha = "A senha é obrigatória";
+  } else if (dados.senha.length < 8) {
+    errors.senha = "A senha deve ter pelo menos 8 caracteres";
+  } else if (!regexSenha.test(dados.senha)) {
+    errors.senha =
+      "A senha deve conter letras maiúsculas, minúsculas, números e um símbolo.";
+  } else if (dados.senha.length > 100) {
+    errors.senha = "A senha excedeu o limite de caracteres";
   }
 
   if (!dados.repetirSenha) {
@@ -151,6 +170,7 @@ function validationFields(dados) {
   if (Object.keys(errors).length > 0) {
     return errors;
   }
+
   return true;
 }
 

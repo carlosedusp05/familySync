@@ -4,6 +4,7 @@ import CardLogin from "../components/forms/CardLogin";
 import { userService } from "../services/userService";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import CryptoJS from "crypto-js";
 
 function LoginScreen() {
   const navigate = useNavigate();
@@ -27,18 +28,16 @@ function LoginScreen() {
         return;
       }
 
-      const response = await userService.loginUser({ email, senha });
+      const senhaHasheada = CryptoJS.SHA256(senha).toString(CryptoJS.enc.Hex);
 
-      if (response === true || response?.status === true) {
+      const response = await userService.loginUser({
+        email,
+        senha: senhaHasheada,
+      });
+
+      if (response.Status === true) {
         localStorage.setItem("@FamilySync:isAuthenticated", "true");
-
-        if (response.usuario) {
-          localStorage.setItem(
-            "@FamilySync:user",
-            JSON.stringify(response.usuario),
-          );
-        }
-
+        localStorage.setItem("@FamilySync", JSON.stringify(response.Response));
         navigate("/dashboard");
         return;
       }
@@ -106,8 +105,8 @@ function validateFields(dados) {
   if (!dados.senha) {
     erros.senha = "A senha é obrigatória.";
     isValid = false;
-  } else if (dados.senha.length > 20) {
-    erros.senha = "Limite de 20 caracteres excedido.";
+  } else if (dados.senha.length > 100) {
+    erros.senha = "Limite de 100 caracteres excedido.";
     isValid = false;
   }
 

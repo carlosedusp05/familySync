@@ -23,11 +23,24 @@ function PrincipalScreen(props) {
     email: "carregando...",
   });
 
-  // useEffect para buscar os dados do LocalStorage assim que a tela carregar
   useEffect(() => {
-    const savedUser = localStorage.getItem("@FamilySync:user");
+    const savedUser = localStorage.getItem("@FamilySync");
+
     if (savedUser) {
-      setUserData(JSON.parse(savedUser));
+      try {
+        const parsedUser = JSON.parse(savedUser);
+
+        const nomeFormatado =
+          parsedUser.nome.charAt(0).toUpperCase() +
+          parsedUser.nome.slice(1).toLowerCase();
+
+        setUserData({
+          nome: nomeFormatado || "Usuário",
+          email: parsedUser.email || "E-mail não encontrado",
+        });
+      } catch (error) {
+        console.error("Erro ao converter dados do localStorage", error);
+      }
     }
   }, []);
 
@@ -81,11 +94,8 @@ function PrincipalScreen(props) {
           p={"pt-25 pb-10 px-30"}
           size={"h-[82%] w-[77%]"}
         >
-          {/* div total */}
           <div className="flex flex-col gap-1 justify-center h-full">
-            {/* div texts */}
             <div className="flex justify-between items-center gap-5">
-              {/* div text esquerda */}
               <div className="flex flex-col">
                 <h2 className="text-4xl font-bold text-orange">
                   Olá, {userData.nome}

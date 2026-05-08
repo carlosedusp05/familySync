@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Configurar cliente HTTP
 const api = axios.create({
-  baseURL: "http://localhost:3000/v1/familysync",
+  baseURL: "https://tcc-back-q3kw.onrender.com/v1/familysync/",
   headers: {
     "Content-Type": "application/json",
   },
