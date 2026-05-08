@@ -8,9 +8,11 @@ function DefaultTextField(props) {
     setShowPassword((prev) => !prev);
   };
 
+  const borderColor = props.hasError ? "border-red-500" : "border-orange";
+
   return (
     <div
-      className={`flex px-5  h-14 w-full border-orange border rounded-4xl justify-center items-center text-orange autofill:text-orange  ${props.grid}`}
+      className={`flex px-5  h-14 w-full ${borderColor} border rounded-4xl justify-center items-center text-orange autofill:text-orange  ${props.grid}`}
     >
       <input
         type={props.isPassword && showPassword ? "text" : props.type}
