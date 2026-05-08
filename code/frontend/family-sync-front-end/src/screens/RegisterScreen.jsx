@@ -1,11 +1,13 @@
 import BackgroundImage from "../components/ui/BackgroundImage";
-import { imageBackground } from "../assets";
+import { imageBackground, eyeIcon, closedEye } from "../assets";
 import AccountRegister from "../components/forms/AccountRegister";
 import { useState } from "react";
 import { userService } from "../services/userService";
+import { useNavigate } from "react-router-dom";
 
 function RegisterScreen() {
-  //inputs
+  const navigate = useNavigate();
+
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
@@ -13,31 +15,68 @@ function RegisterScreen() {
   const [senha, setSenha] = useState("");
   const [repetirSenha, setRepetirSenha] = useState("");
 
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [mostrarRepetirSenha, setMostrarRepetirSenha] = useState(false);
+
   const [erro, setErro] = useState("");
+  const [errosCampos, setErrosCampos] = useState({});
+
+  const [preview, setPreview] = useState(null);
+  const [fileSelecionado, setFileSelecionado] = useState(null);
+
+  const togglePasswordVisibility = () => setMostrarSenha(!mostrarSenha);
+  const toggleRepeatPasswordVisibility = () =>
+    setMostrarRepetirSenha(!mostrarRepetirSenha);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setFileSelecionado(file);
+    const reader = new FileReader();
+    reader.onloadend = (event) => {
+      setPreview(event.target.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImagem = () => {
+    setPreview(null);
+    setFileSelecionado(null);
+  };
 
   const handleSubmit = async function () {
     try {
       setErro("");
+      setErrosCampos({});
 
       const dados = { nome, email, cpf, dataNascimento, senha, repetirSenha };
-
-      console.log(dados);
-
       const validacao = validationFields(dados);
 
-      console.log(validacao);
       if (validacao !== true) {
-        setErro(validacao);
+        setErrosCampos(validacao);
         return;
       }
 
-      const response = await userService.createUser(dados);
+      const dadosBackend = {
+        nome: nome,
+        email: email,
+        cpf: cpf.replace(/\D/g, ""),
+        data_nascimento: dataNascimento,
+        senha: senha,
+      };
 
-      alert("Cadastro Finalizado! Faça login para entrar!");
+      const response = await userService.createUser(dadosBackend);
+
+      if (response) {
+        navigate("/auth/login");
+      }
     } catch (error) {
       setErro("Falha ao Cadastrar! Tente novamente mais tarde!");
     }
   };
+
+  const orangeFilter =
+    "invert-[52%] sepia-[91%] saturate-[3258%] hue-rotate-[1deg] brightness-[103%] contrast-[104%]";
 
   return (
     <div className="h-screen w-full flex justify-center items-center">
@@ -47,6 +86,12 @@ function RegisterScreen() {
         blur_or_glass={"blur"}
       />
       <AccountRegister
+        nome={nome}
+        email={email}
+        cpf={cpf}
+        dataNascimento={dataNascimento}
+        senha={senha}
+        repetirSenha={repetirSenha}
         setNome={setNome}
         setEmail={setEmail}
         setCpf={setCpf}
@@ -55,42 +100,62 @@ function RegisterScreen() {
         setRepetirSenha={setRepetirSenha}
         handleSubmit={handleSubmit}
         erro={erro}
+        errosCampos={errosCampos}
+        setErrosCampos={setErrosCampos}
+        preview={preview}
+        handleFileChange={handleFileChange}
+        removeImagem={removeImagem}
+        typeSenha={mostrarSenha ? "text" : "password"}
+        srcSenha={mostrarSenha ? eyeIcon : closedEye}
+        iconClassSenha={mostrarSenha ? orangeFilter : ""}
+        onClickIconSenha={togglePasswordVisibility}
+        typeRepetirSenha={mostrarRepetirSenha ? "text" : "password"}
+        srcRepetirSenha={mostrarRepetirSenha ? eyeIcon : closedEye}
+        iconClassRepetirSenha={mostrarRepetirSenha ? orangeFilter : ""}
+        onClickIconRepetirSenha={toggleRepeatPasswordVisibility}
       />
     </div>
   );
 }
 
 function validationFields(dados) {
+  const errors = {};
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (!dados.nome || dados.nome.length > 100 || !isNaN(dados.nome)) {
-    return "Nome inválido";
+    errors.nome = "Nome inválido";
   }
 
   if (!dados.email || dados.email.length > 100 || !regex.test(dados.email)) {
-    return "Email inválido";
+    errors.email = "Email inválido";
   }
 
   if (!validarCpf(dados.cpf)) {
-    return "CPF inválido";
+    errors.cpf = "CPF inválido";
   }
 
   if (!dados.dataNascimento || !validarData(dados.dataNascimento)) {
-    return "Data inválida";
+    errors.dataNascimento = "Data inválida";
   }
 
   if (!dados.senha || dados.senha.length > 100) {
-    return "Senha inválida";
+    errors.senha = "Senha inválida";
   }
 
-  if (dados.repetirSenha !== dados.senha) {
-    return "As senhas não conferem";
+  if (!dados.repetirSenha) {
+    errors.repetirSenha = "Confirme sua senha";
+  } else if (dados.repetirSenha !== dados.senha) {
+    errors.repetirSenha = "As senhas não conferem";
   }
 
+  if (Object.keys(errors).length > 0) {
+    return errors;
+  }
   return true;
 }
 
 function validarCpf(cpf) {
+  if (!cpf) return false;
   cpf = cpf.replace(/[^\d]+/g, "");
 
   if (cpf.length !== 11 || !!cpf.match(/(\d)\1{10}/)) return false;
@@ -100,7 +165,7 @@ function validarCpf(cpf) {
   const rest = (count) => {
     return (
       ((cpfDigitos
-        .slice(0, count - 12)
+        .slice(0, count - 11)
         .reduce((soma, el, index) => soma + el * (count - index), 0) *
         10) %
         11) %
@@ -113,11 +178,9 @@ function validarCpf(cpf) {
 function validarData(data) {
   var dataSelecionada = new Date(data);
   var hoje = new Date();
-
   if (dataSelecionada > hoje) {
     return false;
   }
-
   return true;
 }
 

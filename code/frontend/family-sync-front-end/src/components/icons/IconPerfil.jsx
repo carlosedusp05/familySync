@@ -1,7 +1,12 @@
 import { perfilIconOrange, perfilIconWhite, familyIcon } from "../../assets";
 import { useNavigate } from "react-router-dom";
 
-function IconPerfil({ is_white_backgroud, is_family_icon, another_size }) {
+function IconPerfil({
+  is_white_backgroud,
+  is_family_icon,
+  another_size,
+  onClickNew,
+}) {
   const navigate = useNavigate();
 
   const prefetchPerfil = () => {
@@ -27,7 +32,7 @@ function IconPerfil({ is_white_backgroud, is_family_icon, another_size }) {
     <div
       className={`rounded-full p-4 flex items-center justify-center transition-all duration-300  ${style} cursor-pointer hover:scale-110`}
       onMouseEnter={prefetchPerfil}
-      onClick={() => navigate("/dashboard/profile")}
+      onClick={onClickNew ? onClickNew : () => navigate("/dashboard/profile")}
     >
       <img
         src={color}

@@ -8,14 +8,13 @@ import { useNavigate } from "react-router-dom";
 
 function AccountEdit() {
   const fileInputRef = useRef(null);
+  const navigate = useNavigate();
 
   const handleButtonClick = () => {
     setTimeout(() => {
       fileInputRef.current?.click();
     }, 1);
   };
-
-  const navigate = useNavigate();
 
   const prefetchLoggedIn = () => {
     import("../../screens/StartScreen").catch(() => {
@@ -29,6 +28,17 @@ function AccountEdit() {
     });
   };
 
+  // ==========================================
+  // FUNÇÃO DE LOGOUT
+  // ==========================================
+  const handleLogout = () => {
+    // 1. Apaga a "chave" de acesso do navegador
+    localStorage.removeItem("@FamilySync:isAuthenticated");
+
+    // 2. Manda o usuário para a tela pública (que vai redirecionar pro Start)
+    navigate("/");
+  };
+
   return (
     <div className="h-full w-full flex items-center justify-center relative">
       <div className="absolute top-10 left-10 ">
@@ -36,7 +46,7 @@ function AccountEdit() {
           text="Sair da conta"
           logout_image={true}
           onMouseEnter={prefetchLogout}
-          onClick={() => navigate("/")}
+          onClick={handleLogout} // <-- Agora chama a função que limpa o cache
         />
       </div>
       <DefaultCard>

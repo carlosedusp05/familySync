@@ -19,13 +19,15 @@ function DefaultTextField(props) {
         className="w-full h-full border-none focus:outline-none focus:ring-0 text-[1.1rem] autofill:text-orange autofill:shadow-[0_0_0_30px_white_inset]"
         placeholder={props.placeholder}
         onChange={props.onChange}
+        maxLength={props.maxLength}
+        value={props.value || ""} // <-- A MÁGICA ACONTECE AQUI
       />
       {props.src && (
         <img
           className="w-10 h-10 font-bold cursor-pointer"
           src={props.src}
           alt={props.alt}
-          onClick={togglePasswordVisibility}
+          onClick={props.onClickIcon || togglePasswordVisibility}
         />
       )}
     </div>

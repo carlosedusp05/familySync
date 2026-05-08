@@ -35,6 +35,7 @@ import saveIcon from "./save_icon.svg";
 import familyIcon from "./family_icon.svg";
 import loadingOrange from "./orange-loading.json";
 import closeTagIcon from "./close_tag_icon.svg";
+import closedEye from "./closed_eye.svg";
 
 export {
   eyeIcon,
@@ -74,4 +75,5 @@ export {
   familyIcon,
   loadingOrange,
   closeTagIcon,
+  closedEye,
 };

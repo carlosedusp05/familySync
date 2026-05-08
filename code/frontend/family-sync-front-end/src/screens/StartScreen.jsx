@@ -11,11 +11,25 @@ import DefaultHeader from "../components/layout/DefaultHeader";
 import BackgroundImage from "../components/ui/BackgroundImage";
 import LargeCard from "../components/ui/LargeCard";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 function PrincipalScreen(props) {
   const hover = "transition-all duration-400 hover:scale-103 transition-ease";
 
   const navigate = useNavigate();
+
+  const [userData, setUserData] = useState({
+    nome: "Usuário",
+    email: "carregando...",
+  });
+
+  // useEffect para buscar os dados do LocalStorage assim que a tela carregar
+  useEffect(() => {
+    const savedUser = localStorage.getItem("@FamilySync:user");
+    if (savedUser) {
+      setUserData(JSON.parse(savedUser));
+    }
+  }, []);
 
   const prefetchList = () => {
     import("./ListScreen").catch(() => {
@@ -74,10 +88,10 @@ function PrincipalScreen(props) {
               {/* div text esquerda */}
               <div className="flex flex-col">
                 <h2 className="text-4xl font-bold text-orange">
-                  Olá, {"props.nome"}
+                  Olá, {userData.nome}
                 </h2>
                 <p className="text-2xl font-bold text-default">
-                  {"props.email"}
+                  {userData.email}
                 </p>
               </div>
               <h2 className="text-4xl font-bold text-orange">

@@ -20,9 +20,11 @@ function InfoFamiliarScreen() {
       ? JSON.parse(saved)
       : [
           { id: "me", name: "VOCÊ", role: "USER" },
-          { id: "1", name: "MEMBRO 2", role: "FAMILY" },
-          { id: "2", name: "MEMBRO 3", role: "FAMILY" },
-          { id: "3", name: "MEMBRO 4", role: "FAMILY" },
+          { id: "1", name: "Kauan Silva", role: "FAMILY" },
+          { id: "2", name: "Ana Souza", role: "FAMILY" },
+          { id: "3", name: "Bruno Oliveira", role: "FAMILY" },
+          { id: "4", name: "Mariana Santos", role: "FAMILY" },
+          { id: "5", name: "Lucas Lima", role: "FAMILY" },
         ];
   });
 

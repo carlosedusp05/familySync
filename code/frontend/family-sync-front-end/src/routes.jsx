@@ -3,20 +3,28 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 // Layouts
 import App from "./App";
 import RootLayout from "./components/ui/RootLayout";
+import ProtectedRoute from "./components/ui/ProtectedRoute";
 
 // Telas normais (não lazy)
 import InicioScreen from "./screens/InicioScreen";
 import StartScreen from "./screens/StartScreen";
 
-// A configuração do Router englobada pelo RootLayout
 export const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
+      // ==========================================
+      // ROTA RAIZ (Livre)
+      // Se apagar a URL, cai aqui e vai pro "start"
+      // ==========================================
       {
         path: "/",
         element: <Navigate to="/auth/start" replace />,
       },
+
+      // ==========================================
+      // ÁREA PÚBLICA (Auth)
+      // ==========================================
       {
         path: "/auth",
         children: [
@@ -44,86 +52,100 @@ export const router = createBrowserRouter([
           },
         ],
       },
+
+      // ==========================================
+      // ÁREA PROTEGIDA
+      // Tudo aqui dentro precisa de login
+      // ==========================================
       {
-        path: "/dashboard",
-        element: <App />,
+        element: <ProtectedRoute />,
         children: [
-          { index: true, element: <StartScreen /> },
           {
-            path: "calendar",
-            lazy: () =>
-              import("./screens/CalendarScreen").then((m) => ({
-                Component: m.default,
-              })),
-          },
-          {
-            path: "finance",
+            path: "/dashboard",
+            element: <App />,
             children: [
+              { index: true, element: <StartScreen /> },
               {
-                index: true,
+                path: "calendar",
                 lazy: () =>
-                  import("./screens/FinancierScreen").then((m) => ({
+                  import("./screens/CalendarScreen").then((m) => ({
                     Component: m.default,
                   })),
               },
               {
-                path: "add",
+                path: "finance",
+                children: [
+                  {
+                    index: true,
+                    lazy: () =>
+                      import("./screens/FinancierScreen").then((m) => ({
+                        Component: m.default,
+                      })),
+                  },
+                  {
+                    path: "add",
+                    lazy: () =>
+                      import("./screens/AddExpenses").then((m) => ({
+                        Component: m.default,
+                      })),
+                  },
+                ],
+              },
+              {
+                path: "family",
+                children: [
+                  {
+                    index: true,
+                    lazy: () =>
+                      import("./screens/ManageFamily").then((m) => ({
+                        Component: m.default,
+                      })),
+                  },
+                  {
+                    path: "add",
+                    lazy: () =>
+                      import("./screens/AddFamilyScreen").then((m) => ({
+                        Component: m.default,
+                      })),
+                  },
+                  {
+                    path: "info",
+                    lazy: () =>
+                      import("./screens/InfoFamiliarScreen").then((m) => ({
+                        Component: m.default,
+                      })),
+                  },
+                ],
+              },
+              {
+                path: "notifications",
                 lazy: () =>
-                  import("./screens/AddExpenses").then((m) => ({
+                  import("./screens/NotificationsScreen").then((m) => ({
+                    Component: m.default,
+                  })),
+              },
+              {
+                path: "lists",
+                lazy: () =>
+                  import("./screens/ListScreen").then((m) => ({
+                    Component: m.default,
+                  })),
+              },
+              {
+                path: "profile",
+                lazy: () =>
+                  import("./screens/PerfilScreen").then((m) => ({
                     Component: m.default,
                   })),
               },
             ],
-          },
-          {
-            path: "family",
-            children: [
-              {
-                index: true,
-                lazy: () =>
-                  import("./screens/ManageFamily").then((m) => ({
-                    Component: m.default,
-                  })),
-              },
-              {
-                path: "add",
-                lazy: () =>
-                  import("./screens/AddFamilyScreen").then((m) => ({
-                    Component: m.default,
-                  })),
-              },
-              {
-                path: "info",
-                lazy: () =>
-                  import("./screens/InfoFamiliarScreen").then((m) => ({
-                    Component: m.default,
-                  })),
-              },
-            ],
-          },
-          {
-            path: "notifications",
-            lazy: () =>
-              import("./screens/NotificationsScreen").then((m) => ({
-                Component: m.default,
-              })),
-          },
-          {
-            path: "lists",
-            lazy: () =>
-              import("./screens/ListScreen").then((m) => ({
-                Component: m.default,
-              })),
-          },
-          {
-            path: "profile",
-            lazy: () =>
-              import("./screens/PerfilScreen").then((m) => ({
-                Component: m.default,
-              })),
           },
         ],
       },
+
+      // ==========================================
+      // 404 - NÃO ENCONTRADO
+      // ==========================================
       {
         path: "*",
         element: (
