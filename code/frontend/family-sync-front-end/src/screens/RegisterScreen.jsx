@@ -156,23 +156,26 @@ function validationFields(dados) {
 
 function validarCpf(cpf) {
   if (!cpf) return false;
-  cpf = cpf.replace(/[^\d]+/g, "");
 
-  if (cpf.length !== 11 || !!cpf.match(/(\d)\1{10}/)) return false;
+  cpf = cpf.replace(/\D/g, "");
 
-  const cpfDigitos = cpf.split("").map((el) => +el);
+  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
 
-  const rest = (count) => {
-    return (
-      ((cpfDigitos
-        .slice(0, count - 11)
-        .reduce((soma, el, index) => soma + el * (count - index), 0) *
-        10) %
-        11) %
-      10
-    );
+  const cpfDigitos = cpf.split("").map(Number);
+
+  const calcularDigito = (quantidade) => {
+    const soma = cpfDigitos
+      .slice(0, quantidade - 1)
+      .reduce((acc, curr, index) => acc + curr * (quantidade - index), 0);
+
+    const resto = (soma * 10) % 11;
+    return resto === 10 ? 0 : resto;
   };
-  return rest(10) === cpfDigitos[9] && rest(11) === cpfDigitos[10];
+
+  const digito1 = calcularDigito(10);
+  const digito2 = calcularDigito(11);
+
+  return digito1 === cpfDigitos[9] && digito2 === cpfDigitos[10];
 }
 
 function validarData(data) {
