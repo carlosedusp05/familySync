@@ -59,6 +59,8 @@ function DefaultTextField(props) {
     >
       <input
         ref={inputRef}
+        id={props.id}
+        onKeyDown={props.onKeyDown}
         type={props.isPassword && showPassword ? "text" : props.type}
         className={`flex-1 h-full border-none focus:outline-none focus:ring-0 bg-transparent text-[1.1rem] ${hideDefaultCalendarIcon}`}
         placeholder={props.placeholder}

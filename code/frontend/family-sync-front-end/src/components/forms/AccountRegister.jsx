@@ -2,8 +2,8 @@ import DefaultCard from "../ui/DefaultCard";
 import IconPerfil from "../icons/IconPerfil";
 import DefaultButton from "../ui/DefaultButton";
 import DefaultTextField from "../ui/DefaultTextField";
-import { eyeIcon, closedEye, calendarIconForms } from "../../assets";
-import { useRef } from "react";
+import { calendarIconForms } from "../../assets";
+import { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function AccountRegister({
@@ -33,9 +33,24 @@ function AccountRegister({
   srcRepetirSenha,
   iconClassRepetirSenha,
   onClickIconRepetirSenha,
+  onBlurField,
 }) {
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === "Enter") {
+        const activeElem = document.activeElement.tagName;
+        if (activeElem !== "INPUT" && activeElem !== "TEXTAREA") {
+          handleSubmit();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [handleSubmit]);
 
   const todayDate = new Date().toISOString().split("T")[0];
   const minDate = "1900-01-01";
@@ -123,6 +138,20 @@ function AccountRegister({
     },
   ];
 
+  const handleKeyDown = (e, currentIndex) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const isLastField = currentIndex === camposInput.length - 1;
+
+      if (isLastField) {
+        handleSubmit();
+      } else {
+        const nextFieldId = camposInput[currentIndex + 1].id;
+        document.getElementById(nextFieldId)?.focus();
+      }
+    }
+  };
+
   return (
     <DefaultCard h={"pb-20"}>
       <div className="w-30 h-30 relative rounded-full border-2 border-orange flex items-center justify-center bg-white">
@@ -141,7 +170,7 @@ function AccountRegister({
         )}
         <div className="absolute -bottom-3 -right-3 flex items-center justify-center rounded-[50%] cursor-pointer">
           <input
-            className="absolute opacity-0 w-full h-full cursor-pointer hidden"
+            className="hidden"
             type="file"
             ref={fileInputRef}
             onChange={handleFileChange}
@@ -156,12 +185,14 @@ function AccountRegister({
           />
         </div>
       </div>
+
       <h1 className="text-orange text-3xl -mt-6">Eu</h1>
 
       <div className="w-[90%] flex flex-col justify-center items-center gap-5">
-        {camposInput.map((campo) => (
+        {camposInput.map((campo, index) => (
           <div key={campo.id} className="w-full flex flex-col gap-1">
             <DefaultTextField
+              id={campo.id}
               placeholder={campo.placeholder}
               type={campo.type}
               alt={campo.alt}
@@ -174,21 +205,19 @@ function AccountRegister({
               maxLength={campo.id === "cpf" ? 14 : undefined}
               max={campo.max}
               min={campo.min}
+              onKeyDown={(e) => handleKeyDown(e, index)}
+              onBlur={(e) =>
+                onBlurField && onBlurField(campo.id, e.target.value)
+              }
               onChange={(e) => {
                 let valor = e.target.value;
-
-                if (campo.id === "cpf") {
-                  valor = formatCPF(valor);
-                }
-
+                if (campo.id === "cpf") valor = formatCPF(valor);
                 if (campo.id === "dataNascimento") {
                   if (campo.max && valor > campo.max) return;
-
                   if (campo.min && valor) {
                     const parts = valor.split("-");
                     const year = parts[0];
-                    const minYear = campo.min.split("-")[0]; // "1900"
-
+                    const minYear = campo.min.split("-")[0];
                     if (
                       year.length === 4 &&
                       year[0] !== "0" &&
@@ -198,9 +227,7 @@ function AccountRegister({
                     }
                   }
                 }
-
                 campo.setFunc(valor);
-
                 if (errosCampos?.[campo.id]) {
                   setErrosCampos((prev) => ({ ...prev, [campo.id]: "" }));
                 }
@@ -230,6 +257,7 @@ function AccountRegister({
             onMouseEnter={prefetchLogin}
             onClick={() => navigate("/auth/login")}
           />
+          <button type="submit" className="hidden" />
           <DefaultButton
             text="Cadastrar"
             theme={true}

@@ -37,7 +37,8 @@ import loadingOrange from "./orange-loading.json";
 import closeTagIcon from "./close_tag_icon.svg";
 import closedEye from "./closed_eye.svg";
 import calendarIconForms from "./calendar_icon_forms.svg";
-import familySyncAnimation from "./animation_family_sync.mp4";
+import familySyncTextIcon from "./family_sync_text_icon.svg";
+import familySyncSmallIcon from "./family_sync_small_icon.svg";
 
 export {
   eyeIcon,
@@ -79,5 +80,6 @@ export {
   closeTagIcon,
   closedEye,
   calendarIconForms,
-  familySyncAnimation,
+  familySyncTextIcon,
+  familySyncSmallIcon,
 };

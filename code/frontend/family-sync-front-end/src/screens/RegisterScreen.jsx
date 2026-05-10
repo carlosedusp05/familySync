@@ -48,6 +48,91 @@ function RegisterScreen() {
     setFileSelecionado(null);
   };
 
+  const validateFieldOnBlur = (campoId, valor) => {
+    let erroMensagem = "";
+    const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    switch (campoId) {
+      case "nome":
+        if (!valor || valor.trim().length < 3 || !isNaN(valor)) {
+          erroMensagem = "Insira um nome válido (mínimo 3 caracteres)";
+        }
+        break;
+      case "email":
+        if (!valor) {
+          erroMensagem = "O e-mail é obrigatório";
+        } else if (!regexEmail.test(valor)) {
+          erroMensagem = "Insira um formato de e-mail válido";
+        } else if (valor.length > 100) {
+          erroMensagem = "O e-mail deve ter no máximo 100 caracteres";
+        }
+        break;
+      case "cpf":
+        if (!validarCpf(valor)) {
+          erroMensagem = "CPF inválido";
+        }
+        break;
+      case "dataNascimento":
+        if (!valor || !validarData(valor)) {
+          erroMensagem = "Data de nascimento inválida ou futura";
+        }
+        break;
+      case "senha":
+        if (!valor) {
+          erroMensagem = "A senha é obrigatória";
+        } else {
+          const faltaMinuscula = !/[a-z]/.test(valor);
+          const faltaMaiuscula = !/[A-Z]/.test(valor);
+          const faltaNumero = !/\d/.test(valor);
+          const faltaEspecial = !/[!@#$%^&*(),.?":{}|<>_=+ \-]/.test(valor);
+          const tamanhoCurto = valor.length < 8;
+
+          if (
+            tamanhoCurto ||
+            faltaMinuscula ||
+            faltaMaiuscula ||
+            faltaNumero ||
+            faltaEspecial
+          ) {
+            let mensagens = [];
+
+            if (tamanhoCurto) mensagens.push("ter pelo menos 8 caracteres");
+            if (faltaMinuscula) mensagens.push("conter letras minúsculas");
+            if (faltaMaiuscula) mensagens.push("incluir letras maiúsculas");
+            if (faltaNumero) mensagens.push("ter pelo menos um número");
+            if (faltaEspecial) mensagens.push("usar símbolos (ex: @, #, +, -)");
+
+            const fraseFinal = mensagens
+              .join(", ")
+              .replace(/, ([^,]*)$/, " e $1");
+            erroMensagem = `Sua senha precisa ${fraseFinal}.`;
+          } else if (valor.length > 128) {
+            erroMensagem = "A senha excedeu o limite de 128 caracteres";
+          }
+        }
+        break;
+      case "repetirSenha":
+        if (!valor) {
+          erroMensagem = "Confirme sua senha";
+        } else if (valor !== senha) {
+          erroMensagem = "As senhas não conferem";
+        }
+        break;
+      default:
+        break;
+    }
+
+    setErrosCampos((prev) => {
+      const novosErros = { ...prev };
+      if (erroMensagem) {
+        novosErros[campoId] = erroMensagem;
+      } else {
+        delete novosErros[campoId];
+      }
+      return novosErros;
+    });
+  };
+
   const handleSubmit = async function () {
     setErro("");
     setErrosCampos({});
@@ -126,6 +211,7 @@ function RegisterScreen() {
         typeRepetirSenha={mostrarRepetirSenha ? "text" : "password"}
         srcRepetirSenha={mostrarRepetirSenha ? eyeIcon : closedEye}
         onClickIconRepetirSenha={toggleRepeatPasswordVisibility}
+        onBlurField={validateFieldOnBlur} // 👉 Passando a prop aqui!
       />
     </div>
   );
