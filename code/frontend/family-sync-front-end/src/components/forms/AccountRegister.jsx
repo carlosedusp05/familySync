@@ -2,8 +2,7 @@ import DefaultCard from "../ui/DefaultCard";
 import IconPerfil from "../icons/IconPerfil";
 import DefaultButton from "../ui/DefaultButton";
 import DefaultTextField from "../ui/DefaultTextField";
-import ErrorForms from "../ui/ErrorForms";
-import { eyeIcon, closedEye } from "../../assets";
+import { eyeIcon, closedEye, calendarIconForms } from "../../assets";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -21,7 +20,6 @@ function AccountRegister({
   setSenha,
   setRepetirSenha,
   handleSubmit,
-  erro,
   errosCampos,
   setErrosCampos,
   preview,
@@ -38,6 +36,9 @@ function AccountRegister({
 }) {
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
+
+  const todayDate = new Date().toISOString().split("T")[0];
+  const minDate = "1900-01-01";
 
   const formatCPF = (value) => {
     return value
@@ -92,6 +93,9 @@ function AccountRegister({
       alt: "Input Data de Nascimento",
       setFunc: setDataNascimento,
       value: dataNascimento,
+      max: todayDate,
+      min: minDate,
+      src: calendarIconForms,
     },
     {
       id: "senha",
@@ -120,7 +124,7 @@ function AccountRegister({
   ];
 
   return (
-    <DefaultCard h={"pb-30"}>
+    <DefaultCard h={"pb-20"}>
       <div className="w-30 h-30 relative rounded-full border-2 border-orange flex items-center justify-center bg-white">
         {preview ? (
           <img
@@ -168,28 +172,56 @@ function AccountRegister({
               onClickIcon={campo.onClickIcon}
               hasError={!!errosCampos?.[campo.id]}
               maxLength={campo.id === "cpf" ? 14 : undefined}
+              max={campo.max}
+              min={campo.min}
               onChange={(e) => {
                 let valor = e.target.value;
+
                 if (campo.id === "cpf") {
                   valor = formatCPF(valor);
                 }
+
+                if (campo.id === "dataNascimento") {
+                  if (campo.max && valor > campo.max) return;
+
+                  if (campo.min && valor) {
+                    const parts = valor.split("-");
+                    const year = parts[0];
+                    const minYear = campo.min.split("-")[0]; // "1900"
+
+                    if (
+                      year.length === 4 &&
+                      year[0] !== "0" &&
+                      year < minYear
+                    ) {
+                      valor = `${minYear}-${parts[1]}-${parts[2]}`;
+                    }
+                  }
+                }
+
                 campo.setFunc(valor);
+
                 if (errosCampos?.[campo.id]) {
                   setErrosCampos((prev) => ({ ...prev, [campo.id]: "" }));
                 }
               }}
             />
-            {errosCampos?.[campo.id] && (
-              <span className="text-red-500 text-sm px-2">
+            <div
+              className={`overflow-hidden transition-all duration-300 ease-in-out w-full flex ${
+                errosCampos?.[campo.id]
+                  ? "max-h-5 opacity-100 mt-1"
+                  : "max-h-0 opacity-0"
+              }`}
+            >
+              <span className="text-red-500 text-sm px-2 block">
                 {errosCampos[campo.id]}
               </span>
-            )}
+            </div>
           </div>
         ))}
       </div>
 
       <div className="flex items-center justify-center flex-col h-14 pt-15 gap-3 w-[90%]">
-        <ErrorForms erro={erro} />
         <div className="flex h-14 gap-15 items-center justify-center">
           <DefaultButton
             text="Cancelar"

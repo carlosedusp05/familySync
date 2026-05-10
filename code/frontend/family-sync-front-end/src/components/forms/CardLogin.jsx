@@ -12,6 +12,7 @@ function CardLogin({
   setEmail,
   setSenha,
   handleSubmit,
+  erro,
   errosCampos,
   setErrosCampos,
 }) {
@@ -42,7 +43,7 @@ function CardLogin({
   };
 
   return (
-    <DefaultCard h={"h-[50%]"}>
+    <DefaultCard h={"h-fit"}>
       <IconFamilySync />
       <h2 className="text-orange-dark font-bold text-4xl">Login</h2>
 
@@ -64,14 +65,19 @@ function CardLogin({
             hasError={!!errosCampos?.email}
             maxLength={100}
           />
-          {errosCampos?.email && (
-            <span className="text-red-500 text-sm px-2">
-              {errosCampos.email}
+          <div
+            className={`grid transition-all duration-300 ease-in-out ${
+              errosCampos?.email
+                ? "grid-rows-[1fr] opacity-100"
+                : "grid-rows-[0fr] opacity-0"
+            }`}
+          >
+            <span className="overflow-hidden text-red-500 text-sm px-2">
+              {errosCampos?.email}
             </span>
-          )}
+          </div>
         </div>
 
-        {/* Campo de Senha - Alternando Ícone e Cor */}
         <div className="w-full flex flex-col gap-1">
           <DefaultTextField
             placeholder="Senha"
@@ -83,26 +89,37 @@ function CardLogin({
               }
             }}
             type={mostrarSenha ? "text" : "password"}
-            // ALTERNÂNCIA DE ÍCONE:
             src={mostrarSenha ? eyeIcon : closedEye}
             alt="Input Senha"
             isPassword={true}
-            hasError={!!errosCampos?.senha}
-            maxLength={20}
-            // AÇÃO DE CLIQUE:
+            hasError={!!errosCampos?.senha || !!erro}
+            maxLength={100}
             onClickIcon={togglePasswordVisibility}
-            // COR LARANJA (Apenas quando aberto):
-            iconClass={
-              mostrarSenha
-                ? "invert-[52%] sepia-[91%] saturate-[3258%] hue-rotate-[1deg] brightness-[103%] contrast-[104%]"
-                : ""
-            }
           />
-          {errosCampos?.senha && (
-            <span className="text-red-500 text-sm px-2">
-              {errosCampos.senha}
+
+          <div
+            className={`grid transition-all duration-300 ease-in-out ${
+              errosCampos?.senha
+                ? "grid-rows-[1fr] opacity-100"
+                : "grid-rows-[0fr] opacity-0"
+            }`}
+          >
+            <span className="overflow-hidden text-red-500 text-sm px-2">
+              {errosCampos?.senha}
             </span>
-          )}
+          </div>
+
+          <div
+            className={`grid transition-all duration-300 ease-in-out ${
+              erro
+                ? "grid-rows-[1fr] opacity-100 mt-1"
+                : "grid-rows-[0fr] opacity-0"
+            }`}
+          >
+            <span className="overflow-hidden text-red-500 text-sm px-2 font-semibold">
+              {erro}
+            </span>
+          </div>
         </div>
       </div>
 

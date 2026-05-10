@@ -17,9 +17,9 @@ function ManageFamily() {
 
   return (
     <MainLayout>
-      <div className="flex flex-col gap-4 items-center justify-center py-8 h-full">
+      <div className="flex flex-col gap-4 items-center justify-center py-15 h-full">
         <div className="w-[80%] h-full flex gap-8">
-          <div className="h-full flex-1 bg-yellow-cream rounded-[60px] flex flex-col items-center pt-20 text-center text-5xl font-bold text-orange gap-5">
+          <div className="max-h-full flex-1 bg-yellow-cream rounded-[60px] flex flex-col items-center pt-20 text-center text-4xl font-bold text-orange gap-5">
             <div className="relative w-[45%] aspect-square bg-white border-4 border-orange rounded-full flex items-center justify-center">
               <IconPerfil
                 is_family_icon={true}
@@ -30,8 +30,8 @@ function ManageFamily() {
                 <DefaultButton
                   onClick={handleButtonClick}
                   another_padding={"px-0 pb-2"}
-                  another_size={"h-20 w-20"}
-                  another_text_size={"text-7xl"}
+                  another_size={"h-15 w-15"}
+                  another_text_size={"text-5xl"}
                   most_radius={true}
                   text="+"
                 />
@@ -63,14 +63,14 @@ function ManageFamily() {
               ]}
             />
           </div>
-          <div className=" flex flex-col flex-2 gap-10 px-4">
-            <div className="flex-5 bg-yellow-cream rounded-[60px] px-15 pt-10 relative">
-              <div className="w-full text-orange text-6xl font-bold flex items-center p-14 gap-3">
+          <div className="flex justify-between flex-col flex-2 gap-10 px-4">
+            <div className="bg-yellow-cream rounded-[60px] px-15 pt-10 pb-25 relative h-fit">
+              <div className="w-full text-orange text-5xl font-bold flex items-center py-14 gap-3">
                 <h1>Nome da familia</h1>
                 <img
                   src={pencilTerracotaIcon}
                   alt="Icone do pincel terracota"
-                  className="w-14 h-14 opacity-70 transition-colors active:scale-95"
+                  className="w-10 h-10 opacity-70 transition-colors active:scale-95"
                 />
               </div>
               <div className="flex flex-wrap gap-5">
@@ -91,14 +91,12 @@ function ManageFamily() {
               <img
                 src={saveIcon}
                 alt="Icone de save"
-                className="absolute -top-8 -right-8 cursor-pointer
-                transition-all duration-300 ease-out 
-                active:scale-90 active:rotate-0"
+                className="absolute -top-8 -right-8 cursor-pointer transition-all duration-300 ease-out active:scale-90 active:rotate-0"
               />
             </div>
 
-            <div className="flex flex-1 items-center justify-center bg-yellow-cream rounded-[35px] mx-20 gap-5 px-8">
-              <div className="flex-4 flex items-center justify-center h-15 w-[85%] bg-white shadow-lg rounded-2xl px-6">
+            <div className="flex items-center justify-center bg-yellow-cream rounded-[35px] mx-10 gap-5 px-8 py-6">
+              <div className="flex items-center justify-center h-15 w-[85%] bg-white shadow-lg rounded-2xl px-6">
                 <input
                   type="text"
                   placeholder="Digite o nome de usuário..."

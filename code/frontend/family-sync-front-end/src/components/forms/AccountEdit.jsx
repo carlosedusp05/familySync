@@ -34,7 +34,7 @@ function AccountEdit() {
   const handleLogout = () => {
     // 1. Apaga a "chave" de acesso do navegador
     localStorage.removeItem("@FamilySync:isAuthenticated");
-
+    localStorage.removeItem("@FamilySync:user");
     // 2. Manda o usuário para a tela pública (que vai redirecionar pro Start)
     navigate("/");
   };

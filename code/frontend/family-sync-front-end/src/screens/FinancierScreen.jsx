@@ -108,7 +108,7 @@ function FinancierScreen() {
     <MainLayout>
       <div className="flex flex-col gap-4 items-center justify-center py-12 h-full">
         <LargeCard size={"h-[85%] w-[60%]"} display={"flex justify-center"}>
-          <div className="w-full min-h-20 flex flex-col justify-center items-center bg-white px-10 rounded-2xl shadow-inner relative">
+          <div className="w-full min-h-20 flex flex-col justify-center items-center bg-white px-10 py-8 rounded-2xl shadow-inner relative">
             <div className="flex items-center gap-2">
               <img src={dollarIcon} alt="Dinheiro" className="w-6 h-6" />
               <span className="text-brown-dark font-bold text-2xl tracking-wide">
@@ -219,7 +219,7 @@ function FinancierScreen() {
                       key={index}
                       className="relative z-10 flex flex-col items-center"
                       style={{
-                        width: periodo === "Ano" ? "6%" : "12%",
+                        width: "12%",
                         height: "100%",
                       }}
                     >

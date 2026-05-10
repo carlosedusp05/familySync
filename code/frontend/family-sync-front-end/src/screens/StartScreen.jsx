@@ -24,18 +24,24 @@ function PrincipalScreen(props) {
   });
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("@FamilySync");
+    const savedUser = localStorage.getItem("@FamilySync:user");
 
     if (savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser);
 
-        const nomeFormatado =
-          parsedUser.nome.charAt(0).toUpperCase() +
-          parsedUser.nome.slice(1).toLowerCase();
+        const nomeFormatado = parsedUser.nome
+          ? parsedUser.nome
+              .toLowerCase()
+              .split(" ")
+              .map(
+                (palavra) => palavra.charAt(0).toUpperCase() + palavra.slice(1),
+              )
+              .join(" ")
+          : "Usuário";
 
         setUserData({
-          nome: nomeFormatado || "Usuário",
+          nome: nomeFormatado,
           email: parsedUser.email || "E-mail não encontrado",
         });
       } catch (error) {
@@ -113,7 +119,8 @@ function PrincipalScreen(props) {
             <div className="grid grid-cols-10 gap-4">
               {/* Div Lista Compartilhada */}
               <div
-                className={`col-span-4 flex items-center justify-center gap-4 h-[80%] bg-orange py-10 rounded-2xl ${hover} cursor-pointer`}
+                className={`col-span-4 flex items-center justify-center gap-4 h-[80%] bg-orange py-10 rounded-2xl ${hover} duration-300 ease-out hover:-translate-y-0.5
+                transition-all active:scale-90 active:brightness-90 cursor-pointer`}
                 onMouseEnter={prefetchList}
                 onClick={() => navigate("/dashboard/lists")}
               >
@@ -126,7 +133,8 @@ function PrincipalScreen(props) {
               </div>
               {/* Div Calendário */}
               <div
-                className={`flex flex-col col-span-4 rounded-2xl pt-5 px-9 h-[80%] bg-default gap-4 ${hover} cursor-pointer`}
+                className={`flex flex-col col-span-4 rounded-2xl pt-5 px-9 h-[80%] bg-default gap-4 ${hover} duration-300 ease-out hover:-translate-y-0.5
+                transition-all active:scale-90 active:brightness-90 cursor-pointer`}
                 onMouseEnter={prefetchCalendar}
                 onClick={() => navigate("/dashboard/calendar")}
               >
@@ -188,7 +196,8 @@ function PrincipalScreen(props) {
               </div>
               {/* Div Adicionar Familia */}
               <div
-                className={`flex h-[80%] items-center justify-center col-span-2 p-12 rounded-2xl bg-orange-dark ${hover} cursor-pointer`}
+                className={`flex h-[80%] items-center justify-center col-span-2 p-12 rounded-2xl bg-orange-dark ${hover} duration-300 ease-out hover:-translate-y-0.5
+                transition-all active:scale-90 active:brightness-90 cursor-pointer`}
                 onMouseEnter={prefetchNewFamily}
                 onClick={() => navigate("/dashboard/family/add")}
               >
@@ -204,7 +213,8 @@ function PrincipalScreen(props) {
             <div className="grid grid-cols-11 gap-4 h-full -mt-[3%]">
               {/* Div Gerenciamento Financeiro */}
               <div
-                className={`flex flex-col col-span-4 gap-5 items-center rounded-2xl color bg-terracota p-5 h-[80%] ${hover} cursor-pointer`}
+                className={`flex flex-col col-span-4 gap-5 items-center rounded-2xl color bg-terracota p-5 h-[80%] ${hover} duration-300 ease-out hover:-translate-y-0.5
+                transition-all active:scale-90 active:brightness-90 cursor-pointer`}
                 onMouseEnter={prefetchFinancier}
                 onClick={() => navigate("/dashboard/finance")}
               >
@@ -229,7 +239,8 @@ function PrincipalScreen(props) {
                 {/* Div Gerenciador Familiar*/}
               </div>
               <div
-                className={`flex col-span-4 h-[80%] bg-yellow-cream rounded-2xl ${hover} cursor-pointer`}
+                className={`flex col-span-4 h-[80%] bg-yellow-cream rounded-2xl ${hover} duration-300 ease-out hover:-translate-y-0.5
+                transition-all active:scale-90 active:brightness-90 cursor-pointer`}
                 onMouseEnter={prefetchManageFamily}
                 onClick={() => navigate("/dashboard/family")}
               >
@@ -248,7 +259,8 @@ function PrincipalScreen(props) {
               </div>
               {/* Div Informações Familiares */}
               <div
-                className={`flex flex-col items-center justify-center col-span-3 h-[80%] bg-brown-dark rounded-2xl gap-3 ${hover} cursor-pointer`}
+                className={`flex flex-col items-center justify-center col-span-3 h-[80%] bg-brown-dark rounded-2xl gap-3 ${hover} duration-300 ease-out hover:-translate-y-0.5
+                transition-all active:scale-90 active:brightness-90 cursor-pointer`}
                 onMouseEnter={prefetchInfoFamiliar}
                 onClick={() => navigate("/dashboard/family/info")}
               >

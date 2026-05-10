@@ -1,10 +1,10 @@
 import BackgroundImage from "../components/ui/BackgroundImage";
 import { imageBackground, eyeIcon, closedEye } from "../assets";
 import AccountRegister from "../components/forms/AccountRegister";
+import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { useState } from "react";
 import { userService } from "../services/userService";
 import { useNavigate } from "react-router-dom";
-// 1. Importe a biblioteca crypto-js
 import CryptoJS from "crypto-js";
 
 function RegisterScreen() {
@@ -25,6 +25,8 @@ function RegisterScreen() {
 
   const [preview, setPreview] = useState(null);
   const [fileSelecionado, setFileSelecionado] = useState(null);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const togglePasswordVisibility = () => setMostrarSenha(!mostrarSenha);
   const toggleRepeatPasswordVisibility = () =>
@@ -47,43 +49,52 @@ function RegisterScreen() {
   };
 
   const handleSubmit = async function () {
-    try {
-      setErro("");
-      setErrosCampos({});
+    setErro("");
+    setErrosCampos({});
+    setIsLoading(true);
 
-      const dados = { nome, email, cpf, dataNascimento, senha, repetirSenha };
-      const validacao = validationFields(dados);
+    setTimeout(async () => {
+      try {
+        const dados = { nome, email, cpf, dataNascimento, senha, repetirSenha };
+        const validacao = validationFields(dados);
 
-      if (validacao !== true) {
-        setErrosCampos(validacao);
-        return;
+        if (validacao !== true) {
+          setErrosCampos(validacao);
+          setIsLoading(false);
+          return;
+        }
+
+        const senhaHasheada = CryptoJS.SHA256(senha).toString(CryptoJS.enc.Hex);
+
+        const dadosBackend = {
+          nome: nome
+            .toLowerCase()
+            .split(" ")
+            .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+            .join(" "),
+          email: email,
+          cpf: cpf.replace(/\D/g, ""),
+          data_nascimento: dataNascimento,
+          senha: senhaHasheada,
+        };
+
+        const response = await userService.createUser(dadosBackend);
+
+        if (response) {
+          navigate("/auth/login");
+        } else {
+          setIsLoading(false);
+        }
+      } catch (error) {
+        setIsLoading(false);
+        setErro("Falha ao Cadastrar! Tente novamente mais tarde!");
       }
-
-      const senhaHasheada = CryptoJS.SHA256(senha).toString(CryptoJS.enc.Hex);
-
-      const dadosBackend = {
-        nome: nome,
-        email: email,
-        cpf: cpf.replace(/\D/g, ""),
-        data_nascimento: dataNascimento,
-        senha: senhaHasheada,
-      };
-
-      const response = await userService.createUser(dadosBackend);
-
-      if (response) {
-        navigate("/auth/login");
-      }
-    } catch (error) {
-      setErro("Falha ao Cadastrar! Tente novamente mais tarde!");
-    }
+    }, 50);
   };
-
-  const orangeFilter =
-    "invert-[52%] sepia-[91%] saturate-[3258%] hue-rotate-[1deg] brightness-[103%] contrast-[104%]";
 
   return (
     <div className="h-screen w-full flex justify-center items-center">
+      {isLoading && <LoadingOverlay />}
       <BackgroundImage
         src={imageBackground}
         alt={"Imagem Fundo"}
@@ -111,11 +122,9 @@ function RegisterScreen() {
         removeImagem={removeImagem}
         typeSenha={mostrarSenha ? "text" : "password"}
         srcSenha={mostrarSenha ? eyeIcon : closedEye}
-        iconClassSenha={mostrarSenha ? orangeFilter : ""}
         onClickIconSenha={togglePasswordVisibility}
         typeRepetirSenha={mostrarRepetirSenha ? "text" : "password"}
         srcRepetirSenha={mostrarRepetirSenha ? eyeIcon : closedEye}
-        iconClassRepetirSenha={mostrarRepetirSenha ? orangeFilter : ""}
         onClickIconRepetirSenha={toggleRepeatPasswordVisibility}
       />
     </div>
@@ -126,9 +135,6 @@ function validationFields(dados) {
   const errors = {};
 
   const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-  const regexSenha =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/;
 
   if (!dados.nome || dados.nome.trim().length < 3 || !isNaN(dados.nome)) {
     errors.nome = "Insira um nome válido (mínimo 3 caracteres)";
@@ -152,13 +158,33 @@ function validationFields(dados) {
 
   if (!dados.senha) {
     errors.senha = "A senha é obrigatória";
-  } else if (dados.senha.length < 8) {
-    errors.senha = "A senha deve ter pelo menos 8 caracteres";
-  } else if (!regexSenha.test(dados.senha)) {
-    errors.senha =
-      "A senha deve conter letras maiúsculas, minúsculas, números e um símbolo.";
-  } else if (dados.senha.length > 100) {
-    errors.senha = "A senha excedeu o limite de caracteres";
+  } else {
+    const faltaMinuscula = !/[a-z]/.test(dados.senha);
+    const faltaMaiuscula = !/[A-Z]/.test(dados.senha);
+    const faltaNumero = !/\d/.test(dados.senha);
+    const faltaEspecial = !/[!@#$%^&*(),.?":{}|<>_=+ \-]/.test(dados.senha);
+    const tamanhoCurto = dados.senha.length < 8;
+
+    if (
+      tamanhoCurto ||
+      faltaMinuscula ||
+      faltaMaiuscula ||
+      faltaNumero ||
+      faltaEspecial
+    ) {
+      let mensagens = [];
+
+      if (tamanhoCurto) mensagens.push("ter pelo menos 8 caracteres");
+      if (faltaMinuscula) mensagens.push("conter letras minúsculas");
+      if (faltaMaiuscula) mensagens.push("incluir letras maiúsculas");
+      if (faltaNumero) mensagens.push("ter pelo menos um número");
+      if (faltaEspecial) mensagens.push("usar símbolos (ex: @, #, +, -)");
+
+      const fraseFinal = mensagens.join(", ").replace(/, ([^,]*)$/, " e $1");
+      errors.senha = `Sua senha precisa ${fraseFinal}.`;
+    } else if (dados.senha.length > 128) {
+      errors.senha = "A senha excedeu o limite de 128 caracteres";
+    }
   }
 
   if (!dados.repetirSenha) {

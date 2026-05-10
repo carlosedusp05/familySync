@@ -1,51 +1,44 @@
 function FamiliarCard({ name, degree_of_relatives }) {
   return (
-    <div className="flex w-full h-auto bg-white p-6 rounded-3xl shadow-sm gap-5 items-center">
-      <div className="text-brown-dark flex-1 flex flex-col items-center justify-center gap-1">
-        <div className="bg-terracota rounded-full h-24 w-24"></div>
-        <h1 className="text-2xl font-bold">{name}</h1>
-        <div className="flex text-[16px] gap-1 whitespace-nowrap">
-          <span className="font-bold">Grau de parentesco:</span>
-          <span>{degree_of_relatives}</span>
-        </div>
+    <div className="flex w-full max-w-xl bg-white p-5.5 rounded-xl shadow-sm gap-3 items-center overflow-hidden shrink-0 border border-gray-100">
+      <div className="text-brown-dark flex-1 min-w-0 flex flex-col items-center justify-center gap-1 border-r border-gray-100 pr-2">
+        <div className="bg-terracota rounded-full h-20 w-20 shrink-0"></div>
+        <h1
+          className="text-xl font-bold truncate w-full text-center leading-tight"
+          title={name}
+        >
+          {name}
+        </h1>
+        <span
+          className="text-[16px] text-gray-500 truncate w-full text-center"
+          title={degree_of_relatives}
+        >
+          {degree_of_relatives}
+        </span>
       </div>
 
-      <div className="flex-1 flex flex-col justify-center gap-2 pr-8">
-        <h1 className="font-bold text-terracota text-left text-3xl mb-3 whitespace-nowrap">
+      <div className="flex-[1.2] min-w-0 flex flex-col justify-center gap-0.5">
+        <h2 className="font-bold text-terracota text-left text-2xl mb-1 tracking-wider">
           Pode Editar
-        </h1>
+        </h2>
 
-        <div className="flex justify-between items-center w-full text-brown-dark text-[16px] font-normal">
-          <span>Calendário</span>
-          <input
-            type="checkbox"
-            className="w-5 h-5 accent-terracota cursor-pointer"
-          />
-        </div>
-
-        <div className="flex justify-between items-center w-full text-brown-dark text-[16px] font-normal">
-          <span>Lista</span>
-          <input
-            type="checkbox"
-            className="w-5 h-5 accent-terracota cursor-pointer"
-          />
-        </div>
-
-        <div className="flex justify-between items-center w-full text-brown-dark text-[16px] font-normal">
-          <span>Despesas</span>
-          <input
-            type="checkbox"
-            className="w-5 h-5 accent-terracota cursor-pointer"
-          />
-        </div>
-
-        <div className="flex justify-between items-center w-full text-brown-dark text-[16px] font-normal">
-          <span>Informações</span>
-          <input
-            type="checkbox"
-            className="w-5 h-5 accent-terracota cursor-pointer"
-          />
-        </div>
+        {[
+          { label: "Calendário", id: "cal" },
+          { label: "Lista", id: "list" },
+          { label: "Despesas", id: "exp" },
+          { label: "Informações", id: "info" },
+        ].map((item) => (
+          <div
+            key={item.id}
+            className="flex justify-between items-center w-full text-brown-dark text-xl font-medium py-0.5"
+          >
+            <span>{item.label}</span>
+            <input
+              type="checkbox"
+              className="w-5 h-5 accent-terracota cursor-pointer shrink-0"
+            />
+          </div>
+        ))}
       </div>
     </div>
   );

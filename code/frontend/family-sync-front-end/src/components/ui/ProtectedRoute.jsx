@@ -4,7 +4,9 @@ function ProtectedRoute() {
   const isAuthenticated =
     localStorage.getItem("@FamilySync:isAuthenticated") === "true";
 
-  if (!isAuthenticated) {
+  const isAccount = localStorage.getItem("@FamilySync:isAuthenticated");
+
+  if (!isAuthenticated && !isAccount.id_usuario) {
     return <Navigate to="/auth/login" replace />;
   }
 
