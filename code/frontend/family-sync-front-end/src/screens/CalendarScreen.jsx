@@ -1,10 +1,30 @@
 import LargeCard from "../components/ui/LargeCard";
 import MainLayout from "../layouts/Mainlayout";
 import MultEventsField from "../components/ui/MultEventsFIeld";
+import ModalEvents from "../components/ui/ModalEvent";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import { useState } from "react";
 
-function FinancierScreen() {
+function CalendarScreen() {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [diaSelecionado, SetDiaSelecionado] = useState(null);
+
+  function handleDateClick(info) {
+    const hoje = new Date();
+
+    hoje.setHours(0, 0, 0, 0);
+
+    const dataClicada = new Date(info.dateStr);
+
+    SetDiaSelecionado(info.dateStr);
+    if (dataClicada < hoje) {
+      return;
+    }
+    SetDiaSelecionado(info.dateStr);
+    setModalOpen(true);
+  }
   return (
     <MainLayout>
       <div className="h-full flex w-full">
@@ -18,19 +38,21 @@ function FinancierScreen() {
           >
             <div className="w-full h-full p-6">
               <FullCalendar
-                plugins={[dayGridPlugin]}
+                plugins={[dayGridPlugin, interactionPlugin]}
                 initialView="dayGridMonth"
                 height="100%"
+                dateClick={handleDateClick}
               />
             </div>
           </LargeCard>
+          <ModalEvents />
         </div>
 
         {/* Div Eventos */}
         <div className="w-[50%] h-full flex flex-col p-30 gap-10  items-center">
           <h2 className="text-5xl text-white font-bold">Eventos Marcados</h2>
           <div
-            className="flex flex-col gap-5 overflow-y-auto max-h-full w-[90%] px-2 [&::-webkit-scrollbar]:w-2.5
+            className="flex flex-col items-center gap-5 overflow-y-auto max-h-full w-[90%] px-2 [&::-webkit-scrollbar]:w-2.5
             [&::-webkit-scrollbar]:mr-10
             [&::-webkit-scrollbar-track]:bg-transparent
           [&::-webkit-scrollbar-thumb]:bg-[#282828]
@@ -117,4 +139,4 @@ function FinancierScreen() {
   );
 }
 
-export default FinancierScreen;
+export default CalendarScreen;
