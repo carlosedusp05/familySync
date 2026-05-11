@@ -211,7 +211,7 @@ function RegisterScreen() {
         typeRepetirSenha={mostrarRepetirSenha ? "text" : "password"}
         srcRepetirSenha={mostrarRepetirSenha ? eyeIcon : closedEye}
         onClickIconRepetirSenha={toggleRepeatPasswordVisibility}
-        onBlurField={validateFieldOnBlur} // 👉 Passando a prop aqui!
+        onBlurField={validateFieldOnBlur}
       />
     </div>
   );
