@@ -1,11 +1,14 @@
 import { Suspense, useState, useEffect } from "react";
-import { Outlet, useNavigation } from "react-router-dom";
+import { Outlet, useNavigation, useLocation } from "react-router-dom"; // Importe useLocation
 import LoadingOverlay from "./LoadingOverlay";
 import { familySyncTextIcon, familySyncSmallIcon } from "../../assets";
 
 function RootLayout() {
   const navigation = useNavigation();
+  const location = useLocation();
   const isLoading = navigation.state === "loading";
+
+  const isDashboard = location.pathname.startsWith("/dashboard");
 
   const [showSplash, setShowSplash] = useState(false);
   const [splashOpacity, setSplashOpacity] = useState("opacity-0");
@@ -13,13 +16,13 @@ function RootLayout() {
 
   useEffect(() => {
     const iniciarAnimacao = () => {
-      if (sessionStorage.getItem("@FamilySync:splashRodou")) return;
+      if (!isDashboard || sessionStorage.getItem("@FamilySync:splashRodou"))
+        return;
 
       setShowSplash(true);
       setSplashOpacity("opacity-0");
       setRevealText(false);
 
-      // Marca como rodado IMEDIATAMENTE
       sessionStorage.setItem("@FamilySync:splashRodou", "true");
 
       setTimeout(() => setSplashOpacity("opacity-100"), 50);
@@ -35,25 +38,23 @@ function RootLayout() {
       }, tempoTotalParaSumir);
     };
 
-    // Tenta rodar sozinho se o cara já estiver logado e der F5
     const isAuthenticated = localStorage.getItem("@FamilySync:isAuthenticated");
     const splashRodou = sessionStorage.getItem("@FamilySync:splashRodou");
 
-    if (isAuthenticated === "true" && !splashRodou) {
+    if (isAuthenticated === "true" && !splashRodou && isDashboard) {
       iniciarAnimacao();
     }
 
-    // Ouve o evento de login
     window.addEventListener("startSplash", iniciarAnimacao);
 
     return () => {
       window.removeEventListener("startSplash", iniciarAnimacao);
     };
-  }, []);
+  }, [isDashboard]);
 
   return (
     <>
-      {showSplash && (
+      {showSplash && isDashboard && (
         <div
           className={`fixed inset-0 z-9999 flex items-center justify-center bg-white transition-opacity duration-1000 ease-in-out ${splashOpacity}`}
         >
@@ -76,9 +77,9 @@ function RootLayout() {
         </div>
       )}
 
-      {isLoading && !showSplash && <LoadingOverlay />}
+      <div className={showSplash && isDashboard ? "hidden" : "block"}>
+        {isLoading && !showSplash && <LoadingOverlay />}
 
-      <div className={showSplash ? "hidden" : "block"}>
         <Suspense
           fallback={
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">

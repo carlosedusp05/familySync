@@ -100,21 +100,13 @@ function LoginScreen() {
           const userPayload = response.Response || response.data || response;
           localStorage.setItem("@FamilySync:user", JSON.stringify(userPayload));
 
-          const splashJaRodou = sessionStorage.getItem(
-            "@FamilySync:splashRodou",
-          );
-          const delayNavegacao = !splashJaRodou ? 300 : 0;
+          sessionStorage.removeItem("@FamilySync:splashRodou");
 
-          if (!splashJaRodou) {
-            window.dispatchEvent(new Event("startSplash"));
-          }
+          window.dispatchEvent(new Event("startSplash"));
 
           setIsLoading(false);
 
-          setTimeout(() => {
-            navigate("/dashboard");
-          }, delayNavegacao);
-
+          navigate("/dashboard");
           return;
         }
 
@@ -134,16 +126,11 @@ function LoginScreen() {
         }
       } catch (error) {
         setIsLoading(false);
-
-        if (error) {
-          setErrosCampos((prev) => ({
-            ...prev,
-
-            email: "E-mail não encontrado.",
-
-            senha: "Senha invalida",
-          }));
-        }
+        setErrosCampos((prev) => ({
+          ...prev,
+          email: "E-mail não encontrado.",
+          senha: "Senha invalida",
+        }));
       }
     }, 50);
   };

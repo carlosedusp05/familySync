@@ -23,7 +23,6 @@ function PrincipalScreen(props) {
   });
 
   useEffect(() => {
-    // 1. Lógica de carregar dados do usuário
     const savedUser = localStorage.getItem("@FamilySync:user");
 
     if (savedUser) {
@@ -46,16 +45,6 @@ function PrincipalScreen(props) {
       } catch (error) {
         console.error("Erro ao converter dados do localStorage", error);
       }
-    }
-
-    // 2. Lógica para disparar a Splash Screen apenas uma vez por sessão
-    const splashRodou = sessionStorage.getItem("@FamilySync:splashRodou");
-
-    if (!splashRodou) {
-      // Dispara o evento que o RootLayout está ouvindo
-      window.dispatchEvent(new Event("startSplash"));
-      // Salva no sessionStorage para não repetir até fechar a aba
-      sessionStorage.setItem("@FamilySync:splashRodou", "true");
     }
   }, []);
 
