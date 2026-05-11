@@ -7,6 +7,7 @@ import DefaultButton from "./DefaultButton";
 function ModalEvents(
   isOpen,
   onClose,
+  selectedDate,
   data = null,
   onDelete,
   onSave,
@@ -104,6 +105,17 @@ function ModalEvents(
               : "Visualize os detalhes registrados abaixo."}
           </p>
         </div>
+
+        <div className="flex justify-between py-10">
+          <div className="font-bold text-2xl">
+            <p>
+              {/* {selectedDate} */}
+              AAAA
+            </p>
+          </div>
+        </div>
+
+        <div></div>
 
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
@@ -224,7 +236,6 @@ function ModalEvents(
             <>
               <DefaultButton
                 another_color="bg-terracota"
-                another_text_color="text-zinc-700"
                 another_text_size="text-[20px]"
                 another_size="h-14 w-50"
                 text={isGlobalEditFlow ? "Cancelar" : "Fechar"}

@@ -9,7 +9,7 @@ import { useState } from "react";
 
 function CalendarScreen() {
   const [modalOpen, setModalOpen] = useState(false);
-  const [diaSelecionado, SetDiaSelecionado] = useState(null);
+  const [dateSelected, setDateSelected] = useState(null);
 
   function handleDateClick(info) {
     const hoje = new Date();
@@ -18,11 +18,11 @@ function CalendarScreen() {
 
     const dataClicada = new Date(info.dateStr);
 
-    SetDiaSelecionado(info.dateStr);
+    setDateSelected(info.dateStr);
     if (dataClicada < hoje) {
       return;
     }
-    SetDiaSelecionado(info.dateStr);
+    setDateSelected(info.dateStr);
     setModalOpen(true);
   }
   return (
