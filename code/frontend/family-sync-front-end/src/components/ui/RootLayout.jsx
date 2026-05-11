@@ -1,5 +1,5 @@
 import { Suspense, useState, useEffect } from "react";
-import { Outlet, useNavigation, useLocation } from "react-router-dom"; // Importe useLocation
+import { Outlet, useNavigation, useLocation } from "react-router-dom";
 import LoadingOverlay from "./LoadingOverlay";
 import { familySyncTextIcon, familySyncSmallIcon } from "../../assets";
 
@@ -71,7 +71,7 @@ function RootLayout() {
             <img
               src={familySyncSmallIcon}
               alt="FamilySync Icon"
-              className="h-70 w-auto z-10 drop-shadow-sm"
+              className="h-70 w-auto z-10"
             />
           </div>
         </div>
