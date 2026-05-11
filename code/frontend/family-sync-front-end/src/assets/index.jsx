@@ -39,6 +39,10 @@ import closedEye from "./closed_eye.svg";
 import calendarIconForms from "./calendar_icon_forms.svg";
 import familySyncTextIcon from "./family_sync_text_icon.svg";
 import familySyncSmallIcon from "./family_sync_small_icon.svg";
+import editBoxIcon from "./edit_box_icon.svg";
+import deleteRedIcon from "./delete_red_icon.svg";
+import chevronDownBrownIcon from "./chevron_down_brown_icon.svg";
+import editPencilBrownIcon from "./edit_pencil_brown_icon.svg";
 
 export {
   eyeIcon,
@@ -82,4 +86,8 @@ export {
   calendarIconForms,
   familySyncTextIcon,
   familySyncSmallIcon,
+  editBoxIcon,
+  deleteRedIcon,
+  chevronDownBrownIcon,
+  editPencilBrownIcon,
 };

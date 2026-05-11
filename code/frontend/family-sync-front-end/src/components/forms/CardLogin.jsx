@@ -72,7 +72,7 @@ function CardLogin({
               if (errosCampos?.email)
                 setErrosCampos((prev) => ({ ...prev, email: "" }));
             }}
-            onKeyDown={handleEmailKeyDown} // Mantém sua lógica de pular campo
+            onKeyDown={handleEmailKeyDown}
             onBlur={(e) => onBlurField && onBlurField("email", e.target.value)}
             type="text"
             src={emailIcon}

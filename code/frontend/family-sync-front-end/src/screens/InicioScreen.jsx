@@ -14,14 +14,17 @@ function InicioScreen() {
   };
 
   return (
-    <div className="h-screen w-full">
+    <div className="h-screen w-full flex flex-col overflow-hidden">
       <BackgroundImage
         src={imageBackground2}
         alt={"Imagem Fundo"}
         blur_or_glass={"glass"}
       />
-      <DefaultHeader disconnected={true}></DefaultHeader>
-      <main className="flex  px-40 w-full justify-between h-[90%] items-center">
+
+      <DefaultHeader disconnected={true} />
+
+      {/* 2. Trocado 'h-[90%]' por 'flex-1' */}
+      <main className="flex-1 flex px-40 w-full justify-between items-center">
         <p className="text-white font-bold text-2xl w-[20%]">
           Brio é a quantidade de energia que se disponibiliza ao agir para fazer
           o melhor e sentir contentamento com a própria prática.
