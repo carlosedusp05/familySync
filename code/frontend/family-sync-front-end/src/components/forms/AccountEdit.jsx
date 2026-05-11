@@ -49,7 +49,7 @@ function AccountEdit() {
         />
       </div>
 
-      <div className="bg-white/20 backdrop-blur-md border border-white/40 rounded-[30px] p-6 pb-8 flex flex-col items-center w-[570px] max-w-[90vw] shadow-2xl relative">
+      <div className="bg-white/20 backdrop-blur-md border border-white/40 rounded-[30px] p-6 pb-8 flex flex-col items-center w-142.5 max-w-[90vw] shadow-2xl relative">
         <div className="w-30 h-30 relative rounded-full border-2 border-[#ff7b30] flex items-center justify-center bg-white mt-2">
           <IconPerfil is_white_backgroud={true} another_size={"h-[65%]"} />
           <div className="absolute -bottom-3 -right-3 flex items-center justify-center rounded-[50%] cursor-pointer">
