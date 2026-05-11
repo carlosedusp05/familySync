@@ -95,6 +95,7 @@ function DefaultTextField(props) {
         value={props.value || ""}
         max={props.max}
         min={props.min}
+        readOnly={props.readOnly}
       />
 
       {props.src && (

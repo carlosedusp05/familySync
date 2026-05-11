@@ -3,7 +3,7 @@ import { logoutIcon } from "../../assets";
 function DefaultButton({
   theme = true,
   text = "",
-  type = "button", // Adicionado padrão
+  type = "button",
   border = false,
   most_radius = false,
   logout_image = false,
@@ -13,9 +13,9 @@ function DefaultButton({
   another_text_color,
   another_color,
   onClick,
-  onMouseEnter, // Adicionado
+  onMouseEnter,
   another_padding,
-  ...rest // Para pegar qualquer outra prop extra
+  ...rest
 }) {
   const backgroundColor =
     another_color || (theme ? "bg-orange" : "bg-yellow-cream");
@@ -37,7 +37,7 @@ function DefaultButton({
 
   return (
     <button
-      type={type} // Repassando o type
+      type={type}
       className={`${backgroundColor} ${textColor} ${IsExistBorder} ${border_radius} 
         ${size} ${textStyle} ${padding}
         cursor-pointer
