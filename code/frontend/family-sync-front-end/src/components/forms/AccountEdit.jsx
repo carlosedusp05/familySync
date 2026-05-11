@@ -37,6 +37,7 @@ function AccountEdit() {
   const [isLoading, setIsLoading] = useState(false);
   const [preview, setPreview] = useState(null);
   const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const hoje = new Date().toISOString().split("T")[0];
 
@@ -51,15 +52,15 @@ function AccountEdit() {
 
         const response = await userService.getUserById(id_usuario);
 
-        const user = response.Response;
-
-        console.log(user);
+        const user = response.Response[0];
 
         setFormData({
           nome: user.nome || "",
           email: user.email || "",
           cpf: formatCPF(user.cpf || ""),
-          dataNascimento: user.data_nascimento || "",
+          dataNascimento: user.data_nascimento
+            ? new Date(user.data_nascimento).toISOString().split("T")[0]
+            : "",
           senha: "",
         });
 
@@ -167,7 +168,6 @@ function AccountEdit() {
 
   const toggleEdit = (fieldId) => {
     setEditableFields((prev) => ({ ...prev, [fieldId]: !prev[fieldId] }));
-    // Limpa o erro ao fechar o modo de edição para não travar a tela
     if (editableFields[fieldId]) {
       setErrosCampos((prev) => ({ ...prev, [fieldId]: "" }));
     }
@@ -244,6 +244,24 @@ function AccountEdit() {
     }, 1);
   };
 
+  const handleDeleteAccount = async () => {
+    setIsLoading(true);
+    try {
+      const storedUser = JSON.parse(localStorage.getItem("@FamilySync:user"));
+      const id_usuario = parseInt(storedUser.id_usuario);
+
+      await userService.deleteUser(id_usuario);
+
+      localStorage.clear();
+      navigate("/");
+    } catch (error) {
+      console.error("Erro ao excluir conta:", error);
+    } finally {
+      setIsLoading(false);
+      setIsDeleteModalOpen(false);
+    }
+  };
+
   return (
     <div className="h-full w-full flex items-center justify-center relative">
       {isLoading && <LoadingOverlay />}
@@ -260,7 +278,6 @@ function AccountEdit() {
       </div>
 
       <div className="bg-white/20 backdrop-blur-md border border-white/40 rounded-[30px] p-6 pb-8 flex flex-col items-center w-142.5 max-w-[90vw] shadow-2xl">
-        {/* Avatar */}
         <div className="w-30 h-30 relative rounded-full border-2 border-orange bg-white mb-6">
           {preview ? (
             <img
@@ -323,15 +340,22 @@ function AccountEdit() {
             </div>
           ))}
 
-          {/* Seção de Famílias Corrigida */}
           <div className="w-full bg-white rounded-lg shadow-sm mt-2 overflow-hidden">
             <div
               className="p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors"
               onClick={() => setIsFamiliesOpen(!isFamiliesOpen)}
             >
-              <h3 className="text-[#4a2511] font-bold text-xl">
-                Minhas Famílias
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-[#4a2511] font-bold text-xl">
+                  Minha Família:
+                </h3>
+                <span className="text-orange font-medium text-lg truncate max-w-37.5">
+                  {familiasDisponiveis.find((f) =>
+                    familiasSelecionadas.includes(f.id),
+                  )?.nome || "Selecione..."}
+                </span>
+              </div>
+
               <motion.img
                 src={chevronDownBrownIcon}
                 animate={{ rotate: isFamiliesOpen ? 180 : 0 }}
@@ -345,28 +369,36 @@ function AccountEdit() {
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  className="px-4 pb-4 flex flex-col gap-3 border-t border-gray-100 pt-3"
+                  className="px-4 pb-4 flex flex-col gap-1 border-t border-gray-100 pt-3"
                 >
                   {familiasDisponiveis.map((fam) => (
                     <div
                       key={fam.id}
-                      className="flex items-center gap-3 cursor-pointer"
-                      onClick={() => toggleFamily(fam.id)}
+                      className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                      onClick={() => {
+                        setFamiliasSelecionadas([fam.id]);
+                        setIsFamiliesOpen(false);
+                      }}
                     >
                       <div
-                        className={`w-6 h-6 border-2 rounded flex items-center justify-center transition-all ${
+                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                           familiasSelecionadas.includes(fam.id)
-                            ? "bg-orange border-orange"
+                            ? "border-orange"
                             : "border-[#4a2511]/30"
                         }`}
                       >
                         {familiasSelecionadas.includes(fam.id) && (
-                          <span className="text-white text-[10px] font-bold">
-                            ✓
-                          </span>
+                          <div className="w-2.5 h-2.5 bg-orange rounded-full" />
                         )}
                       </div>
-                      <span className="text-[#4a2511] font-bold text-lg">
+
+                      <span
+                        className={`text-lg transition-colors ${
+                          familiasSelecionadas.includes(fam.id)
+                            ? "text-orange font-bold"
+                            : "text-[#4a2511] font-medium"
+                        }`}
+                      >
                         {fam.nome}
                       </span>
                     </div>
@@ -376,7 +408,6 @@ function AccountEdit() {
             </AnimatePresence>
           </div>
         </div>
-        {/* Configurações Avançadas */}
 
         <div className="w-[95%] bg-white rounded-xl mt-6 shadow-sm overflow-hidden">
           <div className="p-4 pb-0">
@@ -393,6 +424,7 @@ function AccountEdit() {
 
               backgroundColor: "rgba(240, 62, 62, 0.09)",
             }}
+            onClick={() => setIsDeleteModalOpen(true)}
             whileTap={{ scale: 0.98 }}
             className="flex items-center justify-between cursor-pointer group p-4 duration-200 ease-out transition-all bg-transparent"
           >
@@ -427,6 +459,54 @@ function AccountEdit() {
           <DefaultButton text="Confirmar" theme={true} onClick={handleUpdate} />
         </div>
       </div>
+      <AnimatePresence>
+        {isDeleteModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setIsDeleteModalOpen(false)}
+              className="absolute inset-0 bg-black/60 will-change-opacity"
+            />
+
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 15 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 15 }}
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              className="bg-white rounded-[30px] p-8 w-full max-w-md relative z-10 shadow-2xl flex flex-col items-center text-center will-change-transform"
+            >
+              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                <img src={deleteRedIcon} className="w-10 h-10" alt="Alerta" />
+              </div>
+
+              <h2 className="text-[#4a2511] font-bold text-2xl mb-2">
+                Excluir Conta
+              </h2>
+              <p className="text-gray-600 mb-8">
+                Tem certeza que deseja excluir sua conta? Esta ação é
+                irreversível e todos os seus dados serão perdidos.
+              </p>
+
+              <div className="flex w-full gap-4">
+                <DefaultButton
+                  text="Não, voltar"
+                  theme={false}
+                  onClick={() => setIsDeleteModalOpen(false)}
+                />
+                <DefaultButton
+                  text="Sim, excluir"
+                  theme={true}
+                  another_bg="bg-[#f03e3e]"
+                  onClick={handleDeleteAccount}
+                />
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
