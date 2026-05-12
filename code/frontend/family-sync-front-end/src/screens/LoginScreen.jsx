@@ -52,6 +52,7 @@ function LoginScreen() {
           email,
           senha: senhaHasheada,
         });
+        console.log(response);
 
         if (
           response &&

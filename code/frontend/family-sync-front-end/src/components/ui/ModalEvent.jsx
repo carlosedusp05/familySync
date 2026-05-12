@@ -3,8 +3,9 @@ import { pencilTerracotaIcon } from "../../assets";
 import { useEffect, useRef, useState } from "react";
 import { space } from "postcss/lib/list";
 import DefaultButton from "./DefaultButton";
+import { div, input } from "framer-motion/client";
 
-function ModalEvents(
+function ModalEvents({
   isOpen,
   onClose,
   selectedDate,
@@ -12,7 +13,7 @@ function ModalEvents(
   onDelete,
   onSave,
   isInitialEdit,
-) {
+}) {
   const isEdit = Boolean(data);
   const [hours, setHours] = useState("");
   const [title, setTitle] = useState("");
@@ -89,7 +90,7 @@ function ModalEvents(
       <LargeCard
         color={"bg-yellow-light"}
         p={"p-18"}
-        size={"h-[50%] w-full max-w-7xl relative"}
+        size={" w-full max-w-7xl relative"}
       >
         <div className="flex flex-col gap-2">
           <h2 className="text-brown-dark text-3xl font-bold">
@@ -106,12 +107,22 @@ function ModalEvents(
           </p>
         </div>
 
-        <div className="flex justify-between py-10">
+        <div className="flex justify-between items-center py-10">
           <div className="font-bold text-2xl">
-            <p>
-              {/* {selectedDate} */}
-              AAAA
-            </p>
+            <p>DIA: {selectedDate}</p>
+          </div>
+          <div className="flex items-center justify-center text-center">
+            {editableFields.hours ? (
+              <input
+                ref={hoursRef}
+                type="time"
+                value={hours}
+                onChange={(e) => setHours(e.target.value)}
+                className="focus:border-[#5D2A11] bg-terracota text-white h-full w-full p-3 font-bold rounded-2xl outline-none border-transparent"
+              />
+            ) : (
+              <div className="focus:border-[#5D2A11] bg-terracota text-white h-full w-full font-bold rounded-2xl p-3 text-center"></div>
+            )}
           </div>
         </div>
 
@@ -131,7 +142,9 @@ function ModalEvents(
                   <img
                     src={pencilTerracotaIcon}
                     alt="Editar"
-                    className={`w-7 h-7 transition-all ${editableFields.title ? "opacity-100" : "opacity-40"}`}
+                    className={`w-7 h-7 transition-all ${
+                      editableFields.title ? "opacity-100" : "opacity-40"
+                    }`}
                   />
                 </button>
               )}
@@ -156,7 +169,13 @@ function ModalEvents(
                     }}
                     placeholder="Título (ex: Formatura do Pedro)"
                     className={`col-start-1 row-start-1 w-full py-2 px-1 outline-none transition-all bg-transparent text-[#5D2A11] text-[18px] font-medium
-                    ${errors.title ? "border-b-2 border-red-500" : editableFields.title ? "border-b-2 border-[#5D2A11]/30" : "border-b-2 border-transparent"}`}
+                    ${
+                      errors.title
+                        ? "border-b-2 border-red-500"
+                        : editableFields.title
+                        ? "border-b-2 border-[#5D2A11]/30"
+                        : "border-b-2 border-transparent"
+                    }`}
                     style={{ textIndent: "5px" }}
                   />
                 ) : (
@@ -187,14 +206,22 @@ function ModalEvents(
                     <img
                       src={pencilTerracotaIcon}
                       alt="Editar"
-                      className={`w-7 h-7 transition-all ${editableFields.description ? "opacity-100" : "opacity-40"}`}
+                      className={`w-7 h-7 transition-all ${
+                        editableFields.description
+                          ? "opacity-100"
+                          : "opacity-40"
+                      }`}
                     />
                   </button>
                 )}
               </div>
               {editableFields.description && isGlobalEditFlow && (
                 <span
-                  className={`text-xs ${description.length >= 950 ? "text-red-500 font-bold" : "text-[#5D2A11]/50"}`}
+                  className={`text-xs ${
+                    description.length >= 950
+                      ? "text-red-500 font-bold"
+                      : "text-[#5D2A11]/50"
+                  }`}
                 >
                   {description.length} / 1000
                 </span>
@@ -215,7 +242,13 @@ function ModalEvents(
                 rows="5"
                 style={{ textIndent: "5px" }}
                 className={`w-full p-4 rounded-2xl outline-none transition-colors resize-none text-[#5D2A11] text-[18px]
-                ${errors.description ? "border-2 border-red-500" : editableFields.description ? "border border-[#5D2A11]/10 bg-white/50" : "bg-[#E0E0E0]/50"}`}
+                ${
+                  errors.description
+                    ? "border-2 border-red-500"
+                    : editableFields.description
+                    ? "border border-[#5D2A11]/10 bg-white/50"
+                    : "bg-[#E0E0E0]/50"
+                }`}
               />
             ) : (
               <div className="bg-[#5D2A11]/5 p-6 rounded-2xl min-h-37.5 w-full">
