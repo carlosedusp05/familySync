@@ -15,7 +15,7 @@ import {
   validateConfirmPassword,
   validateRegisterFields,
 } from "../utils/validators.js";
-import { formatUserName, cleanCPF } from "../utils/validators.js";
+import { formatUserName, cleanCPF } from "../utils/formatters.js";
 
 function RegisterScreen() {
   const navigate = useNavigate();
