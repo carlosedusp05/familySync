@@ -116,7 +116,8 @@ function RegisterScreen() {
       };
 
       const response = await userService.createUser(dadosBackend);
-      if (response) navigate("/auth/login");
+
+      if (response.StatusCode == 201) navigate("/auth/login");
     } catch (error) {
       setErro("Falha ao Cadastrar! Tente novamente mais tarde!");
     } finally {
