@@ -6,10 +6,58 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { useState } from "react";
+import ShowAlert from "../components/ui/ShowAlert";
 
 function CalendarScreen() {
   const [modalOpen, setModalOpen] = useState(false);
   const [dateSelected, setDateSelected] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [warning, setWarning] = useState("");
+  const [showWarning, setShowWarning] = useState(false);
+
+  const [dateEvent, setDateEvent] = useState([]);
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedInfo(null);
+  };
+
+  const handleDelete = (id) => {
+    setDateEvent((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const handleSave = (newData) => {
+    if (selectedInfo) {
+      setDateEvent((prev) =>
+        prev.map((item) =>
+          item.id === selectedInfo.id
+            ? {
+                ...item,
+                date: newData.date,
+                title: newData.title,
+                desc: newData.description,
+              }
+            : item
+        )
+      );
+    } else {
+      const newItem = {
+        id: Date.now(),
+        date: newData.date,
+        title: newData.title,
+        desc: newData.description,
+      };
+      setDateEvent((prev) => [newItem, ...prev]);
+    }
+    handleCloseModal();
+  };
+
+  const handleOpenModal = (info = null, forceEdit = false) => {
+    setSelectedInfo(info);
+    setIsModeEdition(forceEdit);
+    setIsModalOpen(true);
+  };
 
   function handleDateClick(info) {
     const hoje = new Date();
@@ -20,11 +68,26 @@ function CalendarScreen() {
 
     setDateSelected(info.dateStr);
     if (dataClicada < hoje) {
+      triggerAlert("Não é possível marcar eventos em datas passadas!");
       return;
     }
     setDateSelected(info.dateStr);
     setModalOpen(true);
   }
+
+  function triggerAlert(message) {
+    setWarning(message);
+    setShowWarning(true);
+
+    setTimeout(() => {
+      setShowWarning(false);
+    }, 2500);
+
+    setTimeout(() => {
+      setWarning("");
+    }, 3000);
+  }
+
   return (
     <MainLayout>
       <div className="h-full flex w-full">
@@ -43,9 +106,16 @@ function CalendarScreen() {
                 height="100%"
                 dateClick={handleDateClick}
               />
+
+              <ShowAlert warning={warning} showWarning={showWarning} />
+
+              <ModalEvents
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                selectedDate={dateSelected}
+              />
             </div>
           </LargeCard>
-          <ModalEvents />
         </div>
 
         {/* Div Eventos */}
