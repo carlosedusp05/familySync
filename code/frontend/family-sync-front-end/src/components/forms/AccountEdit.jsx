@@ -12,9 +12,26 @@ import { userService } from "../../services/userService";
 import {
   editPencilBrownIcon,
   deleteRedIcon,
-  calendarIconForms,
   chevronDownBrownIcon,
 } from "../../assets";
+
+import {
+  validateName,
+  validateEmail,
+  validarCpf,
+  validarDataNascimento,
+  validatePassword,
+} from "../../utils/validators";
+import {
+  formatCPF,
+  cleanCPF,
+  formatUserName,
+  formatDateForInput,
+} from "../../utils/formatters";
+
+import FamilySelector from "../ui/FamilySelector";
+
+import DeleteModal from "../ui/DeleteModal";
 
 function AccountEdit() {
   const navigate = useNavigate();
@@ -43,14 +60,31 @@ function AccountEdit() {
 
   useEffect(() => {
     const loadData = async () => {
-      setIsLoading(true);
-      try {
-        const storedUser = JSON.parse(localStorage.getItem("@FamilySync:user"));
-        if (!storedUser) return navigate("/auth/login");
+      const storedUser = JSON.parse(localStorage.getItem("@FamilySync:user"));
 
+      if (!storedUser) {
+        return navigate("/auth/login");
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        nome: storedUser.nome || "",
+        email: storedUser.email || "",
+      }));
+
+      setIsLoading(true);
+
+      try {
         const id_usuario = parseInt(storedUser.id_usuario);
 
-        const response = await userService.getUserById(id_usuario);
+        const [response, familias] = await Promise.all([
+          userService.getUserById(id_usuario),
+          Promise.resolve([
+            { id: 1, nome: "Família Silva" },
+            { id: 2, nome: "Família Oliveira" },
+            { id: 3, nome: "Família Souza" },
+          ]),
+        ]);
 
         const user = response.Response[0];
 
@@ -58,51 +92,23 @@ function AccountEdit() {
           nome: user.nome || "",
           email: user.email || "",
           cpf: formatCPF(user.cpf || ""),
-          dataNascimento: user.data_nascimento
-            ? new Date(user.data_nascimento).toISOString().split("T")[0]
-            : "",
+          dataNascimento: formatDateForInput(user.data_nascimento),
           senha: "",
         });
 
         if (user.foto_perfil) setPreview(user.foto_perfil);
 
-        setFamiliasDisponiveis([
-          { id: 1, nome: "Família Silva" },
-          { id: 2, nome: "Família Oliveira" },
-          { id: 3, nome: "Família Souza" },
-        ]);
-
+        setFamiliasDisponiveis(familias);
         setFamiliasSelecionadas(user.familias?.map((f) => f.id) || [1]);
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
       } finally {
-        setIsLoading(false);
+        setTimeout(() => setIsLoading(false), 100);
       }
     };
+
     loadData();
   }, [navigate]);
-
-  const formatCPF = (v) =>
-    v
-      .replace(/\D/g, "")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
-      .slice(0, 14);
-
-  const validarCpf = (cpf) => {
-    cpf = cpf.replace(/\D/g, "");
-    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
-    const calc = (q) => {
-      const s = cpf
-        .split("")
-        .slice(0, q - 1)
-        .reduce((acc, curr, i) => acc + curr * (q - i), 0);
-      const r = (s * 10) % 11;
-      return r === 10 ? 0 : r;
-    };
-    return calc(10) === Number(cpf[9]) && calc(11) === Number(cpf[10]);
-  };
 
   const validateFieldOnBlur = (id, valor) => {
     if (!editableFields[id]) return;
@@ -111,59 +117,26 @@ function AccountEdit() {
 
     switch (id) {
       case "nome":
-        if (!valor || valor.trim().length < 3 || !isNaN(valor))
-          erroMensagem = "Insira um nome válido (mínimo 3 caracteres)";
+        erroMensagem = validateName(valor);
         break;
       case "email":
-        const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (!valor) erroMensagem = "O e-mail é obrigatório";
-        else if (!regexEmail.test(valor))
-          erroMensagem = "Insira um formato de e-mail válido";
+        erroMensagem = validateEmail(valor);
         break;
       case "cpf":
-        if (!validarCpf(valor)) erroMensagem = "CPF inválido";
+        erroMensagem = validarCpf(valor);
         break;
       case "dataNascimento":
-        const dataSelecionada = new Date(valor);
-        const dataHoje = new Date();
-        if (dataSelecionada > dataHoje) {
+        erroMensagem = validarDataNascimento(valor);
+        if (erroMensagem && new Date(valor) > new Date()) {
           setFormData((prev) => ({ ...prev, dataNascimento: hoje }));
-          erroMensagem = "";
-        } else if (!valor) {
-          erroMensagem = "Data de nascimento é obrigatória";
         }
         break;
       case "senha":
-        if (valor) {
-          const faltaMinuscula = !/[a-z]/.test(valor);
-          const faltaMaiuscula = !/[A-Z]/.test(valor);
-          const faltaNumero = !/\d/.test(valor);
-          const faltaEspecial = !/[!@#$%^&*(),.?":{}|<>_=+ \-]/.test(valor);
-          const tamanhoCurto = valor.length < 8;
-
-          if (
-            tamanhoCurto ||
-            faltaMinuscula ||
-            faltaMaiuscula ||
-            faltaNumero ||
-            faltaEspecial
-          ) {
-            erroMensagem =
-              "Senha muito fraca (mín. 8 caracteres, maiúsculas, números e símbolos)";
-          }
-        }
-        break;
-      default:
+        if (valor) erroMensagem = validatePassword(valor);
         break;
     }
 
     setErrosCampos((prev) => ({ ...prev, [id]: erroMensagem }));
-  };
-
-  const toggleFamily = (id) => {
-    setFamiliasSelecionadas((prev) =>
-      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id],
-    );
   };
 
   const toggleEdit = (fieldId) => {
@@ -174,15 +147,39 @@ function AccountEdit() {
   };
 
   const handleUpdate = async () => {
+    const erros = {
+      nome: validateName(formData.nome),
+      email: validateEmail(formData.email),
+      cpf: validarCpf(formData.cpf),
+      dataNascimento: validarDataNascimento(formData.dataNascimento),
+    };
+
+    if (formData.senha) erros.senha = validatePassword(formData.senha);
+
+    Object.keys(erros).forEach((key) => !erros[key] && delete erros[key]);
+
+    if (Object.keys(erros).length > 0) {
+      setErrosCampos(erros);
+      return;
+    }
+
     setIsLoading(true);
     try {
       const dadosUpdate = {
         ...formData,
-        cpf: formData.cpf.replace(/\D/g, ""),
+        nome: formatUserName(formData.nome),
+        cpf: cleanCPF(formData.cpf),
         familias: familiasSelecionadas,
       };
-      if (formData.senha)
-        dadosUpdate.senha = CryptoJS.SHA256(formData.senha).toString();
+
+      if (formData.senha) {
+        dadosUpdate.senha = CryptoJS.SHA256(formData.senha).toString(
+          CryptoJS.enc.Hex,
+        );
+      } else {
+        delete dadosUpdate.senha;
+      }
+
       await userService.updateUser(dadosUpdate);
       navigate("/dashboard");
     } catch (error) {
@@ -339,74 +336,16 @@ function AccountEdit() {
               )}
             </div>
           ))}
-
-          <div className="w-full bg-white rounded-lg shadow-sm mt-2 overflow-hidden">
-            <div
-              className="p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors"
-              onClick={() => setIsFamiliesOpen(!isFamiliesOpen)}
-            >
-              <div className="flex items-center gap-2">
-                <h3 className="text-[#4a2511] font-bold text-xl">
-                  Minha Família:
-                </h3>
-                <span className="text-orange font-medium text-lg truncate max-w-37.5">
-                  {familiasDisponiveis.find((f) =>
-                    familiasSelecionadas.includes(f.id),
-                  )?.nome || "Selecione..."}
-                </span>
-              </div>
-
-              <motion.img
-                src={chevronDownBrownIcon}
-                animate={{ rotate: isFamiliesOpen ? 180 : 0 }}
-                className="w-8 h-8 object-contain"
-              />
-            </div>
-
-            <AnimatePresence>
-              {isFamiliesOpen && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="px-4 pb-4 flex flex-col gap-1 border-t border-gray-100 pt-3"
-                >
-                  {familiasDisponiveis.map((fam) => (
-                    <div
-                      key={fam.id}
-                      className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-50 transition-colors"
-                      onClick={() => {
-                        setFamiliasSelecionadas([fam.id]);
-                        setIsFamiliesOpen(false);
-                      }}
-                    >
-                      <div
-                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                          familiasSelecionadas.includes(fam.id)
-                            ? "border-orange"
-                            : "border-[#4a2511]/30"
-                        }`}
-                      >
-                        {familiasSelecionadas.includes(fam.id) && (
-                          <div className="w-2.5 h-2.5 bg-orange rounded-full" />
-                        )}
-                      </div>
-
-                      <span
-                        className={`text-lg transition-colors ${
-                          familiasSelecionadas.includes(fam.id)
-                            ? "text-orange font-bold"
-                            : "text-[#4a2511] font-medium"
-                        }`}
-                      >
-                        {fam.nome}
-                      </span>
-                    </div>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          <FamilySelector
+            isOpen={isFamiliesOpen}
+            toggleOpen={() => setIsFamiliesOpen(!isFamiliesOpen)}
+            disponiveis={familiasDisponiveis}
+            selecionadas={familiasSelecionadas}
+            onSelect={(id) => {
+              setFamiliasSelecionadas([id]);
+              setIsFamiliesOpen(false);
+            }}
+          />
         </div>
 
         <div className="w-[95%] bg-white rounded-xl mt-6 shadow-sm overflow-hidden">
@@ -459,54 +398,11 @@ function AccountEdit() {
           <DefaultButton text="Confirmar" theme={true} onClick={handleUpdate} />
         </div>
       </div>
-      <AnimatePresence>
-        {isDeleteModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onClick={() => setIsDeleteModalOpen(false)}
-              className="absolute inset-0 bg-black/60 will-change-opacity"
-            />
-
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 15 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 15 }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="bg-white rounded-[30px] p-8 w-full max-w-md relative z-10 shadow-2xl flex flex-col items-center text-center will-change-transform"
-            >
-              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                <img src={deleteRedIcon} className="w-10 h-10" alt="Alerta" />
-              </div>
-
-              <h2 className="text-[#4a2511] font-bold text-2xl mb-2">
-                Excluir Conta
-              </h2>
-              <p className="text-gray-600 mb-8">
-                Tem certeza que deseja excluir sua conta? Esta ação é
-                irreversível e todos os seus dados serão perdidos.
-              </p>
-
-              <div className="flex w-full gap-4">
-                <DefaultButton
-                  text="Não, voltar"
-                  theme={false}
-                  onClick={() => setIsDeleteModalOpen(false)}
-                />
-                <DefaultButton
-                  text="Sim, excluir"
-                  theme={true}
-                  another_bg="bg-[#f03e3e]"
-                  onClick={handleDeleteAccount}
-                />
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteAccount}
+      />
     </div>
   );
 }

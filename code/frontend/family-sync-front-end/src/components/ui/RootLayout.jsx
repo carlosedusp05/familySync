@@ -7,25 +7,26 @@ function RootLayout() {
   const navigation = useNavigation();
   const location = useLocation();
   const isLoading = navigation.state === "loading";
-
   const isDashboard = location.pathname.startsWith("/dashboard");
 
-  const [showSplash, setShowSplash] = useState(false);
-  const [splashOpacity, setSplashOpacity] = useState("opacity-0");
+  const [showSplash, setShowSplash] = useState(() => {
+    const auth = localStorage.getItem("@FamilySync:isAuthenticated");
+    const rodou = sessionStorage.getItem("@FamilySync:splashRodou");
+    return isDashboard && auth === "true" && !rodou;
+  });
+
+  const [splashOpacity, setSplashOpacity] = useState(
+    showSplash ? "opacity-100" : "opacity-0",
+  );
   const [revealText, setRevealText] = useState(false);
 
   useEffect(() => {
     const iniciarAnimacao = () => {
-      if (!isDashboard || sessionStorage.getItem("@FamilySync:splashRodou"))
-        return;
-
       setShowSplash(true);
-      setSplashOpacity("opacity-0");
+      setTimeout(() => setSplashOpacity("opacity-100"), 10);
       setRevealText(false);
 
       sessionStorage.setItem("@FamilySync:splashRodou", "true");
-
-      setTimeout(() => setSplashOpacity("opacity-100"), 50);
 
       const tempoInicioRevelacao = 300;
       setTimeout(() => setRevealText(true), tempoInicioRevelacao);
@@ -34,27 +35,23 @@ function RootLayout() {
 
       setTimeout(() => {
         setSplashOpacity("opacity-0");
-        setTimeout(() => setShowSplash(false), 500);
+        setTimeout(() => {
+          setShowSplash(false);
+        }, 1000);
       }, tempoTotalParaSumir);
     };
 
-    const isAuthenticated = localStorage.getItem("@FamilySync:isAuthenticated");
-    const splashRodou = sessionStorage.getItem("@FamilySync:splashRodou");
-
-    if (isAuthenticated === "true" && !splashRodou && isDashboard) {
+    if (showSplash) {
       iniciarAnimacao();
     }
 
     window.addEventListener("startSplash", iniciarAnimacao);
-
-    return () => {
-      window.removeEventListener("startSplash", iniciarAnimacao);
-    };
-  }, [isDashboard]);
+    return () => window.removeEventListener("startSplash", iniciarAnimacao);
+  }, []);
 
   return (
     <>
-      {showSplash && isDashboard && (
+      {showSplash && (
         <div
           className={`fixed inset-0 z-9999 flex items-center justify-center bg-white transition-opacity duration-1000 ease-in-out ${splashOpacity}`}
         >
@@ -77,7 +74,7 @@ function RootLayout() {
         </div>
       )}
 
-      <div className={showSplash && isDashboard ? "hidden" : "block"}>
+      <div className="block">
         {isLoading && !showSplash && <LoadingOverlay />}
 
         <Suspense
@@ -87,7 +84,7 @@ function RootLayout() {
             </div>
           }
         >
-          <Outlet />
+          {!showSplash && <Outlet />}
         </Suspense>
       </div>
     </>

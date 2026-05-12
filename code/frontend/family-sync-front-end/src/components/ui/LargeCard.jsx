@@ -1,3 +1,6 @@
+import AOS from "aos";
+import "aos/dist/aos.css";
+
 function LargeCard({
   children,
   color,
@@ -6,6 +9,7 @@ function LargeCard({
   p,
   size,
   display,
+  ...rest
 }) {
   const style_card = not_pop_up ? "rounded-[50px]" : "rounded-[24px]";
   const shadow = max_shadow
@@ -15,6 +19,7 @@ function LargeCard({
   return (
     <div
       className={`${size} ${p} ${display} shadow-[0_8px_8px_0_rgba(0,0,0,0.25)] ${shadow} ${style_card} ${color}`}
+      {...rest}
     >
       {children}
     </div>

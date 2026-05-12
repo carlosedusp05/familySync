@@ -6,6 +6,11 @@ import { userService } from "../services/userService";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CryptoJS from "crypto-js";
+import {
+  validateEmail,
+  validatePassword,
+  validateLoginFields,
+} from "../utils/validators.js";
 
 function LoginScreen() {
   const navigate = useNavigate();
@@ -20,54 +25,11 @@ function LoginScreen() {
 
   const validateFieldOnBlur = (campoId, valor) => {
     let erroMensagem = "";
-    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (campoId === "email") {
-      if (!valor) {
-        erroMensagem = "O email é obrigatório.";
-      } else if (valor.length > 100) {
-        erroMensagem = "Limite de 100 caracteres excedido.";
-      } else if (!regexEmail.test(valor)) {
-        erroMensagem = "Formato de email inválido.";
-      }
-    } else if (campoId === "senha") {
-      if (!valor) {
-        erroMensagem = "A senha é obrigatória.";
-      } else {
-        const faltaMinuscula = !/[a-z]/.test(valor);
-        const faltaMaiuscula = !/[A-Z]/.test(valor);
-        const faltaNumero = !/\d/.test(valor);
-        const faltaEspecial = !/[!@#$%^&*(),.?":{}|<>_=+ \-]/.test(valor);
-        const tamanhoCurto = valor.length < 8;
+    if (campoId === "email") erroMensagem = validateEmail(valor);
+    if (campoId === "senha") erroMensagem = validatePassword(valor);
 
-        if (
-          tamanhoCurto ||
-          faltaMinuscula ||
-          faltaMaiuscula ||
-          faltaNumero ||
-          faltaEspecial
-        ) {
-          let mensagens = [];
-          if (tamanhoCurto) mensagens.push("ter pelo menos 8 caracteres");
-          if (faltaMinuscula) mensagens.push("conter letras minúsculas");
-          if (faltaMaiuscula) mensagens.push("incluir letras maiúsculas");
-          if (faltaNumero) mensagens.push("ter pelo menos um número");
-          if (faltaEspecial) mensagens.push("usar símbolos (ex: @, #, +, -)");
-
-          const fraseFinal = mensagens
-            .join(", ")
-            .replace(/, ([^,]*)$/, " e $1");
-          erroMensagem = `Sua senha precisa ${fraseFinal}.`;
-        } else if (valor.length > 100) {
-          erroMensagem = "Limite de 100 caracteres excedido.";
-        }
-      }
-    }
-
-    setErrosCampos((prev) => ({
-      ...prev,
-      [campoId]: erroMensagem,
-    }));
+    setErrosCampos((prev) => ({ ...prev, [campoId]: erroMensagem }));
   };
 
   const handleSubmit = async function () {
@@ -77,11 +39,10 @@ function LoginScreen() {
 
     setTimeout(async () => {
       try {
-        const dados = { email, senha };
-        const validacao = validateFields(dados);
+        const { isValid, erros } = validateLoginFields({ email, senha });
 
-        if (!validacao.isValid) {
-          setErrosCampos(validacao.erros);
+        if (!isValid) {
+          setErrosCampos(erros);
           setIsLoading(false);
           return;
         }
@@ -158,30 +119,6 @@ function LoginScreen() {
       />
     </div>
   );
-}
-
-function validateFields(dados) {
-  const erros = { email: "", senha: "" };
-  let isValid = true;
-  const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!dados.email) {
-    erros.email = "O email é obrigatório.";
-    isValid = false;
-  } else if (!regexEmail.test(dados.email)) {
-    erros.email = "Formato de email inválido.";
-    isValid = false;
-  }
-
-  if (!dados.senha) {
-    erros.senha = "A senha é obrigatória.";
-    isValid = false;
-  } else if (dados.senha.length < 8) {
-    erros.senha = "A senha deve ter no mínimo 8 caracteres.";
-    isValid = false;
-  }
-
-  return { isValid, erros };
 }
 
 export default LoginScreen;

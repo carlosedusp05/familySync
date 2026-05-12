@@ -6,6 +6,16 @@ import { useState } from "react";
 import { userService } from "../services/userService";
 import { useNavigate } from "react-router-dom";
 import CryptoJS from "crypto-js";
+import {
+  validateName,
+  validateEmail,
+  validarCpf,
+  validarDataNascimento,
+  validatePassword,
+  validateConfirmPassword,
+  validateRegisterFields,
+} from "../utils/validators.js";
+import { formatUserName, cleanCPF } from "../utils/validators.js";
 
 function RegisterScreen() {
   const navigate = useNavigate();
@@ -50,131 +60,68 @@ function RegisterScreen() {
 
   const validateFieldOnBlur = (campoId, valor) => {
     let erroMensagem = "";
-    const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     switch (campoId) {
       case "nome":
-        if (!valor || valor.trim().length < 3 || !isNaN(valor)) {
-          erroMensagem = "Insira um nome válido (mínimo 3 caracteres)";
-        }
+        erroMensagem = validateName(valor);
         break;
       case "email":
-        if (!valor) {
-          erroMensagem = "O e-mail é obrigatório";
-        } else if (!regexEmail.test(valor)) {
-          erroMensagem = "Insira um formato de e-mail válido";
-        } else if (valor.length > 100) {
-          erroMensagem = "O e-mail deve ter no máximo 100 caracteres";
-        }
+        erroMensagem = validateEmail(valor);
         break;
       case "cpf":
-        if (!validarCpf(valor)) {
-          erroMensagem = "CPF inválido";
-        }
+        erroMensagem = validarCpf(valor);
         break;
       case "dataNascimento":
-        if (!valor || !validarData(valor)) {
-          erroMensagem = "Data de nascimento inválida ou futura";
-        }
+        erroMensagem = validarDataNascimento(valor);
         break;
       case "senha":
-        if (!valor) {
-          erroMensagem = "A senha é obrigatória";
-        } else {
-          const faltaMinuscula = !/[a-z]/.test(valor);
-          const faltaMaiuscula = !/[A-Z]/.test(valor);
-          const faltaNumero = !/\d/.test(valor);
-          const faltaEspecial = !/[!@#$%^&*(),.?":{}|<>_=+ \-]/.test(valor);
-          const tamanhoCurto = valor.length < 8;
-
-          if (
-            tamanhoCurto ||
-            faltaMinuscula ||
-            faltaMaiuscula ||
-            faltaNumero ||
-            faltaEspecial
-          ) {
-            let mensagens = [];
-
-            if (tamanhoCurto) mensagens.push("ter pelo menos 8 caracteres");
-            if (faltaMinuscula) mensagens.push("conter letras minúsculas");
-            if (faltaMaiuscula) mensagens.push("incluir letras maiúsculas");
-            if (faltaNumero) mensagens.push("ter pelo menos um número");
-            if (faltaEspecial) mensagens.push("usar símbolos (ex: @, #, +, -)");
-
-            const fraseFinal = mensagens
-              .join(", ")
-              .replace(/, ([^,]*)$/, " e $1");
-            erroMensagem = `Sua senha precisa ${fraseFinal}.`;
-          } else if (valor.length > 128) {
-            erroMensagem = "A senha excedeu o limite de 128 caracteres";
-          }
-        }
+        erroMensagem = validatePassword(valor);
         break;
       case "repetirSenha":
-        if (!valor) {
-          erroMensagem = "Confirme sua senha";
-        } else if (valor !== senha) {
-          erroMensagem = "As senhas não conferem";
-        }
-        break;
-      default:
+        erroMensagem = validateConfirmPassword(senha, valor);
         break;
     }
 
     setErrosCampos((prev) => {
-      const novosErros = { ...prev };
-      if (erroMensagem) {
-        novosErros[campoId] = erroMensagem;
-      } else {
-        delete novosErros[campoId];
-      }
-      return novosErros;
+      const novos = { ...prev };
+      erroMensagem ? (novos[campoId] = erroMensagem) : delete novos[campoId];
+      return novos;
     });
   };
-
   const handleSubmit = async function () {
-    setErro("");
-    setErrosCampos({});
+    const { isValid, erros } = validateRegisterFields({
+      nome,
+      email,
+      cpf,
+      dataNascimento,
+      senha,
+      repetirSenha,
+    });
+
+    if (!isValid) {
+      setErrosCampos(erros);
+      return;
+    }
+
     setIsLoading(true);
+    try {
+      const senhaHasheada = CryptoJS.SHA256(senha).toString(CryptoJS.enc.Hex);
 
-    setTimeout(async () => {
-      try {
-        const dados = { nome, email, cpf, dataNascimento, senha, repetirSenha };
-        const validacao = validationFields(dados);
+      const dadosBackend = {
+        nome: formatUserName(nome),
+        email,
+        cpf: cleanCPF(cpf),
+        data_nascimento: dataNascimento,
+        senha: senhaHasheada,
+      };
 
-        if (validacao !== true) {
-          setErrosCampos(validacao);
-          setIsLoading(false);
-          return;
-        }
-
-        const senhaHasheada = CryptoJS.SHA256(senha).toString(CryptoJS.enc.Hex);
-
-        const dadosBackend = {
-          nome: nome
-            .toLowerCase()
-            .split(" ")
-            .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
-            .join(" "),
-          email: email,
-          cpf: cpf.replace(/\D/g, ""),
-          data_nascimento: dataNascimento,
-          senha: senhaHasheada,
-        };
-
-        const response = await userService.createUser(dadosBackend);
-
-        if (response) {
-          navigate("/auth/login");
-        } else {
-          setIsLoading(false);
-        }
-      } catch (error) {
-        setIsLoading(false);
-        setErro("Falha ao Cadastrar! Tente novamente mais tarde!");
-      }
-    }, 50);
+      const response = await userService.createUser(dadosBackend);
+      if (response) navigate("/auth/login");
+    } catch (error) {
+      setErro("Falha ao Cadastrar! Tente novamente mais tarde!");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -215,108 +162,6 @@ function RegisterScreen() {
       />
     </div>
   );
-}
-
-function validationFields(dados) {
-  const errors = {};
-
-  const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-  if (!dados.nome || dados.nome.trim().length < 3 || !isNaN(dados.nome)) {
-    errors.nome = "Insira um nome válido (mínimo 3 caracteres)";
-  }
-
-  if (!dados.email) {
-    errors.email = "O e-mail é obrigatório";
-  } else if (!regexEmail.test(dados.email)) {
-    errors.email = "Insira um formato de e-mail válido";
-  } else if (dados.email.length > 100) {
-    errors.email = "O e-mail deve ter no máximo 100 caracteres";
-  }
-
-  if (!validarCpf(dados.cpf)) {
-    errors.cpf = "CPF inválido";
-  }
-
-  if (!dados.dataNascimento || !validarData(dados.dataNascimento)) {
-    errors.dataNascimento = "Data de nascimento inválida ou futura";
-  }
-
-  if (!dados.senha) {
-    errors.senha = "A senha é obrigatória";
-  } else {
-    const faltaMinuscula = !/[a-z]/.test(dados.senha);
-    const faltaMaiuscula = !/[A-Z]/.test(dados.senha);
-    const faltaNumero = !/\d/.test(dados.senha);
-    const faltaEspecial = !/[!@#$%^&*(),.?":{}|<>_=+ \-]/.test(dados.senha);
-    const tamanhoCurto = dados.senha.length < 8;
-
-    if (
-      tamanhoCurto ||
-      faltaMinuscula ||
-      faltaMaiuscula ||
-      faltaNumero ||
-      faltaEspecial
-    ) {
-      let mensagens = [];
-
-      if (tamanhoCurto) mensagens.push("ter pelo menos 8 caracteres");
-      if (faltaMinuscula) mensagens.push("conter letras minúsculas");
-      if (faltaMaiuscula) mensagens.push("incluir letras maiúsculas");
-      if (faltaNumero) mensagens.push("ter pelo menos um número");
-      if (faltaEspecial) mensagens.push("usar símbolos (ex: @, #, +, -)");
-
-      const fraseFinal = mensagens.join(", ").replace(/, ([^,]*)$/, " e $1");
-      errors.senha = `Sua senha precisa ${fraseFinal}.`;
-    } else if (dados.senha.length > 128) {
-      errors.senha = "A senha excedeu o limite de 128 caracteres";
-    }
-  }
-
-  if (!dados.repetirSenha) {
-    errors.repetirSenha = "Confirme sua senha";
-  } else if (dados.repetirSenha !== dados.senha) {
-    errors.repetirSenha = "As senhas não conferem";
-  }
-
-  if (Object.keys(errors).length > 0) {
-    return errors;
-  }
-
-  return true;
-}
-
-function validarCpf(cpf) {
-  if (!cpf) return false;
-
-  cpf = cpf.replace(/\D/g, "");
-
-  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
-
-  const cpfDigitos = cpf.split("").map(Number);
-
-  const calcularDigito = (quantidade) => {
-    const soma = cpfDigitos
-      .slice(0, quantidade - 1)
-      .reduce((acc, curr, index) => acc + curr * (quantidade - index), 0);
-
-    const resto = (soma * 10) % 11;
-    return resto === 10 ? 0 : resto;
-  };
-
-  const digito1 = calcularDigito(10);
-  const digito2 = calcularDigito(11);
-
-  return digito1 === cpfDigitos[9] && digito2 === cpfDigitos[10];
-}
-
-function validarData(data) {
-  var dataSelecionada = new Date(data);
-  var hoje = new Date();
-  if (dataSelecionada > hoje) {
-    return false;
-  }
-  return true;
 }
 
 export default RegisterScreen;
