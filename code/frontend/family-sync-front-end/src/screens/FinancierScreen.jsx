@@ -7,95 +7,84 @@ import { editIcon, dollarIcon, sortDownIcon } from "../assets";
 function FinancierScreen() {
   const [salario, setSalario] = useState(5000);
   const [periodo, setPeriodo] = useState("Mês");
-
   const [editandoSalario, setEditandoSalario] = useState(false);
   const [tempSalario, setTempSalario] = useState(salario);
 
-  const getSalarioContextualizado = () => {
-    switch (periodo) {
-      case "Dia":
-        return Math.round(salario / 30 / 24);
-      case "Semana":
-        return Math.round(salario / 4);
-      case "Ano":
-        return salario * 12;
-      case "Mês":
-      default:
-        return salario;
-    }
+  const dadosPorPeriodo = {
+    Dia: [
+      { label: "Mercado", valor: 10 },
+      { label: "Transp.", valor: 5 },
+      { label: "Lazer", valor: 15 },
+      { label: "Saúde", valor: 0 },
+      { label: "Contas", valor: 0 },
+      { label: "Roupas", valor: 0 },
+      { label: "Escola", valor: 0 },
+      { label: "Impostos", valor: 0 },
+      { label: "Viagens", valor: 0 },
+      { label: "Casa", valor: 0 },
+      { label: "Carro", valor: 0 },
+      { label: "Outros", valor: 2 },
+    ],
+    Semana: [
+      { label: "Mercado", valor: 250 },
+      { label: "Transp.", valor: 100 },
+      { label: "Lazer", valor: 300 },
+      { label: "Saúde", valor: 50 },
+      { label: "Contas", valor: 400 },
+      { label: "Roupas", valor: 150 },
+      { label: "Escola", valor: 0 },
+      { label: "Impostos", valor: 0 },
+      { label: "Viagens", valor: 0 },
+      { label: "Casa", valor: 0 },
+      { label: "Carro", valor: 0 },
+      { label: "Outros", valor: 20 },
+    ],
+    Mês: [
+      { label: "Mercado", valor: 1200 },
+      { label: "Transp.", valor: 450 },
+      { label: "Lazer", valor: 800 },
+      { label: "Saúde", valor: 200 },
+      { label: "Contas", valor: 1500 },
+      { label: "Roupas", valor: 300 },
+      { label: "Escola", valor: 0 },
+      { label: "Impostos", valor: 0 },
+      { label: "Viagens", valor: 0 },
+      { label: "Casa", valor: 500 },
+      { label: "Carro", valor: 0 },
+      { label: "Outros", valor: 50 },
+    ],
+    Ano: [
+      { label: "Mercado", valor: 14000 },
+      { label: "Transp.", valor: 5000 },
+      { label: "Lazer", valor: 10000 },
+      { label: "Saúde", valor: 2000 },
+      { label: "Contas", valor: 18000 },
+      { label: "Roupas", valor: 3500 },
+      { label: "Escola", valor: 12000 },
+      { label: "Impostos", valor: 5000 },
+      { label: "Viagens", valor: 8000 },
+      { label: "Casa", valor: 6000 },
+      { label: "Carro", valor: 4000 },
+      { label: "Outros", valor: 1000 },
+    ],
   };
 
-  const salarioAtualPeriodo = getSalarioContextualizado();
+  const gastosAtuais = dadosPorPeriodo[periodo];
+  const maiorGastoNoPeriodo = Math.max(
+    ...gastosAtuais.map((item) => item.valor),
+    1
+  );
 
   const gerarEixoY = () => {
     const passos = 7;
     const valores = [];
     for (let i = passos; i >= 0; i--) {
-      valores.push(Math.round((salarioAtualPeriodo / passos) * i));
+      valores.push(Math.round((maiorGastoNoPeriodo / passos) * i));
     }
     return valores;
   };
 
   const yAxisValues = gerarEixoY();
-
-  const dadosPorPeriodo = {
-    Dia: [
-      { label: "Mercado", porcentagem: 10 },
-      { label: "Transp.", porcentagem: 24 },
-      { label: "Lazer", porcentagem: 70 },
-      { label: "Saúde", porcentagem: 40 },
-      { label: "Contas", porcentagem: 20 },
-      { label: "Roupas", porcentagem: 0 },
-      { label: "Escola", porcentagem: 0 },
-      { label: "Impostos", porcentagem: 0 },
-      { label: "Viagens", porcentagem: 0 },
-      { label: "Casa", porcentagem: 0 },
-      { label: "Carro", porcentagem: 0 },
-      { label: "Outros", porcentagem: 0 },
-    ],
-    Semana: [
-      { label: "Mercado", porcentagem: 20 },
-      { label: "Transp.", porcentagem: 30 },
-      { label: "Lazer", porcentagem: 90 },
-      { label: "Saúde", porcentagem: 16 },
-      { label: "Contas", porcentagem: 60 },
-      { label: "Roupas", porcentagem: 76 },
-      { label: "Escola", porcentagem: 0 },
-      { label: "Impostos", porcentagem: 0 },
-      { label: "Viagens", porcentagem: 0 },
-      { label: "Casa", porcentagem: 0 },
-      { label: "Carro", porcentagem: 0 },
-      { label: "Outros", porcentagem: 10 },
-    ],
-    Mês: [
-      { label: "Mercado", porcentagem: 64 },
-      { label: "Transp.", porcentagem: 42 },
-      { label: "Lazer", porcentagem: 96 },
-      { label: "Saúde", porcentagem: 0 },
-      { label: "Contas", porcentagem: 0 },
-      { label: "Roupas", porcentagem: 0 },
-      { label: "Escola", porcentagem: 0 },
-      { label: "Impostos", porcentagem: 0 },
-      { label: "Viagens", porcentagem: 0 },
-      { label: "Casa", porcentagem: 30 },
-      { label: "Carro", porcentagem: 0 },
-      { label: "Outros", porcentagem: 0 },
-    ],
-    Ano: [
-      { label: "Mercado", porcentagem: 40 },
-      { label: "Transp.", porcentagem: 50 },
-      { label: "Lazer", porcentagem: 80 },
-      { label: "Saúde", porcentagem: 64 },
-      { label: "Contas", porcentagem: 96 },
-      { label: "Roupas", porcentagem: 42 },
-      { label: "Escola", porcentagem: 30 },
-      { label: "Impostos", porcentagem: 56 },
-      { label: "Viagens", porcentagem: 78 },
-      { label: "Casa", porcentagem: 62 },
-      { label: "Carro", porcentagem: 40 },
-      { label: "Outros", porcentagem: 99 },
-    ],
-  };
 
   const labelsData = {
     Dia: "08 de Maio",
@@ -192,20 +181,13 @@ function FinancierScreen() {
               <div className="relative w-16 h-full flex flex-col justify-between items-end pr-4 text-gray-400 font-medium text-lg">
                 {yAxisValues.map((val, idx) => (
                   <span key={idx} className="leading-none">
-                    {val}
+                    {val.toLocaleString()}
                   </span>
                 ))}
               </div>
 
               <div className="relative flex-1 border-l border-b border-gray-300 h-full">
                 <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-                  <div className="absolute inset-0 grid grid-cols-6 divide-x divide-gray-100">
-                    {[...Array(6)].map((_, i) => (
-                      <div key={i} className="h-full"></div>
-                    ))}
-                    <div className="h-full border-r border-gray-100"></div>
-                  </div>
-
                   {yAxisValues.map((_, idx) => (
                     <div
                       key={idx}
@@ -213,28 +195,32 @@ function FinancierScreen() {
                     ></div>
                   ))}
                 </div>
-                <div className="relative w-full h-full flex justify-around items-start px-2">
-                  {dadosPorPeriodo[periodo].map((item, index) => (
-                    <div
-                      key={index}
-                      className="relative z-10 flex flex-col items-center"
-                      style={{
-                        width: "12%",
-                        height: "100%",
-                      }}
-                    >
-                      <div className="flex items-end h-full w-full">
-                        <div
-                          className="w-full bg-linear-to-b from-[#FFB382] via-[#FF8C42] to-[#DFB3CD] rounded-b-sm shadow-sm transition-all duration-700"
-                          style={{ height: `${item.porcentagem}%` }}
-                        ></div>
-                      </div>
 
-                      <span className="absolute -bottom-10 text-xl text-gray-500 font-medium whitespace-nowrap">
-                        {item.label}
-                      </span>
-                    </div>
-                  ))}
+                <div className="relative w-full h-full flex justify-around items-start px-2">
+                  {gastosAtuais.map((item, index) => {
+                    const alturaDaBarra =
+                      (item.valor / maiorGastoNoPeriodo) * 100;
+
+                    return (
+                      <div
+                        key={index}
+                        className="relative z-10 flex flex-col items-center"
+                        style={{ width: "12%", height: "100%" }}
+                      >
+                        <div className="flex items-end h-full w-full">
+                          <div
+                            className="w-full bg-linear-to-b from-[#FFB382] via-[#FF8C42] to-[#DFB3CD] rounded-b-sm shadow-sm transition-all duration-700"
+                            style={{ height: `${alturaDaBarra}%` }}
+                            title={`R$ ${item.valor}`}
+                          ></div>
+                        </div>
+
+                        <span className="absolute -bottom-10 text-xl text-gray-500 font-medium whitespace-nowrap">
+                          {item.label}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>

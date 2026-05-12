@@ -26,11 +26,8 @@ function MainScreen(props) {
           p={"p-40 pt-25"}
           size={"h-[82%] w-[77%]"}
         >
-          {/* div total */}
           <div className="flex flex-col gap-1 justify-center h-full">
-            {/* div texts */}
             <div className="flex justify-between items-center gap-5">
-              {/* div text esquerda */}
               <div className="flex flex-col">
                 <h2 className="text-4xl font-bold text-orange">
                   Olá, {"props.nome"}
@@ -43,7 +40,6 @@ function MainScreen(props) {
                 Nome da Familia
               </h2>
             </div>
-
             {/* Grid Div 1*/}
             <div className="grid grid-cols-10 gap-3">
               {/* Div Lista Compartilhada */}

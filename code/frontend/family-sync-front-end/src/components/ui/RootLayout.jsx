@@ -16,7 +16,7 @@ function RootLayout() {
   });
 
   const [splashOpacity, setSplashOpacity] = useState(
-    showSplash ? "opacity-100" : "opacity-0",
+    showSplash ? "opacity-100" : "opacity-0"
   );
   const [revealText, setRevealText] = useState(false);
 
@@ -31,7 +31,7 @@ function RootLayout() {
       const tempoInicioRevelacao = 300;
       setTimeout(() => setRevealText(true), tempoInicioRevelacao);
 
-      const tempoTotalParaSumir = tempoInicioRevelacao + 1000 + 1000;
+      const tempoTotalParaSumir = tempoInicioRevelacao + 1000 + 500;
 
       setTimeout(() => {
         setSplashOpacity("opacity-0");
@@ -57,7 +57,9 @@ function RootLayout() {
         >
           <div className="flex items-center">
             <div
-              className={`overflow-hidden transition-[max-width] duration-3000 ease-in-out flex justify-start ${revealText ? "max-w-300 opacity-100" : "max-w-0 opacity-0"}`}
+              className={`overflow-hidden transition-[max-width] duration-3000 ease-in-out flex justify-start ${
+                revealText ? "max-w-300 opacity-100" : "max-w-0 opacity-0"
+              }`}
             >
               <img
                 src={familySyncTextIcon}

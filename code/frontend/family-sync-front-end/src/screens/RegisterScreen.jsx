@@ -88,6 +88,7 @@ function RegisterScreen() {
       return novos;
     });
   };
+
   const handleSubmit = async function () {
     const { isValid, erros } = validateRegisterFields({
       nome,
@@ -118,6 +119,12 @@ function RegisterScreen() {
       const response = await userService.createUser(dadosBackend);
 
       if (response.StatusCode == 201) navigate("/auth/login");
+      else
+        setErrosCampos((prev) => ({
+          ...prev,
+          email: "Verifique se este e-mail já foi usado.",
+          cpf: "Verifique se este CPF já foi usado.",
+        }));
     } catch (error) {
       setErro("Falha ao Cadastrar! Tente novamente mais tarde!");
     } finally {

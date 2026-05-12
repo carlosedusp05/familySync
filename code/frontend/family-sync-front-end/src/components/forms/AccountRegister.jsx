@@ -22,7 +22,6 @@ function AccountRegister({
   handleSubmit,
   errosCampos,
   setErrosCampos,
-  erro,
   preview,
   handleFileChange,
   removeImagem,
@@ -265,14 +264,6 @@ function AccountRegister({
             onMouseEnter={prefetchLogin}
             onClick={handleSubmit}
           />
-        </div>
-
-        <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out w-full flex ${
-            erro ? "max-h-5 opacity-100 mt-1" : "max-h-0 opacity-0"
-          }`}
-        >
-          <span className="text-red-500 text-sm px-2 block">{erro}</span>
         </div>
       </div>
     </DefaultCard>
