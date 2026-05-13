@@ -1,6 +1,6 @@
 import ItemEvents from "./ItemEvents";
 
-function MultEventsField({ events = [] }) {
+function MultEventsField({ events = [], onEdit }) {
   return events.map((event, index) => {
     return (
       <ItemEvents
@@ -10,6 +10,7 @@ function MultEventsField({ events = [] }) {
         date={event.date}
         desc={event.desc}
         creator={event.creator}
+        onEdit={() => onEdit(event, true)}
       />
     );
   });

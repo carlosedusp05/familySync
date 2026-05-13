@@ -2,7 +2,7 @@ import { pencilTerracotaIcon } from "../../assets";
 
 function ItemEvents(props) {
   return (
-    <div className="w-[95%] flex flex-col gap-2 rounded-2xl bg-white-yellow relative pl-5 pr-8 py-2 transition-all duration-400 hover:scale-103">
+    <div className="w-[95%] flex flex-col gap-2 rounded-2xl bg-white-yellow relative pl-5 pr-8 pt-2 pb-10 transition-all duration-400 hover:scale-103">
       <div className="px-10 flex absolute top-0 left-0 bg-terracota py-1 rounded-tl-2xl ">
         <h3 className="text-white flex text-[18px] font-medium">
           {props.title}
@@ -13,6 +13,7 @@ function ItemEvents(props) {
           src={pencilTerracotaIcon}
           alt="PencilIcon"
           className="cursor-pointer transition-all duration-400 hover:scale-120"
+          onClick={props.onEdit}
         />
         <span className="text-terracota text-[18px] font-medium">
           {props.hours}
@@ -24,7 +25,9 @@ function ItemEvents(props) {
       <p className="w-[90%] text-terracota font-bold text-[18px] flex-wrap">
         {props.desc}
       </p>
-      <span className="text-red text-[16px] font-bold">{props.creator}</span>
+      <span className="text-red text-[16px] font-bold absolute right-4 bottom-2">
+        {props.creator}
+      </span>
     </div>
   );
 }

@@ -166,7 +166,9 @@ function StartScreen(props) {
                 <div
                   className={`w-full h-full flex flex-col rounded-2xl pt-5 px-9 bg-default gap-4 ${hover} duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
                   onMouseEnter={prefetchCalendar}
-                  onClick={() => navigate("/dashboard/calendar")}
+                  onClick={() => {
+                    navigate("/dashboard/calendar");
+                  }}
                 >
                   <div className="flex w-full rounded-2xl overflow-hidden bg-white">
                     {[1, 2, 3, 4].map((i) => (

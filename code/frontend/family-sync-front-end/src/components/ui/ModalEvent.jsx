@@ -38,7 +38,7 @@ function ModalEvents({
     if (isOpen) {
       setIsConfirmingDelete(false);
       setErrors({ hours: false, title: false, description: false });
-      setHours(data?.title || "");
+      setHours(data?.hours || "");
       setTitle(data?.title || "");
       setDescription(data?.desc || "");
 
@@ -73,8 +73,11 @@ function ModalEvents({
 
     setErrors({ hours: hoursError, title: titleError, description: descError });
 
-    if (!titleError && !descError) {
+    console.log(currentHours, currentTitle);
+
+    if (!hoursError && !titleError && !descError) {
       onSave({
+        date: selectedDate,
         hours: currentHours,
         title: currentTitle,
         description: currentDesc,
@@ -111,22 +114,58 @@ function ModalEvents({
           <div className="font-bold text-2xl">
             <p>DIA: {selectedDate}</p>
           </div>
-          <div className="flex items-center justify-center text-center">
-            {editableFields.hours ? (
-              <input
-                ref={hoursRef}
-                type="time"
-                value={hours}
-                onChange={(e) => setHours(e.target.value)}
-                className="focus:border-[#5D2A11] bg-terracota text-white h-full w-full p-3 font-bold rounded-2xl outline-none border-transparent"
-              />
-            ) : (
-              <div className="focus:border-[#5D2A11] bg-terracota text-white h-full w-full font-bold rounded-2xl p-3 text-center"></div>
-            )}
+          <div className="flex items-center justify-center text-center flex-col">
+            <div className="flex gap-3 items-center justify-center">
+              {editableFields.hours ? (
+                <input
+                  ref={hoursRef}
+                  type="time"
+                  value={hours}
+                  readOnly={!editableFields.hours}
+                  onChange={(e) => {
+                    setHours(e.target.value);
+                    if (errors.hours && e.target.value.trim() !== "")
+                      setErrors((prev) => ({ ...prev, hours: false }));
+                  }}
+                  className={`focus:border-[#5D2A11] bg-terracota text-white w-30 h-12 p-3 text-center font-bold rounded-2xl outline-none border-transparent
+                   ${
+                     errors.hours
+                       ? "border-b-2 border-red-500"
+                       : editableFields.hours
+                         ? "border-b-2 border-[#5D2A11]/30"
+                         : "border-b-2 border-transparent"
+                   }`}
+                  style={{ textIndent: "5px" }}
+                />
+              ) : (
+                <div className="focus:border-[#5D2A11] w-30 h-12 bg-terracota text-white  px-5 font-bold rounded-2xl p-3 text-center">
+                  {hours}
+                </div>
+              )}
+              {isGlobalEditFlow && isEdit && (
+                <button
+                  onClick={() => toggleEdit("hours", hoursRef)}
+                  className="transition-transform"
+                >
+                  <img
+                    src={pencilTerracotaIcon}
+                    alt="Editar"
+                    className={`w-7 h-7 transition-all ${
+                      editableFields.hours ? "opacity-100" : "opacity-40"
+                    }`}
+                  />
+                </button>
+              )}
+            </div>
+            <div className="h-5">
+              {errors.hours && (
+                <span className="text-red-500 text-xs mt-1 block px-1">
+                  O horário é obrigatório.
+                </span>
+              )}
+            </div>
           </div>
         </div>
-
-        <div></div>
 
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
@@ -173,8 +212,8 @@ function ModalEvents({
                       errors.title
                         ? "border-b-2 border-red-500"
                         : editableFields.title
-                        ? "border-b-2 border-[#5D2A11]/30"
-                        : "border-b-2 border-transparent"
+                          ? "border-b-2 border-[#5D2A11]/30"
+                          : "border-b-2 border-transparent"
                     }`}
                     style={{ textIndent: "5px" }}
                   />
@@ -246,8 +285,8 @@ function ModalEvents({
                   errors.description
                     ? "border-2 border-red-500"
                     : editableFields.description
-                    ? "border border-[#5D2A11]/10 bg-white/50"
-                    : "bg-[#E0E0E0]/50"
+                      ? "border border-[#5D2A11]/10 bg-white/50"
+                      : "bg-[#E0E0E0]/50"
                 }`}
               />
             ) : (
