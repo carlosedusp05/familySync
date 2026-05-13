@@ -5,55 +5,74 @@ import ModalEvents from "../components/ui/ModalEvent";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ShowAlert from "../components/ui/ShowAlert";
 
 function CalendarScreen() {
-  const [modalOpen, setModalOpen] = useState(false);
+  const user = JSON.parse(localStorage.getItem("@FamilySync:user"));
+
   const [dateSelected, setDateSelected] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [warning, setWarning] = useState("");
   const [showWarning, setShowWarning] = useState(false);
 
-  const [dateEvent, setDateEvent] = useState([]);
+  const [dateEvent, setDateEvent] = useState(() => {
+    const saved = localStorage.getItem(`dateEvents`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [selectedInfo, setSelectedInfo] = useState(null);
+  const [isModeEdition, setIsModeEdition] = useState(false);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedInfo(null);
   };
 
+  useEffect(() => {
+    const saved = localStorage.getItem(`dateEvents`);
+    setDateEvent(saved ? JSON.parse(saved) : []);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(`dateEvents`, JSON.stringify(dateEvent));
+  }, [dateEvent]);
+
   const handleDelete = (id) => {
     setDateEvent((prev) => prev.filter((item) => item.id !== id));
   };
 
   const handleSave = (newData) => {
-    if (selectedInfo) {
+    if (selectedInfo !== null) {
       setDateEvent((prev) =>
         prev.map((item) =>
           item.id === selectedInfo.id
             ? {
                 ...item,
                 date: newData.date,
+                hours: newData.hours,
                 title: newData.title,
                 desc: newData.description,
               }
-            : item
-        )
+            : item,
+        ),
       );
     } else {
       const newItem = {
         id: Date.now(),
         date: newData.date,
+        hours: newData.hours,
         title: newData.title,
         desc: newData.description,
+        creator: user.nome,
       };
       setDateEvent((prev) => [newItem, ...prev]);
     }
     handleCloseModal();
   };
 
-  const handleOpenModal = (info = null, forceEdit = false) => {
+  const handleOpenModal = (info = null, forceEdit = true) => {
     setSelectedInfo(info);
     setIsModeEdition(forceEdit);
     setIsModalOpen(true);
@@ -61,18 +80,17 @@ function CalendarScreen() {
 
   function handleDateClick(info) {
     const hoje = new Date();
-
     hoje.setHours(0, 0, 0, 0);
 
-    const dataClicada = new Date(info.dateStr);
+    const [ano, mes, dia] = info.dateStr.split("-");
+    const dataClicada = new Date(ano, mes - 1, dia);
 
-    setDateSelected(info.dateStr);
     if (dataClicada < hoje) {
       triggerAlert("Não é possível marcar eventos em datas passadas!");
       return;
     }
     setDateSelected(info.dateStr);
-    setModalOpen(true);
+    setIsModalOpen(true);
   }
 
   function triggerAlert(message) {
@@ -110,9 +128,13 @@ function CalendarScreen() {
               <ShowAlert warning={warning} showWarning={showWarning} />
 
               <ModalEvents
-                isOpen={modalOpen}
-                onClose={() => setModalOpen(false)}
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
                 selectedDate={dateSelected}
+                onSave={handleSave}
+                onDelete={handleDelete}
+                isInitialEdit={isModeEdition}
+                data={selectedInfo}
               />
             </div>
           </LargeCard>
@@ -121,87 +143,8 @@ function CalendarScreen() {
         {/* Div Eventos */}
         <div className="w-[50%] h-full flex flex-col p-30 gap-10  items-center">
           <h2 className="text-5xl text-white font-bold">Eventos Marcados</h2>
-          <div
-            className="flex flex-col items-center gap-5 overflow-y-auto max-h-full w-[90%] px-2 [&::-webkit-scrollbar]:w-2.5
-            [&::-webkit-scrollbar]:mr-10
-            [&::-webkit-scrollbar-track]:bg-transparent
-          [&::-webkit-scrollbar-thumb]:bg-[#282828]
-            [&::-webkit-scrollbar-thumb]:rounded-md"
-          >
-            <MultEventsField
-              events={[
-                {
-                  title: "Workshop de UI/UX",
-                  hours: "14:00 ",
-                  date: "2026-05-15",
-                  desc: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                  creator: "Alice Silva",
-                },
-                {
-                  title: "Daily Scrum",
-                  hours: "09:00",
-                  date: "2026-05-16",
-                  desc: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-                  creator: "Bruno Souza",
-                },
-                {
-                  title: "Lançamento da Sprint",
-                  hours: "10:00",
-                  date: "2026-05-18",
-                  desc: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-                  creator: "Carla Mendes",
-                },
-                {
-                  title: "Tech Talk: React 19",
-                  hours: "19:00",
-                  date: "2026-05-20",
-                  desc: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-                  creator: "Diego Ramos",
-                },
-                {
-                  title: "Happy Hour Remoto",
-                  hours: "18:00",
-                  date: "2026-05-22",
-                  desc: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.",
-                  creator: "Elena Farias",
-                },
-                {
-                  title: "Revisão de Código",
-                  hours: "15:00",
-                  date: "2026-05-23",
-                  desc: "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores.",
-                  creator: "Fabio Lima",
-                },
-                {
-                  title: "Mentoria de Frontend",
-                  hours: "11:00",
-                  date: "2026-05-25",
-                  desc: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.",
-                  creator: "Giovanna Rossi",
-                },
-                {
-                  title: "Ajustes de Deploy",
-                  hours: "08:30",
-                  date: "2026-05-26",
-                  desc: "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur.",
-                  creator: "Henrique Vaz",
-                },
-                {
-                  title: "Planejamento Trimestral",
-                  hours: "14:00",
-                  date: "2026-06-01",
-                  desc: "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti.",
-                  creator: "Isabela Santos",
-                },
-                {
-                  title: "Sessão de Pair Programming",
-                  hours: "16:00",
-                  date: "2026-06-03",
-                  desc: "Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi.",
-                  creator: "João Paulo",
-                },
-              ]}
-            />
+          <div className="flex flex-col items-center gap-5 overflow-y-auto max-h-full w-[75%] px-2 ">
+            <MultEventsField events={dateEvent} onEdit={handleOpenModal} />
           </div>
         </div>
       </div>

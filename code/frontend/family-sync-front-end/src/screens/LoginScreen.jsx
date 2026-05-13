@@ -60,10 +60,10 @@ function LoginScreen() {
         ) {
           localStorage.setItem("@FamilySync:isAuthenticated", "true");
           const userPayload = response.Response || response.data || response;
-          if (userPayload.token) {
-            localStorage.setItem("@FamilySync:token", userPayload.token);
-          }
-          localStorage.setItem("@FamilySync:user", JSON.stringify(userPayload));
+
+          const { senha, password, ...safeUser } = userPayload;
+
+          localStorage.setItem("@FamilySync:user", JSON.stringify(safeUser));
 
           sessionStorage.removeItem("@FamilySync:splashRodou");
           window.dispatchEvent(new Event("startSplash"));
