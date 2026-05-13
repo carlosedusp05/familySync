@@ -2,81 +2,83 @@ import { useState } from "react";
 import LargeCard from "../components/ui/LargeCard";
 import MainLayout from "../layouts/Mainlayout";
 import DefaultButton from "../components/ui/DefaultButton";
+import AddExpenses from "../components/ui/AddExpenses";
 import { editIcon, dollarIcon, sortDownIcon } from "../assets";
 
 function FinancierScreen() {
-  const [salario, setSalario] = useState(5000);
   const [periodo, setPeriodo] = useState("Mês");
-  const [editandoSalario, setEditandoSalario] = useState(false);
-  const [tempSalario, setTempSalario] = useState(salario);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const dadosPorPeriodo = {
-    Dia: [
-      { label: "Mercado", valor: 10 },
-      { label: "Transp.", valor: 5 },
-      { label: "Lazer", valor: 15 },
-      { label: "Saúde", valor: 0 },
-      { label: "Contas", valor: 0 },
-      { label: "Roupas", valor: 0 },
-      { label: "Escola", valor: 0 },
-      { label: "Impostos", valor: 0 },
-      { label: "Viagens", valor: 0 },
-      { label: "Casa", valor: 0 },
-      { label: "Carro", valor: 0 },
-      { label: "Outros", valor: 2 },
-    ],
-    Semana: [
-      { label: "Mercado", valor: 250 },
-      { label: "Transp.", valor: 100 },
-      { label: "Lazer", valor: 300 },
-      { label: "Saúde", valor: 50 },
-      { label: "Contas", valor: 400 },
-      { label: "Roupas", valor: 150 },
-      { label: "Escola", valor: 0 },
-      { label: "Impostos", valor: 0 },
-      { label: "Viagens", valor: 0 },
-      { label: "Casa", valor: 0 },
-      { label: "Carro", valor: 0 },
-      { label: "Outros", valor: 20 },
-    ],
-    Mês: [
-      { label: "Mercado", valor: 1200 },
-      { label: "Transp.", valor: 450 },
-      { label: "Lazer", valor: 800 },
-      { label: "Saúde", valor: 200 },
-      { label: "Contas", valor: 1500 },
-      { label: "Roupas", valor: 300 },
-      { label: "Escola", valor: 0 },
-      { label: "Impostos", valor: 0 },
-      { label: "Viagens", valor: 0 },
-      { label: "Casa", valor: 500 },
-      { label: "Carro", valor: 0 },
-      { label: "Outros", valor: 50 },
-    ],
-    Ano: [
-      { label: "Mercado", valor: 14000 },
-      { label: "Transp.", valor: 5000 },
-      { label: "Lazer", valor: 10000 },
-      { label: "Saúde", valor: 2000 },
-      { label: "Contas", valor: 18000 },
-      { label: "Roupas", valor: 3500 },
-      { label: "Escola", valor: 12000 },
-      { label: "Impostos", valor: 5000 },
-      { label: "Viagens", valor: 8000 },
-      { label: "Casa", valor: 6000 },
-      { label: "Carro", valor: 4000 },
-      { label: "Outros", valor: 1000 },
-    ],
-  };
+  const [dadosPorPeriodo, setDadosPorPeriodo] = useState(() => {
+    const saved = localStorage.getItem("@FamilySync:gastos");
+    return saved
+      ? JSON.parse(saved)
+      : { Dia: [], Semana: [], Mês: [], Ano: [] };
+  });
 
-  const gastosAtuais = dadosPorPeriodo[periodo];
-  const maiorGastoNoPeriodo = Math.max(
-    ...gastosAtuais.map((item) => item.valor),
-    1
+  const gastosAtuais = dadosPorPeriodo[periodo] || [];
+  const totalGastoNoPeriodo = gastosAtuais.reduce(
+    (acc, curr) => acc + curr.valor,
+    0,
   );
 
+  const valorMaximoReal =
+    gastosAtuais.length > 0
+      ? Math.max(...gastosAtuais.map((item) => item.valor))
+      : 1000;
+
+  const maiorGastoNoPeriodo = valorMaximoReal * 1.2;
+
+  const handleDeleteExpense = (id) => {
+    const novosDados = { ...dadosPorPeriodo };
+    Object.keys(novosDados).forEach((p) => {
+      novosDados[p] = novosDados[p].filter((item) => item.id !== id);
+    });
+    setDadosPorPeriodo(novosDados);
+    localStorage.setItem("@FamilySync:gastos", JSON.stringify(novosDados));
+  };
+
+  const [salario, setSalario] = useState(() => {
+    const saved = localStorage.getItem("@FamilySync:salario");
+    return saved ? Number(saved) : 5000;
+  });
+
+  const handleUpdateSalario = (novoSalario) => {
+    setSalario(novoSalario);
+    localStorage.setItem("@FamilySync:salario", novoSalario.toString());
+  };
+
+  const handleSaveExpense = (categoria, valor, emoji) => {
+    const novosDados = { ...dadosPorPeriodo };
+    const periodos = ["Dia", "Semana", "Mês", "Ano"];
+
+    periodos.forEach((p) => {
+      const itemExistente = novosDados[p].find(
+        (item) => item.label === categoria,
+      );
+
+      if (itemExistente) {
+        novosDados[p] = novosDados[p].map((item) =>
+          item.label === categoria
+            ? { ...item, valor: item.valor + valor }
+            : item,
+        );
+      } else {
+        novosDados[p] = [
+          ...novosDados[p],
+          { label: categoria, valor: valor, emoji: emoji, id: Date.now() },
+        ];
+      }
+    });
+
+    setDadosPorPeriodo(novosDados);
+    localStorage.setItem("@FamilySync:gastos", JSON.stringify(novosDados));
+    setIsModalOpen(false);
+  };
+
   const gerarEixoY = () => {
-    const passos = 7;
+    const passos = 5;
     const valores = [];
     for (let i = passos; i >= 0; i--) {
       valores.push(Math.round((maiorGastoNoPeriodo / passos) * i));
@@ -89,148 +91,138 @@ function FinancierScreen() {
   const labelsData = {
     Dia: "08 de Maio",
     Semana: "04 Mai - 10 Mai",
-    Mês: "Maio 2026",
+    Mês: "01 mar - 31 mar",
     Ano: "Janeiro - Dezembro 2026",
   };
 
   return (
     <MainLayout>
-      <div className="flex flex-col gap-4 items-center justify-center py-12 h-full">
-        <LargeCard size={"h-[85%] w-[60%]"} display={"flex justify-center"}>
-          <div className="w-full min-h-20 flex flex-col justify-center items-center bg-white px-10 py-8 rounded-2xl shadow-inner relative">
-            <div className="flex items-center gap-2">
-              <img src={dollarIcon} alt="Dinheiro" className="w-6 h-6" />
-              <span className="text-brown-dark font-bold text-2xl tracking-wide">
-                Total
-              </span>
-              <img
-                src={sortDownIcon}
-                alt="Expandir"
-                className="w-4 h-4 opacity-70"
-              />
-            </div>
-
-            <div className="flex items-center gap-3 mt-1">
-              {editandoSalario ? (
-                <input
-                  type="number"
-                  autoFocus
-                  className="text-orange-500 font-bold text-3xl w-40 border-b-2 border-orange-500 outline-none"
-                  value={tempSalario}
-                  onChange={(e) => setTempSalario(Number(e.target.value))}
-                  onBlur={() => {
-                    setSalario(tempSalario);
-                    setEditandoSalario(false);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      setSalario(tempSalario);
-                      setEditandoSalario(false);
-                    }
-                  }}
-                />
-              ) : (
-                <h2 className="text-orange-500 font-bold text-3xl">
-                  R$ {salario.toLocaleString()}
+      <div className="flex flex-col items-center justify-center py-12 h-full">
+        <LargeCard size={"h-[85%] w-[65%]"} display={"flex justify-center"}>
+          <div className="w-full h-full flex flex-col items-center bg-white p-10 rounded-3xl relative">
+            <div className="flex flex-col items-center mb-6">
+              <div className="flex items-center gap-2 text-orange font-bold mb-1">
+                <img src={dollarIcon} alt="Moeda" className="w-4 h-4" />
+                <span className="text-2xl">Total</span>
+                <img src={sortDownIcon} alt="Seta" className="w-3 h-3" />
+              </div>
+              <div className="flex items-center gap-3">
+                <h2 className="text-brown-dark font-extrabold text-[40px]">
+                  R$ {totalGastoNoPeriodo.toLocaleString("pt-BR")}
                 </h2>
-              )}
-              <button
-                className="p-1 active:scale-95 transition-transform"
-                onClick={() => {
-                  setTempSalario(salario);
-                  setEditandoSalario(true);
-                }}
-              >
-                <img
-                  src={editIcon}
-                  alt="Editar"
-                  className="w-6 h-6"
-                  draggable={false}
-                />
-              </button>
+              </div>
             </div>
 
-            <div className="w-full flex items-center justify-between px-20 mt-8">
+            <div className="w-full flex items-center justify-center gap-50 mt-4 px-10">
               {["Dia", "Semana", "Mês", "Ano"].map((item) => (
                 <div
                   key={item}
-                  className="flex flex-col items-center cursor-pointer group"
+                  className="flex flex-col items-center cursor-pointer relative"
                   onClick={() => setPeriodo(item)}
                 >
                   <span
-                    className={`text-2xl transition-colors ${
-                      periodo === item
-                        ? "text-orange-500 font-bold"
-                        : "text-orange-400 font-medium group-hover:text-orange-500"
-                    }`}
+                    className={`text-2xl pb-2 transition-colors ${periodo === item ? "text-[#E77838] font-semibold" : "text-[#E77838]/60 font-medium"}`}
                   >
                     {item}
                   </span>
                   {periodo === item && (
-                    <div className="h-1 w-full bg-orange-500 mt-1 rounded-full"></div>
+                    <div className="absolute bottom-0 h-[2px] w-full bg-[#E77838]"></div>
                   )}
                 </div>
               ))}
             </div>
 
-            <div className="text-orange-500 font-semibold my-6 text-xl">
+            <div className="text-orange font-semibold mt-6 mb-8 text-xl">
               {labelsData[periodo]}
             </div>
 
-            <div className="relative w-[85%] h-[45%] mt-4 flex">
-              <div className="relative w-16 h-full flex flex-col justify-between items-end pr-4 text-gray-400 font-medium text-lg">
-                {yAxisValues.map((val, idx) => (
-                  <span key={idx} className="leading-none">
-                    {val.toLocaleString()}
-                  </span>
+            <div className="relative w-full max-w-300 h-150 mt-2 mb-10">
+              <div className="absolute inset-0 flex flex-col justify-between z-0">
+                {yAxisValues.map((val, i) => (
+                  <div key={i} className="flex items-center w-full h-0">
+                    <span className="text-[16px] text-gray-800 font-medium w-12 text-right pr-3 bg-white z-10">
+                      {val}
+                    </span>
+                    <div className="flex-1 border-t border-gray-300"></div>
+                    <div className="w-2 border-t border-gray-300 border-r h-full"></div>{" "}
+                  </div>
                 ))}
+                <div className="absolute top-0 bottom-0 left-[48px] border-l border-gray-300"></div>
               </div>
 
-              <div className="relative flex-1 border-l border-b border-gray-300 h-full">
-                <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-                  {yAxisValues.map((_, idx) => (
+              <div className="relative z-10 w-full h-full flex items-end justify-around pl-[60px] pr-4">
+                {gastosAtuais.map((item, index) => {
+                  const alturaDaBarra =
+                    maiorGastoNoPeriodo > 0
+                      ? (item.valor / maiorGastoNoPeriodo) * 100
+                      : 0;
+                  const porcentagemTotal =
+                    totalGastoNoPeriodo > 0
+                      ? ((item.valor / totalGastoNoPeriodo) * 100).toFixed(1)
+                      : 0;
+
+                  return (
                     <div
-                      key={idx}
-                      className="w-full border-t border-gray-100 relative z-0"
-                    ></div>
-                  ))}
-                </div>
-
-                <div className="relative w-full h-full flex justify-around items-start px-2">
-                  {gastosAtuais.map((item, index) => {
-                    const alturaDaBarra =
-                      (item.valor / maiorGastoNoPeriodo) * 100;
-
-                    return (
+                      key={item.id}
+                      className="relative w-14 h-full flex flex-col justify-end items-center group"
+                      onMouseEnter={() => setHoveredIndex(index)}
+                      onMouseLeave={() => setHoveredIndex(null)}
+                    >
                       <div
-                        key={index}
-                        className="relative z-10 flex flex-col items-center"
-                        style={{ width: "12%", height: "100%" }}
+                        className={`absolute bottom-[${alturaDaBarra}%] mb-4 z-30 w-48 bg-white border border-orange-200 shadow-xl rounded-2xl p-4 flex flex-col items-center transition-all duration-300 origin-bottom
+                        ${hoveredIndex === index ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-90 translate-y-4 pointer-events-none"}`}
                       >
-                        <div className="flex items-end h-full w-full">
-                          <div
-                            className="w-full bg-linear-to-b from-[#FFB382] via-[#FF8C42] to-[#DFB3CD] rounded-b-sm shadow-sm transition-all duration-700"
-                            style={{ height: `${alturaDaBarra}%` }}
-                            title={`R$ ${item.valor}`}
-                          ></div>
-                        </div>
-
-                        <span className="absolute -bottom-10 text-xl text-gray-500 font-medium whitespace-nowrap">
-                          {item.label}
+                        <span className="text-3xl mb-1">
+                          {item.emoji || "💰"}
                         </span>
+                        <p className="text-xs text-gray-400 font-medium">
+                          Adicionado por:
+                        </p>
+                        <p className="text-sm font-bold text-brown-dark">
+                          {item.author || "Usuário"}
+                        </p>
+                        <div className="w-full h-px bg-gray-100 my-2"></div>
+                        <p className="text-[#E77838] font-black text-lg">
+                          {porcentagemTotal}%
+                        </p>
+
+                        <button
+                          onClick={() => handleDeleteExpense(item.id)}
+                          className="mt-2 text-[10px] text-red-500 hover:underline font-bold uppercase tracking-wider"
+                        >
+                          Excluir Gasto
+                        </button>
+                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-r border-b border-orange-200 rotate-45"></div>
                       </div>
-                    );
-                  })}
-                </div>
+
+                      <div
+                        className="w-full bg-linear-to-b from-[#FFB382] via-[#FF8C42] to-[#DFB3CD] transition-all duration-500 hover:brightness-110 cursor-pointer"
+                        style={{ height: `${alturaDaBarra}%` }}
+                      ></div>
+                      <span className="absolute -bottom-6 text-sm font-medium text-gray-700 truncate w-full text-center">
+                        {item.label}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
-            <div className="w-full flex justify-center items-center gap-70 mt-25 mb-4">
-              <DefaultButton text="Editar" another_size="h-12 w-44" />
-              <DefaultButton text="Incluir" another_size="h-12 w-44" />
+            <div className="mt-8 flex px-165 w-full justify-center">
+              <DefaultButton
+                text="Incluir"
+                onClick={() => setIsModalOpen(true)}
+              />
             </div>
           </div>
         </LargeCard>
+
+        {isModalOpen && (
+          <AddExpenses
+            onClose={() => setIsModalOpen(false)}
+            onSave={handleSaveExpense}
+          />
+        )}
       </div>
     </MainLayout>
   );

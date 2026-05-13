@@ -74,22 +74,10 @@ export const router = createBrowserRouter([
               },
               {
                 path: "finance",
-                children: [
-                  {
-                    index: true,
-                    lazy: () =>
-                      import("./screens/FinancierScreen").then((m) => ({
-                        Component: m.default,
-                      })),
-                  },
-                  {
-                    path: "add",
-                    lazy: () =>
-                      import("./screens/AddExpenses").then((m) => ({
-                        Component: m.default,
-                      })),
-                  },
-                ],
+                lazy: () =>
+                  import("./screens/FinancierScreen").then((m) => ({
+                    Component: m.default,
+                  })),
               },
               {
                 path: "family",

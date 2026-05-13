@@ -1,6 +1,19 @@
 import api from "./api";
 
-const getFamilies = async function (data) {
+const getFamilies = async function () {
+  const url = "/familias";
+
+  try {
+    const response = await api.get(url);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
+const getFamily = async function (data) {
   const url = "/familias";
 
   try {
@@ -28,5 +41,6 @@ const createFamily = async function (data) {
 
 export const familyService = {
   getFamilies,
+  getFamily,
   createFamily,
 };

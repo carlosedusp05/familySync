@@ -176,6 +176,7 @@ function AddFamilyScreen() {
       const responseCreationFamily =
         await familyService.createFamily(dadosFamily);
 
+      console.log(responseCreationFamily);
       if (
         responseCreationFamily.StatusCode == 201 ||
         responseCreationFamily.StatusCode == 200 ||
@@ -183,8 +184,12 @@ function AddFamilyScreen() {
       ) {
         const responseFamilies = await familyService.getFamilies();
 
-        const ultimaFamilia = responseFamilies.at(-1);
+        console.log(responseFamilies);
+
+        const ultimaFamilia = responseFamilies.Response.at(-1);
         const idFamiliaGerado = ultimaFamilia?.id || ultimaFamilia?.id_familia;
+
+        console.log(idFamiliaGerado);
 
         if (!idFamiliaGerado)
           throw new Error("ID da família não encontrado após a criação.");
@@ -199,6 +204,8 @@ function AddFamilyScreen() {
           estado: formData.uf,
           numero: formData.numero,
         };
+
+        console.log(formData);
 
         await enderecoService.createEndereco(dadosEndereco);
 
@@ -236,7 +243,6 @@ function AddFamilyScreen() {
           size={"h-[80%] w-[75%]"}
         >
           <div className="h-full w-full flex items-center justify-between">
-            {/* Lógica de Preview de Imagem Atualizada */}
             <div className="w-110 h-110 relative rounded-full border-2 border-orange flex items-center justify-center bg-white">
               {preview ? (
                 <img

@@ -117,6 +117,7 @@ function RegisterScreen() {
       };
 
       const response = await userService.createUser(dadosBackend);
+      console.log(response);
 
       if (response.StatusCode == 201) navigate("/auth/login");
       else

@@ -68,27 +68,22 @@ function SelectAddFamily({ w, error, value, onChange, onBlur, id, onKeyDown }) {
     setIsOpen(val.length < 2);
   };
 
-  // Lógica atualizada para autocompletar com o estado mais próximo
   const handleInputBlur = (e) => {
     if (value) {
       const valUpper = value.toUpperCase();
 
-      // Verifica se o que está digitado já é uma sigla exata
       const exactMatch = estadosBrasil.find(
         (estado) => estado.sigla === valUpper,
       );
 
       if (!exactMatch) {
-        // Tenta achar a correspondência mais próxima
         const closestMatch =
           estadosBrasil.find((estado) => estado.sigla.startsWith(valUpper)) ||
-          filteredEstados[0]; // Pega o primeiro da lista filtrada como fallback
+          filteredEstados[0];
 
         if (closestMatch) {
-          // Se achou algo parecido, autocompleta com a sigla correspondente
           onChange({ target: { id, value: closestMatch.sigla } });
         } else {
-          // Se não tem absolutamente nada a ver, limpa o campo
           onChange({ target: { id, value: "" } });
         }
       }
@@ -117,7 +112,7 @@ function SelectAddFamily({ w, error, value, onChange, onBlur, id, onKeyDown }) {
           onBlur={handleInputBlur}
           onKeyDown={onKeyDown}
           autoComplete="off"
-          className={`flex p-3 text-[20px] border-2 rounded-4xl px-6 w-full text-black focus:outline-none transition-all placeholder:text-gray-400 ${
+          className={`flex p-3 text-[20px] border-2 rounded-4xl px-6 w-full text-black  bg-white focus:outline-none transition-all placeholder:text-gray-400 ${
             error ? "border-red-500" : "border-orange"
           }`}
         />
