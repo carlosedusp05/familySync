@@ -1,13 +1,4 @@
-import axios from "axios";
-
-// Configurar cliente HTTP
-const api = axios.create({
-  baseURL: "https://tcc-back-q3kw.onrender.com/v1/familysync/",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
+import api from "./api";
 // GET - Listar usuários
 const getUsers = async function () {
   const url = "/usuario";
@@ -105,6 +96,19 @@ const listUsersByFamily = async function (idFamily) {
   }
 };
 
+const createUserFamily = async function (data) {
+  const url = "/usuario-familia";
+
+  try {
+    const response = await api.post(url, data);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 export const userService = {
   getUsers,
   getUserById,
@@ -113,4 +117,5 @@ export const userService = {
   deleteUser,
   loginUser,
   listUsersByFamily,
+  createUserFamily,
 };

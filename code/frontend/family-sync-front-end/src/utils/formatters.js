@@ -31,3 +31,27 @@ export const formatUserName = (name) => {
     .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
     .join(" ");
 };
+
+export const formatPhone = (value) => {
+  if (!value) return "";
+
+  const f = value.replace(/\D/g, "");
+
+  if (f.length <= 2) return `(${f}`;
+  if (f.length <= 6) return `(${f.slice(0, 2)}) ${f.slice(2)}`;
+  if (f.length <= 10)
+    return `(${f.slice(0, 2)}) ${f.slice(2, 6)}-${f.slice(6)}`;
+
+  return `(${f.slice(0, 2)}) ${f.slice(2, 7)}-${f.slice(7, 11)}`;
+};
+
+export const formatCEP = (value) => {
+  if (!value) return "";
+
+  return value
+    .replace(/\D/g, "")
+    .replace(/(\d{5})(\d)/, "$1-$2")
+    .slice(0, 9);
+};
+
+export const cleanCEP = (cep) => cep.replace(/\D/g, "");

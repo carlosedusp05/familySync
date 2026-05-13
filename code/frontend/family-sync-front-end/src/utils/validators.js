@@ -106,3 +106,19 @@ export const validateLoginFields = (dados) => {
 
   return { isValid, erros };
 };
+
+export const validatePhone = (telefone) => {
+  if (!telefone) return "O telefone é obrigatório";
+
+  const limpo = telefone.replace(/\D/g, "");
+
+  if (limpo.length < 10 || limpo.length > 11) {
+    return "Telefone inválido (insira DDD + número)";
+  }
+
+  if (/^(\d)\1{9,10}$/.test(limpo)) {
+    return "Número de telefone inválido";
+  }
+
+  return "";
+};

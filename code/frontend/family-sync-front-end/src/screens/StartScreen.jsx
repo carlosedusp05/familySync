@@ -160,7 +160,7 @@ function StartScreen(props) {
               {/* Div Calendário - WRAPPER */}
               <div
                 className="col-span-4 h-[80%]"
-                data-aos="fade-up"
+                data-aos="fade-down"
                 data-aos-delay="500"
               >
                 <div
