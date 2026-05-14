@@ -1,7 +1,7 @@
 import MainLayout from "../layouts/Mainlayout";
 import LargeCard from "../components/ui/LargeCard";
 import DefaultButton from "../components/ui/DefaultButton";
-import { editIconWhite } from "../assets";
+import { editIcon } from "../assets";
 import MultItemsList from "../components/ui/MultItemsList";
 import SearchBar from "../components/ui/SearchBar";
 import MultLists from "../components/ui/MultLists";
@@ -217,25 +217,24 @@ function ListScreen() {
     <MainLayout>
       <div className="flex items-center justify-center py-12 h-full">
         <LargeCard
-          max_shadow={true}
-          color="bg-yellow-light"
+          color="bg-black/20 backdrop-blur-md"
           not_pop_up={true}
           size={"h-full w-[80%]"}
           p={"py-[43px] px-[80px]"}
           display={"flex"}
         >
-          <div className="h-full w-[37%] pt-10 pr-18 border-r-2 border-black">
+          <div className="h-full w-[37%] pt-10 pr-18 border-r border-[#D6CFC2]">
             <div className="py-10 px-3">
-              <h1 className="text-orange-dark text-[40px] font-bold">
+              <h1 className="text-orange-dark text-4xl font-semibold">
                 Nome da Lista
               </h1>
-              <h1 className="text-brown-dark text-[16px]">
+              <h1 className="text-white text-[16px]">
                 Fulado, Ciclano, Carlos, Eduardo...
               </h1>
             </div>
 
-            <div className="h-[65%] w-full bg-terracota rounded-2xl flex flex-wrap items-center justify-center pt-5">
-              <div className="h-[10%] w-full flex items-center justify-between pl-4 pr-8">
+            <div className="h-[64%] w-full shadow-sm rounded-2xl flex flex-col gap-4">
+              <div className="h-[10%] w-full flex items-center justify-between pl-4 pr-8 text">
                 <DefaultButton
                   text={
                     selectedItems.length === initialItems.length
@@ -243,8 +242,8 @@ function ListScreen() {
                       : "Selecionar todos"
                   }
                   onClick={handleSelectAll}
-                  another_text_size="text-[24px]"
-                  another_size="h-[3%] w-[50%]"
+                  another_text_size="text-[20px]"
+                  another_size="h-10 w-[50%]"
                   another_text_weight="font-normal"
                   another_color={
                     selectedItems.length === initialItems.length
@@ -253,7 +252,7 @@ function ListScreen() {
                   }
                 />
                 <img
-                  src={editIconWhite}
+                  src={editIcon}
                   alt="Pincel de edição"
                   className="h-10 w-10 cursor-pointer"
                   draggable={false}
@@ -269,7 +268,7 @@ function ListScreen() {
               </div>
             </div>
           </div>
-          <div className="h-full w-[67%] flex justify-center flex-wrap">
+          <div className="h-full w-[63%] flex flex-col gap-6 px-8">
             <div className="w-full flex justify-evenly items-center pl-8">
               <SearchBar />
               <DefaultButton
@@ -282,7 +281,7 @@ function ListScreen() {
                 most_radius={true}
               />
             </div>
-            <div className="h-[80%] w-full">
+            <div className="h-[85%] w-full flex flex-col ">
               <MultLists lists={myLists} />
             </div>
           </div>

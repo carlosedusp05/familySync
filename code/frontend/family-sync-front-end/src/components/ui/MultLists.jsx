@@ -15,6 +15,7 @@ function MultLists({ lists = [] }) {
           total_spent={list.total_spent}
           percentage_now={list.percentage_now}
           author={list.author}
+          background={[index % 2 === 0 ? "bg-yellow-cream" : "bg-yellow-light"]}
         />
       ))}
     </div>

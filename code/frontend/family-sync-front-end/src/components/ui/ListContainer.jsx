@@ -7,55 +7,59 @@ function ListContainer({
   percentage_now,
   author,
   isFavorite = false,
+  background,
 }) {
   const [favorite, setFavorite] = useState(isFavorite);
   const percentage = percentage_now ? percentage_now : 0;
 
   return (
-    <div className={`w-full bg-orange-dark rounded-3xl px-8 py-5 items-center`}>
-      <div className="relative w-full flex justify-center">
-        <div className="w-[80%] flex flex-wrap py-3 mx-20">
-          <h1 className="text-4xl font-medium text-[#333131] flex-1 leading-tight">
+    <div
+      className={`w-full ${background} shadow-sm rounded-3xl px-8 py-8 items-center`}
+    >
+      <div className="w-full flex items-start justify-between">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-3xl font-semibold text-[#3A2414] leading-tight">
             {name}
-          </h1>
-          <div className="absolute left-[50%]">
-            <button
-              onClick={() => setFavorite(!favorite)}
-              className="focus:outline-none hover:scale-110 transition-transform active:scale-90"
-            >
-              <img
-                src={favorite ? favoriteIcon : unfavoriteIcon}
-                alt="Icone de favorito"
-                className="w-14 h-14 cursor-pointer"
-                draggable={false}
-              />
-            </button>
-          </div>
-
-          <h1 className="absolute left-[56%] top-[30%] flex items-center font-bold text-2xl text-white">
-            TOTAL GASTO: {total_spent}
           </h1>
         </div>
 
-        <button className="bg-red-light p-4 rounded-3xl duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 shadow-lg">
-          <img
-            src={trashIcon}
-            alt="Icone de lixo"
-            className="w-8 h-8"
-            draggable={false}
-          />
-        </button>
+        <div className="flex items-center gap-10 pl-6">
+          <button
+            onClick={() => setFavorite(!favorite)}
+            className="hover:scale-110 transition-transform active:scale-90"
+          >
+            <img
+              src={favorite ? favoriteIcon : unfavoriteIcon}
+              alt="Ícone favorito"
+              className="h-10"
+              draggable={false}
+            />
+          </button>
+
+          <h1 className="font-bold text-xl text-[#e67700] w-50 flex items-center justify-center">
+            TOTAL: {total_spent}
+          </h1>
+
+          <button className="bg-orange p-3 rounded-2xl hover:bg-red transition-all shadow-md cursor-pointer">
+            <img
+              src={trashIcon}
+              alt="Ícone de lixo"
+              className="w-6 h-6"
+              draggable={false}
+            />
+          </button>
+        </div>
       </div>
       <div className="flex w-full items-center justify-center gap-3 mt-6">
-        <div className="w-full h-6 bg-default rounded-3xl overflow-hidden">
+        <div className="w-full h-3 bg-[#ffdcb6] rounded-full overflow-hidden">
           <div
-            className="h-full w-[80%] bg-brown-dark"
+            className="h-full w-[80%] bg-[#b75307]"
             style={{ width: percentage }}
           ></div>
         </div>
-        <h1 className="text-black font-extrabold text-3xl">{percentage_now}</h1>
+        <h1 className="text-black font-bold text-lg">{percentage_now}</h1>
       </div>
-      <h1 className="text-2xl text-left text-white font-light px-10">
+      <h1 className=" text-lef text-sm font-light px-10">
         Criado por {author}
       </h1>
     </div>
