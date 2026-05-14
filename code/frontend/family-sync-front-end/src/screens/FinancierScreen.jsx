@@ -118,7 +118,11 @@ function FinancierScreen() {
   return (
     <MainLayout>
       <div className="flex flex-col items-center justify-center py-12 h-full">
-        <LargeCard size={"h-[85%] w-[65%]"} display={"flex justify-center"}>
+        <LargeCard
+          color={"bg-black/20 backdrop-blur-md"}
+          size={"h-[85%] w-[65%]"}
+          display={"flex justify-center"}
+        >
           <div className="w-full h-full flex flex-col items-center bg-white p-10 rounded-3xl relative">
             {/* Header: Select e Valor Total */}
             <div className="flex flex-col items-center mb-6">

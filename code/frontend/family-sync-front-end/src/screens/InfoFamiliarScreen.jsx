@@ -130,7 +130,7 @@ function InfoFamiliarScreen() {
                   <h3 className="text-white/80 text-2xl font-semibold">
                     Nenhuma informação registrada
                   </h3>
-                  <p className="text-white/40 max-w-[350px] mx-auto text-lg leading-relaxed">
+                  <p className="text-white/40 max-w-87.5 mx-auto text-lg leading-relaxed">
                     Sua lista está vazia. Clique no botão acima para adicionar
                     detalhes importantes sobre a saúde da família.
                   </p>

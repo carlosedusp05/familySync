@@ -26,7 +26,7 @@ function ItemEvents(props) {
         {props.desc}
       </p>
       <span className="text-red text-[16px] font-bold absolute right-4 bottom-2">
-        {props.creator}
+        Criado por {props.creator}
       </span>
     </div>
   );

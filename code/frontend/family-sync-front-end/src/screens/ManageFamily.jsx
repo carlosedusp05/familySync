@@ -136,7 +136,7 @@ function ManageFamily() {
 
             {/* Seção de Convite */}
             <div className="flex items-center justify-center bg-yellow-light rounded-4xl mx-10 gap-5 px-8 py-6 w-[90%]">
-              <div className="flex items-center justify-center h-15 w-[85%] bg-white rounded-2xl px-6">
+              <div className="flex items-center justify-center h-15 w-[85%] bg-white rounded-2xl px-6 border border-white">
                 <input
                   type="text"
                   placeholder="Digite o nome de usuário..."

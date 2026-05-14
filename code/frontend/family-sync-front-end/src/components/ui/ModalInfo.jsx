@@ -230,7 +230,7 @@ function ModalInfo({
                 }`}
                   />
                 ) : (
-                  <div className="bg-[#5D2A11]/5 p-6 rounded-2xl min-h-[150px] w-full">
+                  <div className="bg-[#5D2A11]/5 p-6 rounded-2xl min-h-37.5 w-full">
                     <p className="text-[#5D2A11] text-[20px] leading-relaxed whitespace-pre-wrap wrap-break-word">
                       {description}
                     </p>

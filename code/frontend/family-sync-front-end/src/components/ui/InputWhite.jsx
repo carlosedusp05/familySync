@@ -1,7 +1,7 @@
 function InputWhite({ text, styleFlex }) {
   return (
     <div
-      className={`${styleFlex} flex items-center justify-center h-17 bg-white rounded-2xl`}
+      className={`${styleFlex} flex items-center justify-center h-17 bg-white rounded-2xl shadow border border-white`}
     >
       <input
         type="text"
