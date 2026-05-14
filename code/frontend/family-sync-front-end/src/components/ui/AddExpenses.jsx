@@ -1,67 +1,98 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useMemo, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import DefaultButton from "./DefaultButton";
 import { formatToBRL, validateExpenseValue } from "../../utils/formatters.js";
+
+const FINANCE_EMOJIS = [
+  { icon: "🛍️", label: "Compras" },
+  { icon: "💡", label: "Luz" },
+  { icon: "💧", label: "Água" },
+  { icon: "🏠", label: "Casa" },
+  { icon: "❤️", label: "Saúde" },
+  { icon: "📖", label: "Educação" },
+  { icon: "🍴", label: "Alimentação" },
+  { icon: "👥", label: "Família" },
+  { icon: "🚗", label: "Transporte" },
+  { icon: "🎮", label: "Lazer" },
+  { icon: "📱", label: "Assinaturas" },
+  { icon: "💰", label: "Outros" },
+];
 
 function AddExpenses({ is_edit_expenses, onClose, onSave }) {
   const [valor, setValor] = useState(0);
   const [categoria, setCategoria] = useState("");
   const [emojiSelecionado, setEmojiSelecionado] = useState("🛍️");
-  const [errors, setErrors] = useState({ valor: "", categoria: "" });
+  const [errors, setErrors] = useState({});
 
-  const financeEmojis = [
-    { icon: "🛍️", label: "Compras" },
-    { icon: "💡", label: "Luz" },
-    { icon: "💧", label: "Água" },
-    { icon: "🏠", label: "Casa" },
-    { icon: "❤️", label: "Saúde" },
-    { icon: "📖", label: "Educação" },
-    { icon: "🍴", label: "Alimentação" },
-    { icon: "👥", label: "Família" },
-    { icon: "🚗", label: "Transporte" },
-    { icon: "🎮", label: "Lazer" },
-    { icon: "📱", label: "Assinaturas" },
-    { icon: "💰", label: "Outros" },
-  ];
+  const validate = useCallback((campo, val) => {
+    let msg = "";
+    if (campo === "valor" && !validateExpenseValue(val))
+      msg = "Insira um valor maior que zero";
+    if (campo === "categoria" && !val.trim())
+      msg = "O nome da categoria é obrigatório";
 
-  const validateFieldOnBlur = (campoId, valorAtual) => {
-    let erroMensagem = "";
-    if (campoId === "valor") {
-      if (!validateExpenseValue(valorAtual))
-        erroMensagem = "Insira um valor maior que zero";
-    }
-    if (campoId === "categoria") {
-      if (!valorAtual.trim())
-        erroMensagem = "O nome da categoria é obrigatório";
-    }
-    setErrors((prev) => ({ ...prev, [campoId]: erroMensagem }));
-  };
+    setErrors((prev) => ({ ...prev, [campo]: msg }));
+    return !msg;
+  }, []);
 
-  const handleConfirm = () => {
-    let hasError = false;
-    if (!validateExpenseValue(valor)) {
-      setErrors((prev) => ({
-        ...prev,
-        valor: "Insira um valor maior que zero",
-      }));
-      hasError = true;
-    }
-    if (!categoria.trim()) {
-      setErrors((prev) => ({
-        ...prev,
-        categoria: "O nome da categoria é obrigatório",
-      }));
-      hasError = true;
-    }
-    if (!hasError) onSave(categoria, valor, emojiSelecionado);
-  };
+  const handleConfirm = useCallback(() => {
+    const isValorValid = validate("valor", valor);
+    const isCatValid = validate("categoria", categoria);
 
-  const handleValorChange = (e) => {
-    const apenasDigitos = e.target.value.replace(/\D/g, "");
-    const valorNumerico = Number(apenasDigitos) / 100;
-    setValor(valorNumerico);
-    if (errors.valor) setErrors({ ...errors, valor: "" });
-  };
+    if (isValorValid && isCatValid) {
+      onSave(categoria, valor, emojiSelecionado);
+    }
+  }, [validate, valor, categoria, emojiSelecionado, onSave]);
+
+  const handleValorChange = useCallback(
+    (e) => {
+      const apenasDigitos = e.target.value.replace(/\D/g, "");
+      const valorNumerico = apenasDigitos ? Number(apenasDigitos) / 100 : 0;
+      setValor(valorNumerico);
+      if (errors.valor) setErrors((prev) => ({ ...prev, valor: "" }));
+    },
+    [errors.valor],
+  );
+
+  const handleCategoriaChange = useCallback(
+    (e) => {
+      setCategoria(e.target.value);
+      if (errors.categoria) setErrors((prev) => ({ ...prev, categoria: "" }));
+    },
+    [errors.categoria],
+  );
+
+  const displayValor = useMemo(
+    () => (valor > 0 ? formatToBRL(valor).replace("R$", "").trim() : ""),
+    [valor],
+  );
+  const emojiGrid = useMemo(
+    () => (
+      <div className="grid grid-cols-4 gap-4 max-h-52 overflow-y-auto pr-2 custom-scrollbar py-2">
+        {FINANCE_EMOJIS.map((item) => (
+          <motion.button
+            key={item.label}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setEmojiSelecionado(item.icon)}
+            className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-colors border-[3px] shadow-sm
+            ${emojiSelecionado === item.icon ? "bg-orange border-orange" : "bg-white border-orange/30 hover:border-orange"}`}
+          >
+            <span
+              className={
+                emojiSelecionado === item.icon
+                  ? "brightness-110"
+                  : "grayscale-[0.5]"
+              }
+            >
+              {item.icon}
+            </span>
+          </motion.button>
+        ))}
+      </div>
+    ),
+    [emojiSelecionado],
+  );
 
   return (
     <motion.div
@@ -69,101 +100,85 @@ function AddExpenses({ is_edit_expenses, onClose, onSave }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 will-change-opacity"
     >
       <motion.div
-        initial={{ scale: 0.8, opacity: 0, y: 20 }}
+        initial={{ scale: 0.95, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.8, opacity: 0, y: 20 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
+        exit={{ scale: 0.95, opacity: 0, y: 20 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-150 bg-white rounded-[40px] flex flex-col items-center py-8 px-10 shadow-2xl relative border border-orange-100 transform-gpu"
+        className="w-[500px] bg-white rounded-[40px] flex flex-col items-center py-8 px-10 shadow-2xl border border-orange-100 will-change-transform"
       >
-        <h1 className="text-[26px] font-black text-[#5B3E31] mb-8 antialiased">
+        <h1 className="text-[26px] font-black text-brown-dark mb-8">
           {is_edit_expenses ? "Editar gastos" : "Adicionar gastos"}
         </h1>
 
-        <div className="flex flex-col items-center w-full mb-10">
+        <div className="flex flex-col items-center w-full mb-8">
           <div
-            className={`flex items-end gap-3 border-b-2 transition-colors px-6 pb-2 ${errors.valor ? "border-red-500" : "border-[#E77838]"}`}
+            className={`flex items-end gap-3 border-b-2 transition-colors px-6 pb-2 ${errors.valor ? "border-red-500" : "border-orange"}`}
           >
             <input
               type="text"
-              value={
-                valor > 0 ? formatToBRL(valor).replace("R$", "").trim() : ""
-              }
+              inputMode="decimal"
+              value={displayValor}
               onChange={handleValorChange}
-              onBlur={() => validateFieldOnBlur("valor", valor)}
-              maxLength={14}
-              className="w-48 outline-none text-[#E77838] text-[42px] font-black bg-transparent text-center placeholder:opacity-30"
+              onBlur={() => validate("valor", valor)}
+              className="w-48 outline-none text-orange text-[42px] font-black bg-transparent text-center placeholder:text-orange/20"
               placeholder="0,00"
             />
-            <span className="text-[#E77838] text-xl font-bold mb-3">BRL</span>
+            <span className="text-orange text-xl font-bold mb-3">BRL</span>
           </div>
-          {errors.valor && (
-            <motion.p
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-red-light text-xs font-semibold mt-2 uppercase tracking-tighter"
-            >
-              {errors.valor}
-            </motion.p>
-          )}
-        </div>
-
-        <div className="w-full bg-[#FFF4D1] rounded-[35px] p-8 flex flex-col gap-6 shadow-inner relative">
-          <div className="w-full">
-            <input
-              type="text"
-              placeholder="Nome"
-              className={`w-full h-14 rounded-full outline-none border-2 px-6 text-lg font-medium text-gray-700 bg-white transition-all ${errors.categoria ? "border-red-400" : "border-transparent focus:border-[#E77838]"}`}
-              value={categoria}
-              maxLength={100}
-              onChange={(e) => {
-                setCategoria(e.target.value);
-                if (errors.categoria) setErrors({ ...errors, categoria: "" });
-              }}
-              onBlur={() => validateFieldOnBlur("categoria", categoria)}
-            />
-            {errors.categoria && (
+          <AnimatePresence>
+            {errors.valor && (
               <motion.p
-                initial={{ opacity: 0, x: -5 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="text-red-light text-[10px] font-semibold mt-2 ml-4 uppercase tracking-wider"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="text-red-500 text-xs font-bold mt-2 uppercase overflow-hidden"
               >
-                {errors.categoria}
+                {errors.valor}
               </motion.p>
             )}
-          </div>
-
-          <div className="grid grid-cols-4 gap-y-8 gap-x-4 max-h-50 overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#282828] [&::-webkit-scrollbar-thumb]:rounded-md py-2">
-            {financeEmojis.map((item, index) => (
-              <div key={index} className="flex justify-center">
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => setEmojiSelecionado(item.icon)}
-                  className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-all duration-300 border-[3px] 
-                    ${emojiSelecionado === item.icon ? "bg-orange border-orange shadow-lg" : "bg-white border-orange hover:bg-orange-50 shadow-sm"}`}
-                >
-                  <span
-                    className={
-                      emojiSelecionado === item.icon
-                        ? "brightness-125 scale-110 transition-transform"
-                        : ""
-                    }
-                  >
-                    {item.icon}
-                  </span>
-                </motion.button>
-              </div>
-            ))}
-          </div>
+          </AnimatePresence>
         </div>
 
-        <div className="flex gap-20 mt-10 px-10 w-full justify-center">
+        <div className="w-full bg-[#FFF4D1] rounded-[35px] p-6 flex flex-col gap-6 shadow-inner">
+          <div className="w-full">
+            <div className="flex flex-col items-center w-full">
+              <input
+                type="text"
+                placeholder="Nome da categoria"
+                className={`w-full h-14 rounded-full outline-none border-2 px-6 text-lg font-bold bg-white transition-colors ${errors.categoria ? "border-red-400" : "border-transparent focus:border-orange"}`}
+                value={categoria}
+                onChange={handleCategoriaChange}
+                onBlur={() => validate("categoria", categoria)}
+              />
+              <AnimatePresence>
+                {errors.categoria && (
+                  <motion.p
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="text-red-500 text-xs font-bold mt-2 uppercase overflow-hidden"
+                  >
+                    {errors.categoria}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+          {emojiGrid}
+        </div>
+
+        <div className="flex gap-6 mt-10 w-full justify-center">
           <DefaultButton onClick={onClose} text="Cancelar" theme={false} />
-          <DefaultButton onClick={handleConfirm} text="Adicionar" />
+          <DefaultButton
+            onClick={handleConfirm}
+            text={is_edit_expenses ? "Salvar" : "Adicionar"}
+          />
         </div>
       </motion.div>
     </motion.div>

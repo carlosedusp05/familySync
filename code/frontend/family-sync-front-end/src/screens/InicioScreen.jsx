@@ -22,8 +22,6 @@ function InicioScreen() {
       />
 
       <DefaultHeader disconnected={true} />
-
-      {/* 2. Trocado 'h-[90%]' por 'flex-1' */}
       <main className="flex-1 flex px-40 w-full justify-between items-center">
         <p className="text-white font-bold text-2xl w-[20%]">
           Brio é a quantidade de energia que se disponibiliza ao agir para fazer

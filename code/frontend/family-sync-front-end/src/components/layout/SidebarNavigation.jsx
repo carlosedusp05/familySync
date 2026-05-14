@@ -1,5 +1,5 @@
 import { useLocation, Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, LayoutGroup } from "framer-motion";
 import ImgSidebar from "../icons/ImgSidebar";
 import {
   listIcon,
@@ -45,29 +45,38 @@ function SideBarNavegation() {
   };
 
   return (
-    <div className="p-4 gap-10 bg-orange flex flex-col items-center justify-center relative">
-      {navLinks.map((link) => {
-        const isActive = checkIsPage(link);
+    <div className="p-4 gap-10 bg-orange flex flex-col items-center justify-center relative transform-gpu">
+      <LayoutGroup>
+        {navLinks.map((link) => {
+          const isActive = checkIsPage(link);
 
-        return (
-          <Link
-            key={link.path}
-            to={link.path}
-            className="relative p-2 hover:scale-110 transition-transform duration-300 ease-in-out"
-          >
-            {isActive && (
-              <motion.div
-                layoutId="activeBackground"
-                className="absolute inset-0 bg-black/20 rounded-2xl"
-                transition={{ type: "spring", stiffness: 380, damping: 30 }}
-              />
-            )}
-            <div className="relative z-10">
-              <ImgSidebar isPage={isActive} src={link.icon} alt={link.alt} />
-            </div>
-          </Link>
-        );
-      })}
+          return (
+            <Link
+              key={link.path}
+              to={link.path}
+              className="relative p-2 hover:scale-110 transition-transform duration-300 ease-in-out"
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="activeBackground"
+                  initial={false}
+                  className="absolute inset-0 bg-black/20 rounded-2xl"
+                  style={{ willChange: "transform" }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 30,
+                    mass: 0.8,
+                  }}
+                />
+              )}
+              <div className="relative z-10">
+                <ImgSidebar isPage={isActive} src={link.icon} alt={link.alt} />
+              </div>
+            </Link>
+          );
+        })}
+      </LayoutGroup>
     </div>
   );
 }

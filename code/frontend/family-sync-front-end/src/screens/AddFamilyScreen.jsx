@@ -209,6 +209,21 @@ function AddFamilyScreen() {
 
         await enderecoService.createEndereco(dadosEndereco);
 
+        console.log(
+          "Tentando adicionar usuário à família com nome:",
+          formData.nomeUsuario,
+        );
+
+        console.log("id da familia", idFamiliaGerado);
+
+        const familyValid = {
+          email: formData.nomeUsuario,
+          id_familia: idFamiliaGerado,
+        };
+        const responseCreationUserInFamily =
+          await userService.addUserFamily(familyValid);
+
+        console.log("Resposta final:", responseCreationUserInFamily);
         navigate("/dashboard");
       } else {
         setErrosCampos({ geral: responseCreationFamily.message });
@@ -400,12 +415,7 @@ function AddFamilyScreen() {
                       handleChange("nomeUsuario", e.target.value)
                     }
                     onKeyDown={(e) => handleKeyDown(e, "nomeUsuario")}
-                    className="py-2 px-5 bg-orange text-brown-dark placeholder:text-brown-dark/70 rounded-2xl w-[60%] flex items-center text-xl sm:text-2xl font-bold focus:outline-none"
-                  />
-                  <DefaultButton
-                    text="Convidar"
-                    another_text_size={"text-2xl"}
-                    another_size={"w-[40%]"}
+                    className="py-2 px-5 bg-orange text-brown-dark placeholder:text-brown-dark/70 rounded-2xl w-full flex items-center text-xl sm:text-2xl font-bold focus:outline-none"
                   />
                 </div>
                 <div className="w-full flex justify-between">

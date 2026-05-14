@@ -109,6 +109,19 @@ const createUserFamily = async function (data) {
   }
 };
 
+const addUserFamily = async function (data) {
+  const url = "/usuario-familia/email/";
+
+  try {
+    const response = await api.post(url, data);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 export const userService = {
   getUsers,
   getUserById,
@@ -118,4 +131,5 @@ export const userService = {
   loginUser,
   listUsersByFamily,
   createUserFamily,
+  addUserFamily,
 };

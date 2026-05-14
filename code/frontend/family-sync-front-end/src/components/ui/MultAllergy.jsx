@@ -1,18 +1,20 @@
-import ItemAllergy from "./ItemAllergy";
 import React, { useMemo } from "react";
+import ItemAllergy from "./ItemAllergy";
+const truncate = (text, limit) => {
+  if (!text) return "";
+  return text.length > limit ? text.substring(0, limit) + "..." : text;
+};
 
 function MultAllergys({ allergys = [], onEditItem, onEditClick }) {
   const renderedList = useMemo(() => {
-    const truncate = (text, limit) =>
-      text.length > limit ? text.substring(0, limit) + "..." : text;
-
     return allergys.map((allergy) => (
       <ItemAllergy
         key={allergy.id}
-        title={truncate(allergy.title || "", 60)}
-        desc={truncate(allergy.desc || "", 80)}
-        onClick={() => onEditItem(allergy)}
-        onEditClick={() => onEditClick(allergy)}
+        item={allergy}
+        title={truncate(allergy.title, 60)}
+        desc={truncate(allergy.desc, 80)}
+        onEditItem={onEditItem}
+        onEditClick={onEditClick}
       />
     ));
   }, [allergys, onEditItem, onEditClick]);

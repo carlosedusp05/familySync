@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { pencilTerracotaIcon } from "../../assets";
-import { motion, AnimatePresence } from "framer-motion";
 import DefaultButton from "./DefaultButton";
 
 function ModalInfo({
@@ -12,6 +11,8 @@ function ModalInfo({
   isInitialEdit,
 }) {
   const isEdit = Boolean(data);
+  const isGlobalEditFlow = !isEdit || isInitialEdit;
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [errors, setErrors] = useState({ title: false, description: false });
@@ -30,64 +31,54 @@ function ModalInfo({
       setErrors({ title: false, description: false });
       setTitle(data?.title || "");
       setDescription(data?.desc || "");
-
       setEditableFields({
         title: !isEdit,
         description: !isEdit,
       });
     }
   }, [isOpen, data, isEdit]);
-
-  const toggleEdit = (field, ref = null) => {
+  const toggleEdit = (field, ref) => {
     setEditableFields((prev) => {
       const isNowEditable = !prev[field];
-      if (isNowEditable && ref && ref.current) {
-        setTimeout(() => ref.current.focus(), 50);
+      if (isNowEditable) {
+        setTimeout(() => ref.current?.focus(), 10);
       }
       return { ...prev, [field]: isNowEditable };
     });
   };
 
   const handleSave = () => {
-    const currentTitle = title || "";
-    const currentDesc = description || "";
+    const safeTitle = title?.trim() || "";
+    const safeDesc = description?.trim() || "";
 
-    const titleError = !currentTitle.trim();
-    const descError = !currentDesc.trim();
+    const titleError = !safeTitle;
+    const descError = !safeDesc;
 
     setErrors({ title: titleError, description: descError });
 
     if (!titleError && !descError) {
       onSave({
-        title: currentTitle,
-        description: currentDesc,
+        title: safeTitle,
+        description: safeDesc,
       });
     }
   };
 
-  const isGlobalEditFlow = !isEdit || isInitialEdit;
-
   return (
-    <AnimatePresence>
+    <div>
       {isOpen && (
-        <div className="fixed inset-0 z-9999 flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            style={{ willChange: "opacity" }}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm transform-gpu"
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <div
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            className="absolute inset-0 bg-black/60"
             onClick={onClose}
           />
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+          <div
+            initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            style={{ willChange: "transform, opacity" }}
-            className="relative bg-[#FEF6E4] w-full max-w-7xl p-8 rounded-[40px] shadow-2xl border border-white/20 flex flex-col gap-6 z-10 transform-gpu backface-hidden"
+            exit={{ opacity: 0, scale: 0.96 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="relative bg-[#FEF6E4] w-full max-w-7xl p-8 rounded-[40px] shadow-2xl border border-white/20 flex flex-col gap-6 z-10"
           >
             <div className="flex flex-col gap-2">
               <h2 className="text-brown-dark text-3xl font-bold">
@@ -141,18 +132,18 @@ function ModalInfo({
                         readOnly={!editableFields.title}
                         onChange={(e) => {
                           setTitle(e.target.value);
-                          if (errors.title && e.target.value.trim() !== "")
+                          if (errors.title)
                             setErrors((prev) => ({ ...prev, title: false }));
                         }}
                         placeholder="Título (ex: Alergia a Glúten severa)"
                         className={`col-start-1 row-start-1 w-full py-2 px-1 outline-none transition-all bg-transparent text-[#5D2A11] text-[18px] font-medium
-                    ${
-                      errors.title
-                        ? "border-b-2 border-red-500"
-                        : editableFields.title
-                          ? "border-b-2 border-[#5D2A11]/30"
-                          : "border-b-2 border-transparent"
-                    }`}
+                          ${
+                            errors.title
+                              ? "border-b-2 border-red-500"
+                              : editableFields.title
+                                ? "border-b-2 border-[#5D2A11]/30"
+                                : "border-b-2 border-transparent"
+                          }`}
                         style={{ textIndent: "5px" }}
                       />
                     ) : (
@@ -169,7 +160,6 @@ function ModalInfo({
                 )}
               </div>
 
-              {/* DESCRIÇÃO */}
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between px-1">
                   <div className="flex items-center gap-2">
@@ -214,20 +204,20 @@ function ModalInfo({
                     readOnly={!editableFields.description}
                     onChange={(e) => {
                       setDescription(e.target.value);
-                      if (errors.description && e.target.value.trim() !== "")
+                      if (errors.description)
                         setErrors((prev) => ({ ...prev, description: false }));
                     }}
                     placeholder="Descrição detalhada..."
                     rows="5"
                     style={{ textIndent: "5px" }}
                     className={`w-full p-4 rounded-2xl outline-none transition-colors resize-none text-[#5D2A11] text-[18px]
-                ${
-                  errors.description
-                    ? "border-2 border-red-500"
-                    : editableFields.description
-                      ? "border border-[#5D2A11]/10 bg-white/50"
-                      : "bg-[#E0E0E0]/50"
-                }`}
+                      ${
+                        errors.description
+                          ? "border-2 border-red-500"
+                          : editableFields.description
+                            ? "border border-[#5D2A11]/10 bg-white/50"
+                            : "bg-[#E0E0E0]/50"
+                      }`}
                   />
                 ) : (
                   <div className="bg-[#5D2A11]/5 p-6 rounded-2xl min-h-[150px] w-full">
@@ -246,7 +236,13 @@ function ModalInfo({
 
             <div className="flex w-full gap-3 mt-4 justify-end items-center h-14 relative z-20">
               {!isConfirmingDelete ? (
-                <>
+                <div
+                  key="actions"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex gap-3"
+                >
                   <DefaultButton
                     another_color="bg-[#BDC3C7]"
                     another_text_color="text-zinc-700"
@@ -274,13 +270,14 @@ function ModalInfo({
                       )}
                     </>
                   )}
-                </>
+                </div>
               ) : (
-                <motion.div
+                <div
+                  key="confirmDelete"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  style={{ willChange: "transform, opacity" }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
                   className="flex items-center gap-4 bg-white/40 px-6 rounded-2xl border border-brown-dark/20 h-14"
                 >
                   <span className="text-[#5D2A11] font-bold text-[18px]">
@@ -302,13 +299,13 @@ function ModalInfo({
                     another_size="h-10 w-40"
                     text="Sim, Excluir"
                   />
-                </motion.div>
+                </div>
               )}
             </div>
-          </motion.div>
+          </div>
         </div>
       )}
-    </AnimatePresence>
+    </div>
   );
 }
 
