@@ -41,9 +41,10 @@ function DefaultButton({
       className={`${backgroundColor} ${textColor} ${IsExistBorder} ${border_radius} 
         ${size} ${textStyle} ${padding}
         cursor-pointer
-        duration-300 ease-out hover:-translate-y-0.5
-        transition-all active:scale-90 active:brightness-90
-        shadow-lg flex justify-center content-center items-center gap-3.5`}
+        transition-transform duration-300 ease-out
+        hover:-translate-y-0.5 active:scale-90 active:brightness-90
+        translate-z-0 perspective-1000 select-none
+        shadow-lg flex justify-center content-center items-center gap-3.5 `}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       {...rest}

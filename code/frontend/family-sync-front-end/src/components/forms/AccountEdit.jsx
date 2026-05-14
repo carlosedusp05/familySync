@@ -51,7 +51,7 @@ function AccountEdit() {
 
   const [editableFields, setEditableFields] = useState({});
   const [errosCampos, setErrosCampos] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [preview, setPreview] = useState(null);
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -103,7 +103,7 @@ function AccountEdit() {
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
       } finally {
-        setTimeout(() => setIsLoading(false), 100);
+        setIsLoading(false);
       }
     };
 

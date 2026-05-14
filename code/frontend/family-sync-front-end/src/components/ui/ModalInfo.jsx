@@ -76,7 +76,8 @@ function ModalInfo({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            style={{ willChange: "opacity" }}
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm transform-gpu"
             onClick={onClose}
           />
 
@@ -85,7 +86,8 @@ function ModalInfo({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="relative bg-[#FEF6E4] w-full max-w-7xl p-8 rounded-[40px] shadow-2xl border border-white/20 flex flex-col gap-6 z-10"
+            style={{ willChange: "transform, opacity" }}
+            className="relative bg-[#FEF6E4] w-full max-w-7xl p-8 rounded-[40px] shadow-2xl border border-white/20 flex flex-col gap-6 z-10 transform-gpu backface-hidden"
           >
             <div className="flex flex-col gap-2">
               <h2 className="text-brown-dark text-3xl font-bold">
@@ -111,7 +113,7 @@ function ModalInfo({
                   {isGlobalEditFlow && isEdit && (
                     <button
                       onClick={() => toggleEdit("title", titleRef)}
-                      className="transition-transform hover:scale-110"
+                      className="transition-transform hover:scale-110 active:scale-95"
                     >
                       <img
                         src={pencilTerracotaIcon}
@@ -148,8 +150,8 @@ function ModalInfo({
                       errors.title
                         ? "border-b-2 border-red-500"
                         : editableFields.title
-                        ? "border-b-2 border-[#5D2A11]/30"
-                        : "border-b-2 border-transparent"
+                          ? "border-b-2 border-[#5D2A11]/30"
+                          : "border-b-2 border-transparent"
                     }`}
                         style={{ textIndent: "5px" }}
                       />
@@ -177,7 +179,7 @@ function ModalInfo({
                     {isGlobalEditFlow && isEdit && (
                       <button
                         onClick={() => toggleEdit("description", descRef)}
-                        className="transition-transform hover:scale-110"
+                        className="transition-transform hover:scale-110 active:scale-95"
                       >
                         <img
                           src={pencilTerracotaIcon}
@@ -223,12 +225,12 @@ function ModalInfo({
                   errors.description
                     ? "border-2 border-red-500"
                     : editableFields.description
-                    ? "border border-[#5D2A11]/10 bg-white/50"
-                    : "bg-[#E0E0E0]/50"
+                      ? "border border-[#5D2A11]/10 bg-white/50"
+                      : "bg-[#E0E0E0]/50"
                 }`}
                   />
                 ) : (
-                  <div className="bg-[#5D2A11]/5 p-6 rounded-2xl min-h-37.5 w-full">
+                  <div className="bg-[#5D2A11]/5 p-6 rounded-2xl min-h-[150px] w-full">
                     <p className="text-[#5D2A11] text-[20px] leading-relaxed whitespace-pre-wrap wrap-break-word">
                       {description}
                     </p>
@@ -278,6 +280,7 @@ function ModalInfo({
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
+                  style={{ willChange: "transform, opacity" }}
                   className="flex items-center gap-4 bg-white/40 px-6 rounded-2xl border border-brown-dark/20 h-14"
                 >
                   <span className="text-[#5D2A11] font-bold text-[18px]">

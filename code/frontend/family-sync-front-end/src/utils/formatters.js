@@ -55,3 +55,18 @@ export const formatCEP = (value) => {
 };
 
 export const cleanCEP = (cep) => cep.replace(/\D/g, "");
+
+export const formatToBRL = (value) => {
+  if (typeof value !== "number") {
+    value = parseFloat(value) || 0;
+  }
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(value);
+};
+
+export const validateExpenseValue = (value) => {
+  const num = Number(value);
+  return !isNaN(num) && num > 0;
+};

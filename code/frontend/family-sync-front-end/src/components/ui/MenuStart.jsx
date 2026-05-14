@@ -17,20 +17,11 @@ function MenuStart(props) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      document.querySelectorAll("[data-aos]").forEach((el) => {
-        el.classList.remove("aos-animate");
-      });
-
-      AOS.init({
-        duration: 1000,
-        once: true,
-        easing: "ease-out-cubic",
-      });
-      AOS.refreshHard();
-    }, 50);
-
-    return () => clearTimeout(timer);
+    AOS.init({
+      duration: 1000,
+      once: true,
+      easing: "ease-out-cubic",
+    });
   }, []);
 
   const prefetchList = () => {
@@ -85,14 +76,16 @@ function MenuStart(props) {
               data-aos="fade-down"
               data-aos-delay="400"
             >
-              Olá, {props.userData.nome}
+              <span className="ajuste-desfoque">
+                Olá, {props.userData.nome}
+              </span>
             </h2>
             <p
               className="text-2xl font-bold text-default"
               data-aos="fade-down"
               data-aos-delay="450"
             >
-              {props.userData.email}
+              <span className="ajuste-desfoque">{props.userData.email}</span>
             </p>
           </div>
           <h2
@@ -100,7 +93,9 @@ function MenuStart(props) {
             data-aos="fade-down"
             data-aos-delay="450"
           >
-            {props.userData.nomeFamilia}
+            <span className="ajuste-desfoque">
+              {props.userData.nomeFamilia}
+            </span>
           </h2>
         </div>
 
@@ -113,7 +108,7 @@ function MenuStart(props) {
             data-aos-delay="400"
           >
             <div
-              className={`w-full h-full flex items-center justify-center gap-4 bg-orange py-10 rounded-2xl ${hover} duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
+              className={`w-full h-full flex items-center justify-center gap-4 bg-orange py-10 rounded-2xl ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
               onMouseEnter={prefetchList}
               onClick={() => navigate("/dashboard/lists")}
             >
@@ -131,7 +126,7 @@ function MenuStart(props) {
             data-aos-delay="500"
           >
             <div
-              className={`w-full h-full flex flex-col rounded-2xl pt-5 px-9 bg-default gap-4 ${hover} duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
+              className={`w-full h-full flex flex-col rounded-2xl pt-5 px-9 bg-default gap-4 ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
               onMouseEnter={prefetchCalendar}
               onClick={() => navigate("/dashboard/calendar")}
             >
@@ -164,7 +159,7 @@ function MenuStart(props) {
             data-aos-delay="600"
           >
             <div
-              className={`w-full h-full flex items-center justify-center p-12 rounded-2xl bg-orange-dark ${hover} duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
+              className={`w-full h-full flex items-center justify-center p-12 rounded-2xl bg-orange-dark ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
               onMouseEnter={prefetchNewFamily}
               onClick={() => navigate("/dashboard/family/add")}
             >
@@ -182,7 +177,7 @@ function MenuStart(props) {
             data-aos-delay="700"
           >
             <div
-              className={`w-full h-full flex flex-col gap-5 items-center rounded-2xl bg-terracota p-5 ${hover} duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
+              className={`w-full h-full flex flex-col gap-5 items-center rounded-2xl bg-terracota p-5 ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
               onMouseEnter={prefetchFinancier}
               onClick={() => navigate("/dashboard/finance")}
             >
@@ -212,7 +207,7 @@ function MenuStart(props) {
             data-aos-delay="800"
           >
             <div
-              className={`w-full h-full flex bg-yellow-cream rounded-2xl ${hover} duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
+              className={`w-full h-full flex bg-yellow-cream rounded-2xl ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
               onMouseEnter={prefetchManageFamily}
               onClick={() => navigate("/dashboard/family")}
             >
@@ -234,7 +229,7 @@ function MenuStart(props) {
             data-aos-delay="900"
           >
             <div
-              className={`w-full h-full flex flex-col items-center justify-center bg-brown-dark rounded-2xl gap-3 ${hover} duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
+              className={`w-full h-full flex flex-col items-center justify-center bg-brown-dark rounded-2xl gap-3 ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
               onMouseEnter={prefetchInfoFamiliar}
               onClick={() => navigate("/dashboard/family/info")}
             >

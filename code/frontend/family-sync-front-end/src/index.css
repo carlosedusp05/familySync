@@ -92,3 +92,17 @@
 .fc-theme-standard .fc-scrollgrid {
   border: 1px solid var(--color-terracota);
 }
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ajuste-desfoque {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}

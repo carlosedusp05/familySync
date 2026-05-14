@@ -10,7 +10,7 @@ function InfoFamiliarScreen() {
   const [activeMemberId, setActiveMemberId] = useState("me");
 
   const [allergies, setAllergies] = useState(() => {
-    const saved = localStorage.getItem(`allergies_${activeMemberId}`);
+    const saved = localStorage.getItem("allergies_me");
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -28,17 +28,11 @@ function InfoFamiliarScreen() {
         ];
   });
 
+  // Lê do storage APENAS quando o ID muda (evita double renders)
   useEffect(() => {
     const saved = localStorage.getItem(`allergies_${activeMemberId}`);
     setAllergies(saved ? JSON.parse(saved) : []);
   }, [activeMemberId]);
-
-  useEffect(() => {
-    localStorage.setItem(
-      `allergies_${activeMemberId}`,
-      JSON.stringify(allergies),
-    );
-  }, [allergies, activeMemberId]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -46,26 +40,40 @@ function InfoFamiliarScreen() {
   };
 
   const handleDelete = (id) => {
-    setAllergies((prev) => prev.filter((item) => item.id !== id));
+    setAllergies((prev) => {
+      const updatedList = prev.filter((item) => item.id !== id);
+      localStorage.setItem(
+        `allergies_${activeMemberId}`,
+        JSON.stringify(updatedList),
+      );
+      return updatedList;
+    });
   };
 
   const handleSave = (newData) => {
-    if (selectedInfo) {
-      setAllergies((prev) =>
-        prev.map((item) =>
+    setAllergies((prev) => {
+      let updatedList;
+      if (selectedInfo) {
+        updatedList = prev.map((item) =>
           item.id === selectedInfo.id
             ? { ...item, title: newData.title, desc: newData.description }
             : item,
-        ),
+        );
+      } else {
+        const newItem = {
+          id: Date.now(),
+          title: newData.title,
+          desc: newData.description,
+        };
+        updatedList = [newItem, ...prev];
+      }
+      // Salva de forma síncrona na hora da ação
+      localStorage.setItem(
+        `allergies_${activeMemberId}`,
+        JSON.stringify(updatedList),
       );
-    } else {
-      const newItem = {
-        id: Date.now(),
-        title: newData.title,
-        desc: newData.description,
-      };
-      setAllergies((prev) => [newItem, ...prev]);
-    }
+      return updatedList;
+    });
     handleCloseModal();
   };
 
@@ -80,7 +88,7 @@ function InfoFamiliarScreen() {
   return (
     <MainLayout>
       <div className="flex flex-row gap-4 items-center justify-center py-12 h-full">
-        <div className="h-full w-[60%] bg-black/20 backdrop-blur-md border border-white/10 shadow-lg rounded-3xl p-8 overflow-hidden flex flex-col relative">
+        <div className="h-full w-[60%] bg-black/20 backdrop-blur-md border border-white/10 shadow-lg rounded-3xl p-8 overflow-hidden flex flex-col relative transform-gpu backface-hidden">
           <div className="w-full p-5 flex justify-end absolute top-3 right-3 z-10">
             <DefaultButton
               text="Adicionar informação familiar"
@@ -122,7 +130,7 @@ function InfoFamiliarScreen() {
                   <h3 className="text-white/80 text-2xl font-semibold">
                     Nenhuma informação registrada
                   </h3>
-                  <p className="text-white/40 max-w-87.5 mx-auto text-lg leading-relaxed">
+                  <p className="text-white/40 max-w-[350px] mx-auto text-lg leading-relaxed">
                     Sua lista está vazia. Clique no botão acima para adicionar
                     detalhes importantes sobre a saúde da família.
                   </p>
@@ -132,7 +140,7 @@ function InfoFamiliarScreen() {
           </div>
         </div>
 
-        <div className="w-70 h-full bg-[#EED9CE]/40 backdrop-blur-lg border border-white/10 p-6 flex flex-col items-center gap-6 shadow-[-10px_0_30px_0_rgba(0,0,0,0.1)] rounded-[40px]">
+        <div className="w-70 h-full bg-[#EED9CE]/40 backdrop-blur-lg border border-white/10 p-6 flex flex-col items-center gap-6 shadow-[-10px_0_30px_0_rgba(0,0,0,0.1)] rounded-[40px] transform-gpu backface-hidden">
           <div className="flex flex-col items-center gap-6 w-full">
             {members.map((member) => (
               <div
@@ -141,11 +149,11 @@ function InfoFamiliarScreen() {
                 className="flex flex-col items-center gap-1 w-full group cursor-pointer"
               >
                 <div
-                  className={`rounded-full h-24 w-24 flex items-center justify-center shadow-md transition-all border-4 
+                  className={`rounded-full h-24 w-24 flex items-center justify-center shadow-md transition-all border-4 duration-300 ease-out will-change-transform
                   ${
                     activeMemberId === member.id
-                      ? "bg-brown-dark border-brown-dark  hover:scale-105"
-                      : "bg-yellow-cream border-yellow-cream hover:scale-105"
+                      ? "bg-brown-dark border-brown-dark scale-105"
+                      : "bg-yellow-cream border-yellow-cream hover:scale-105 active:scale-95"
                   }`}
                 ></div>
                 <span
