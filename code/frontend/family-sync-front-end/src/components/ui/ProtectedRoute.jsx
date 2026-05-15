@@ -1,12 +1,12 @@
 import { Navigate, Outlet } from "react-router-dom";
+import { isTokenExpired } from "../../utils/auth";
+import Cookies from "js-cookie";
 
 function ProtectedRoute() {
-  const isAuthenticated =
-    localStorage.getItem("@FamilySync:isAuthenticated") === "true";
+  const token = Cookies.get("@FamilySync:token");
 
-  const isAccount = localStorage.getItem("@FamilySync:isAuthenticated");
-
-  if (!isAuthenticated && !isAccount.id_usuario) {
+  if (!token || isTokenExpired(token)) {
+    Cookies.remove("@FamilySync:token");
     return <Navigate to="/auth/login" replace />;
   }
 

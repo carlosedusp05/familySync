@@ -1,8 +1,13 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import MainLayout from "../layouts/Mainlayout";
 import DefaultButton from "../components/ui/DefaultButton";
-import MultAllergys from "../components/ui/MultAllergy";
+import MultInfos from "../components/ui/MultInfos";
 import ModalInfo from "../components/ui/ModalInfo";
+import { userService } from "../services/userService";
+import { infoService } from "../services/infoService";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
+
 const DEFAULT_MEMBERS = [
   { id: "me", name: "VOCÊ", role: "USER" },
   { id: "1", name: "Kauan Silva", role: "FAMILY" },
@@ -15,28 +20,56 @@ const DEFAULT_MEMBERS = [
 function InfoFamiliarScreen() {
   const [members, setMembers] = useState(() => {
     if (typeof window !== "undefined") {
-      const savedMembers = localStorage.getItem("familia_data");
+      const savedMembers = Cookies.get("familia_data");
       return savedMembers ? JSON.parse(savedMembers) : DEFAULT_MEMBERS;
     }
     return DEFAULT_MEMBERS;
   });
 
   const [activeMemberId, setActiveMemberId] = useState("me");
-  const [allergies, setAllergies] = useState([]);
+  const [infos, setInfos] = useState([]);
+  const [loggedUserId, setLoggedUserId] = useState(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedInfo, setSelectedInfo] = useState(null);
   const [isModeEdition, setIsModeEdition] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const savedAllergies = localStorage.getItem(
-        `allergies_${activeMemberId}`,
-      );
-      setAllergies(savedAllergies ? JSON.parse(savedAllergies) : []);
-    }, 350);
+    const fetchInfos = async () => {
+      try {
+        const token = Cookies.get("@FamilySync:token");
+        if (token) {
+          const decoded = jwtDecode(token);
+          setLoggedUserId(decoded.id_usuario);
 
-    return () => clearTimeout(timer);
+          // Define de quem vamos buscar as infos (logado ou membro da familia)
+          const targetUserId =
+            activeMemberId === "me" ? decoded.id_usuario : activeMemberId;
+
+          // Busca da API
+          const response = await userService.getUserInfoById(targetUserId);
+
+          if (response && response.length > 0) {
+            setInfos(response);
+            // Atualiza o cache do cookie com os dados mais recentes da API
+            Cookies.set(`infos_${activeMemberId}`, JSON.stringify(response), {
+              expires: 7,
+            });
+          } else {
+            // Se a API não retornar nada, tenta usar o que está no Cookie
+            const savedinfos = Cookies.get(`infos_${activeMemberId}`);
+            setInfos(savedinfos ? JSON.parse(savedinfos) : []);
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao carregar dados ou token:", error);
+        // Fallback para os cookies em caso de erro na rede
+        const savedinfos = Cookies.get(`infos_${activeMemberId}`);
+        setInfos(savedinfos ? JSON.parse(savedinfos) : []);
+      }
+    };
+
+    fetchInfos();
   }, [activeMemberId]);
 
   const handleCloseModal = useCallback(() => {
@@ -51,44 +84,102 @@ function InfoFamiliarScreen() {
   }, []);
 
   const handleDelete = useCallback(
-    (id) => {
-      setAllergies((prev) => {
-        const updatedList = prev.filter((item) => item.id !== id);
-        localStorage.setItem(
-          `allergies_${activeMemberId}`,
-          JSON.stringify(updatedList),
-        );
-        return updatedList;
-      });
+    async (id) => {
+      try {
+        // Chamada da API para deletar
+        await infoService.deleteInfo(id);
+
+        setInfos((prev) => {
+          const updatedList = prev.filter((item) => item.id !== id);
+          Cookies.set(`infos_${activeMemberId}`, JSON.stringify(updatedList), {
+            expires: 7,
+          });
+          return updatedList;
+        });
+      } catch (error) {
+        console.error("Erro ao deletar informação:", error);
+      }
     },
     [activeMemberId],
   );
 
   const handleSave = useCallback(
-    (newData) => {
-      setAllergies((prev) => {
-        let updatedList;
+    async (newData) => {
+      try {
+        let savedData;
+        const targetUserId =
+          activeMemberId === "me" ? loggedUserId : activeMemberId;
+
         if (selectedInfo) {
-          updatedList = prev.map((item) =>
-            item.id === selectedInfo.id
-              ? { ...item, title: newData.title, desc: newData.description }
-              : item,
-          );
+          // Edição
+          const payload = {
+            titulo: newData.title,
+            descricao: newData.description,
+          };
+          await infoService.updateInfo(selectedInfo.id, payload);
+
+          savedData = {
+            ...selectedInfo,
+            title: newData.title,
+            desc: newData.description,
+          };
+
+          setInfos((prev) => {
+            const updatedList = prev.map((item) =>
+              item.id === selectedInfo.id ? savedData : item,
+            );
+            Cookies.set(
+              `infos_${activeMemberId}`,
+              JSON.stringify(updatedList),
+              { expires: 7 },
+            );
+            return updatedList;
+          });
         } else {
-          updatedList = [
-            { id: Date.now(), title: newData.title, desc: newData.description },
-            ...prev,
-          ];
+          const infoData = {
+            titulo: newData.title,
+            descricao: newData.description,
+          };
+          const createInfo = await infoService.createInfo(infoData);
+
+          console.log(infoData);
+
+          const allInfos = await infoService.getInfos();
+          const lastInfo = allInfos[allInfos.length - 1];
+
+          console.log(lastInfo);
+
+          const payload = {
+            id_informacao: lastInfo.id,
+            id_usuario: targetUserId,
+          };
+
+          console.log(payload);
+          await userService.AddUserInfo(payload);
+
+          savedData = {
+            id: lastInfo.id,
+            title: newData.title,
+            desc: newData.description,
+          };
+
+          setInfos((prev) => {
+            const updatedList = [savedData, ...prev];
+            Cookies.set(
+              `infos_${activeMemberId}`,
+              JSON.stringify(updatedList),
+              { expires: 7 },
+            );
+            return updatedList;
+          });
         }
-        localStorage.setItem(
-          `allergies_${activeMemberId}`,
-          JSON.stringify(updatedList),
-        );
-        return updatedList;
-      });
-      handleCloseModal();
+
+        handleCloseModal();
+      } catch (error) {
+        console.error("Erro ao salvar informação:", error);
+      }
     },
-    [activeMemberId, selectedInfo, handleCloseModal],
+    [activeMemberId, selectedInfo, handleCloseModal, loggedUserId],
   );
 
   const renderedMembers = useMemo(() => {
@@ -135,10 +226,10 @@ function InfoFamiliarScreen() {
           </div>
 
           <div className="flex-1 flex items-center justify-center">
-            {allergies.length > 0 ? (
+            {infos.length > 0 ? (
               <div className="w-full h-full overflow-y-auto pt-24 pr-2">
-                <MultAllergys
-                  allergys={allergies}
+                <MultInfos
+                  infos={infos}
                   onEditItem={(item) => handleOpenModal(item, false)}
                   onEditClick={(item) => handleOpenModal(item, true)}
                 />

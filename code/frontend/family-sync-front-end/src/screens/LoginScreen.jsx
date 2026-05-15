@@ -11,6 +11,7 @@ import {
   validatePassword,
   validateLoginFields,
 } from "../utils/validators.js";
+import Cookies from "js-cookie";
 
 function LoginScreen() {
   const navigate = useNavigate();
@@ -52,18 +53,25 @@ function LoginScreen() {
           email,
           senha: senhaHasheada,
         });
-        console.log(response);
 
         if (
           response &&
-          (response.Status === true || response.Status === "true")
+          (response.Status === true ||
+            response.Status === "true" ||
+            response.token)
         ) {
-          localStorage.setItem("@FamilySync:isAuthenticated", "true");
-          const userPayload = response.Response || response.data || response;
+          const token = response.token || response.Response;
 
-          const { senha, password, ...safeUser } = userPayload;
-
-          localStorage.setItem("@FamilySync:user", JSON.stringify(safeUser));
+          if (!token) {
+            setErro("Token não recebido do servidor.");
+            setIsLoading(false);
+            return;
+          }
+          Cookies.set("@FamilySync:token", token, {
+            expires: 1,
+            secure: true,
+            sameSite: "strict",
+          });
 
           sessionStorage.removeItem("@FamilySync:splashRodou");
           window.dispatchEvent(new Event("startSplash"));

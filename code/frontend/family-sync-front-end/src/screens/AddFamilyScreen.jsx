@@ -239,7 +239,6 @@ function AddFamilyScreen() {
 
         await enderecoService.createEndereco(dadosEndereco);
 
-        // Iterando sobre o array de membros para adicionar cada um
         console.log("Tentando adicionar membros à família:", formData.membros);
 
         for (const email of formData.membros) {

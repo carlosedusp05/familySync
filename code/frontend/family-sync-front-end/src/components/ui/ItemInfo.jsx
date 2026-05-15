@@ -1,7 +1,7 @@
 import React from "react";
 import { pencilTerracotaIcon } from "../../assets";
 
-function ItemAllergy({ item, title, desc, creator, onEditItem, onEditClick }) {
+function ItemInfo({ item, title, desc, creator, onEditItem, onEditClick }) {
   const handleItemClick = () => {
     if (onEditItem) onEditItem(item);
   };
@@ -26,7 +26,6 @@ function ItemAllergy({ item, title, desc, creator, onEditItem, onEditClick }) {
           onClick={handlePencilClick}
           src={pencilTerracotaIcon}
           alt="Ícone de Lápis para Edição"
-          // 5. loading="lazy" ajuda se a lista for gigantesca
           loading="lazy"
           className="duration-300 ease-out transition-all active:scale-90 active:brightness-90 cursor-pointer"
           draggable={false}
@@ -42,4 +41,4 @@ function ItemAllergy({ item, title, desc, creator, onEditItem, onEditClick }) {
   );
 }
 
-export default React.memo(ItemAllergy);
+export default React.memo(ItemInfo);

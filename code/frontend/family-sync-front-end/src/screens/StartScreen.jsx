@@ -3,36 +3,49 @@ import DefaultHeader from "../components/layout/DefaultHeader";
 import BackgroundImage from "../components/ui/BackgroundImage";
 import MenuStart from "../components/ui/MenuStart";
 import { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
+import Cookies from "js-cookie";
+import { formatUserName } from "../utils/formatters";
+import { infoService } from "../services/infoService";
 
 function StartScreen(props) {
   const [userData, setUserData] = useState({
+    id_usuario: 0,
     nome: "Usuário",
     email: "Carregando...",
     nomeFamilia: "Carregando...",
   });
 
-  useEffect(() => {
-    const savedUser = localStorage.getItem("@FamilySync:user");
-    if (savedUser) {
-      try {
-        const parsedUser = JSON.parse(savedUser);
-        const nomeFormatado = parsedUser.nome
-          ? parsedUser.nome
-              .toLowerCase()
-              .split(" ")
-              .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
-              .join(" ")
-          : "Usuário";
+  const [infos, setInfos] = useState(null);
 
-        setUserData({
-          nome: nomeFormatado,
-          email: parsedUser.email || "E-mail não encontrado",
-          nomeFamilia: "Nome familia",
-        });
-      } catch (error) {
-        console.error("Erro ao converter dados", error);
+  useEffect(() => {
+    const loadData = async () => {
+      const token = Cookies.get("@FamilySync:token");
+
+      if (token) {
+        try {
+          const decoded = jwtDecode(token);
+          const nomeBruto = decoded.nome || "Usuário";
+          const nomeFormatado = formatUserName(nomeBruto);
+
+          setUserData({
+            id_usuario: decoded.id_usuario,
+            nome: nomeFormatado,
+            email: decoded.email || "E-mail não encontrado",
+            nomeFamilia: decoded.nome_familia || "Minha Família",
+          });
+
+          const IdUsuario = parseInt(decoded.id_usuario);
+          const response = await infoService.getInfosById(IdUsuario);
+
+          setInfos(response);
+        } catch (error) {
+          console.error("Erro ao carregar dados:", error);
+        }
       }
-    }
+    };
+
+    loadData();
   }, []);
 
   return (
@@ -44,7 +57,7 @@ function StartScreen(props) {
       />
       <DefaultHeader />
       <div className="w-full flex justify-center items-center h-full ">
-        <MenuStart props={props} userData={userData} />
+        <MenuStart props={props} userData={userData} infos={infos} />
       </div>
     </div>
   );

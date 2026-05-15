@@ -14,6 +14,19 @@ const getInfos = async function () {
   }
 };
 
+const getInfosById = async function (id) {
+  const url = `/usuario-informacao/${id}`;
+
+  try {
+    const response = await api.get(url);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 // POST - Criar Informação
 const createInfo = async function (data) {
   const url = "/usuario-informacao";
@@ -58,6 +71,7 @@ const deleteInfo = async function (id) {
 
 export const infoService = {
   getInfos,
+  getInfosById,
   createInfo,
   updateInfo,
   deleteInfo,

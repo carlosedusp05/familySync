@@ -241,16 +241,16 @@ function MenuStart(props) {
               </div>
               <div className="w-[78%] h-[50%] bg-terracota rounded-2xl flex flex-col px-3 py-2">
                 <h3 className="font-bold text-brown-dark text-[25px]">
-                  Principais Alergias:
+                  Principais informações:
                 </h3>
                 <ul className="font-bold text-white text-[18px]">
-                  {(
-                    props.alergias || [
-                      "Você ainda não tem alergias cadastradas!",
-                    ]
-                  ).map((alergia, index) => (
-                    <li key={index}>{alergia}</li>
-                  ))}
+                  {Array.isArray(props.infos) && props.infos.length > 0 ? (
+                    props.infos.map((info, index) => (
+                      <li key={index}>{info.descricao || info}</li>
+                    ))
+                  ) : (
+                    <li>Você ainda não tem informações cadastradas!</li>
+                  )}
                 </ul>
               </div>
             </div>
