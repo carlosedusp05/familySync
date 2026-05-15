@@ -6,6 +6,8 @@ import DefaultButton from "../components/ui/DefaultButton";
 import AddExpenses from "../components/ui/AddExpenses";
 import FinancialSelect from "../components/ui/FinancialSelect";
 import EditExpensesList from "../components/ui/EditExpensesList";
+import { jwtDecode } from "jwt-decode";
+import Cookies from "js-cookie";
 const PERIODOS = ["Dia", "Semana", "Mês", "Ano"];
 const OPCOES_VISUALIZACAO = ["total", "dia", "semana", "mês", "ano"];
 
@@ -27,8 +29,17 @@ function FinancierScreen() {
   });
 
   const authorName = useMemo(() => {
-    const savedUser = localStorage.getItem("@FamilySync:user");
-    return savedUser ? JSON.parse(savedUser).nome : "Usuário";
+    try {
+      const token = Cookies.get("@FamilySync:token");
+      if (!token) return "Usuário";
+      const decoded = jwtDecode(token);
+      console.log(decoded);
+
+      return decoded?.nome || "Usuário";
+    } catch (error) {
+      console.error("Erro ao ler o token do usuário:", error);
+      return "Usuário";
+    }
   }, []);
   useEffect(() => {
     localStorage.setItem("@FamilySync:gastos", JSON.stringify(dadosPorPeriodo));

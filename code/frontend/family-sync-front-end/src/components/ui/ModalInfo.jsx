@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion"; // Importações necessárias
 import { pencilTerracotaIcon } from "../../assets";
 import DefaultButton from "./DefaultButton";
 
@@ -38,7 +37,6 @@ function ModalInfo({
       });
     }
   }, [isOpen, data, isEdit]);
-
   const toggleEdit = (field, ref) => {
     setEditableFields((prev) => {
       const isNowEditable = !prev[field];
@@ -67,25 +65,19 @@ function ModalInfo({
   };
 
   return (
-    <AnimatePresence>
+    <div>
       {isOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 base-layer">
-          {/* Backdrop - Opacidade simples e rápida */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15, ease: "linear" }}
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <div
+            transition={{ duration: 0.2, ease: "easeInOut" }}
             className="absolute inset-0 bg-black/60"
             onClick={onClose}
           />
-
-          {/* Conteúdo do Modal - Escala sutil + leve subida no eixo Y */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.98, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: 8 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }} // Custom ease-out ultraleve
+          <div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.96 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             className="relative bg-[#FEF6E4] w-full max-w-7xl p-8 rounded-[40px] shadow-2xl border border-white/20 flex flex-col gap-6 z-10"
           >
             <div className="flex flex-col gap-2">
@@ -104,7 +96,6 @@ function ModalInfo({
             </div>
 
             <div className="flex flex-col gap-4">
-              {/* Campo de Título */}
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2 px-1">
                   <label className="text-[#5D2A11] text-[18px] font-semibold">
@@ -169,7 +160,6 @@ function ModalInfo({
                 )}
               </div>
 
-              {/* Campo de Descrição */}
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between px-1">
                   <div className="flex items-center gap-2">
@@ -244,82 +234,78 @@ function ModalInfo({
               </div>
             </div>
 
-            {/* Container de Ações com transição fluida interna */}
             <div className="flex w-full gap-3 mt-4 justify-end items-center h-14 relative z-20">
-              <AnimatePresence mode="wait">
-                {!isConfirmingDelete ? (
-                  <motion.div
-                    key="actions"
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.15 }}
-                    className="flex gap-3"
-                  >
-                    <DefaultButton
-                      another_color="bg-[#BDC3C7]"
-                      another_text_color="text-zinc-700"
-                      another_text_size="text-[20px]"
-                      another_size="h-14 w-50"
-                      text={isGlobalEditFlow ? "Cancelar" : "Fechar"}
-                      onClick={onClose}
-                    />
-                    {isGlobalEditFlow && (
-                      <>
+              {!isConfirmingDelete ? (
+                <div
+                  key="actions"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex gap-3"
+                >
+                  <DefaultButton
+                    another_color="bg-[#BDC3C7]"
+                    another_text_color="text-zinc-700"
+                    another_text_size="text-[20px]"
+                    another_size="h-14 w-50"
+                    text={isGlobalEditFlow ? "Cancelar" : "Fechar"}
+                    onClick={onClose}
+                  />
+                  {isGlobalEditFlow && (
+                    <>
+                      <DefaultButton
+                        text={isEdit ? "Salvar Edição" : "Salvar Informação"}
+                        another_text_size="text-[20px]"
+                        another_size="h-14 w-50"
+                        onClick={handleSave}
+                      />
+                      {isEdit && (
                         <DefaultButton
-                          text={isEdit ? "Salvar Edição" : "Salvar Informação"}
+                          text="Excluir"
+                          another_color="bg-red-light"
                           another_text_size="text-[20px]"
                           another_size="h-14 w-50"
-                          onClick={handleSave}
+                          onClick={() => setIsConfirmingDelete(true)}
                         />
-                        {isEdit && (
-                          <DefaultButton
-                            text="Excluir"
-                            another_color="bg-red-light"
-                            another_text_size="text-[20px]"
-                            another_size="h-14 w-50"
-                            onClick={() => setIsConfirmingDelete(true)}
-                          />
-                        )}
-                      </>
-                    )}
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="confirmDelete"
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.15 }}
-                    className="flex items-center gap-4 bg-white/40 px-6 rounded-2xl border border-brown-dark/20 h-14"
-                  >
-                    <span className="text-[#5D2A11] font-bold text-[18px]">
-                      Deseja excluir permanentemente?
-                    </span>
-                    <DefaultButton
-                      onClick={() => setIsConfirmingDelete(false)}
-                      another_color="bg-[#BDC3C7]"
-                      another_text_color="text-zinc-700"
-                      another_size="h-10 w-24"
-                      text="Não"
-                    />
-                    <DefaultButton
-                      onClick={() => {
-                        onDelete && onDelete(data.id);
-                        onClose();
-                      }}
-                      another_color="bg-red-light"
-                      another_size="h-10 w-40"
-                      text="Sim, Excluir"
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                      )}
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div
+                  key="confirmDelete"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  className="flex items-center gap-4 bg-white/40 px-6 rounded-2xl border border-brown-dark/20 h-14"
+                >
+                  <span className="text-[#5D2A11] font-bold text-[18px]">
+                    Deseja excluir permanentemente?
+                  </span>
+                  <DefaultButton
+                    onClick={() => setIsConfirmingDelete(false)}
+                    another_color="bg-[#BDC3C7]"
+                    another_text_color="text-zinc-700"
+                    another_size="h-10 w-24"
+                    text="Não"
+                  />
+                  <DefaultButton
+                    onClick={() => {
+                      onDelete && onDelete(data.id);
+                      onClose();
+                    }}
+                    another_color="bg-red-light"
+                    another_size="h-10 w-40"
+                    text="Sim, Excluir"
+                  />
+                </div>
+              )}
             </div>
-          </motion.div>
+          </div>
         </div>
       )}
-    </AnimatePresence>
+    </div>
   );
 }
 
