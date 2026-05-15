@@ -18,10 +18,14 @@ const FINANCE_EMOJIS = [
   { icon: "💰", label: "Outros" },
 ];
 
-function AddExpenses({ is_edit_expenses, onClose, onSave }) {
-  const [valor, setValor] = useState(0);
-  const [categoria, setCategoria] = useState("");
-  const [emojiSelecionado, setEmojiSelecionado] = useState("🛍️");
+function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
+  const [valor, setValor] = useState(initialData ? initialData.valor : 0);
+  const [categoria, setCategoria] = useState(
+    initialData ? initialData.label : "",
+  );
+  const [emojiSelecionado, setEmojiSelecionado] = useState(
+    initialData ? initialData.emoji : "🛍️",
+  );
   const [errors, setErrors] = useState({});
 
   const validate = useCallback((campo, val) => {
@@ -40,9 +44,10 @@ function AddExpenses({ is_edit_expenses, onClose, onSave }) {
     const isCatValid = validate("categoria", categoria);
 
     if (isValorValid && isCatValid) {
-      onSave(categoria, valor, emojiSelecionado);
+      // Passamos o ID de volta se estivermos editando
+      onSave(categoria, valor, emojiSelecionado, initialData?.id);
     }
-  }, [validate, valor, categoria, emojiSelecionado, onSave]);
+  }, [validate, valor, categoria, emojiSelecionado, onSave, initialData]);
 
   const handleValorChange = useCallback(
     (e) => {

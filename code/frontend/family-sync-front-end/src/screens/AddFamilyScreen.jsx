@@ -6,13 +6,12 @@ import InputAddFamily from "../components/ui/InputAddFamily";
 import SelectAddFamily from "../components/ui/SelectAddFamily";
 import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { validateName, validatePhone } from "../utils/validators.js";
 import {
-  formatPhone,
-  formatCEP,
-  cleanCEP,
-  formatUserName,
-} from "../utils/formatters.js";
+  validateName,
+  validatePhone,
+  validateEmail,
+} from "../utils/validators.js";
+import { formatPhone, formatCEP, cleanCEP } from "../utils/formatters.js";
 import { viaCepService } from "../services/viaCepService.jsx";
 import { familyService } from "../services/familyService.jsx";
 import { enderecoService } from "../services/enderecoService.jsx";
@@ -26,6 +25,9 @@ function AddFamilyScreen() {
   const [preview, setPreview] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Estado para o e-mail que está sendo digitado no momento
+  const [currentEmail, setCurrentEmail] = useState("");
+
   const [formData, setFormData] = useState({
     nomeFamilia: "",
     telefone: "",
@@ -36,11 +38,12 @@ function AddFamilyScreen() {
     logradouro: "",
     numero: "",
     complemento: "",
-    nomeUsuario: "",
+    membros: [], // Modificado para array
   });
 
   const [errosCampos, setErrosCampos] = useState({});
 
+  // Removido "nomeUsuario" da ordem de foco
   const focusOrder = [
     "nomeFamilia",
     "telefone",
@@ -51,7 +54,6 @@ function AddFamilyScreen() {
     "logradouro",
     "numero",
     "complemento",
-    "nomeUsuario",
   ];
 
   const handleFileChange = (e) => {
@@ -86,8 +88,7 @@ function AddFamilyScreen() {
           mensagem = "CEP inválido";
         break;
       default:
-        if (!valor && id !== "complemento" && id !== "nomeUsuario")
-          mensagem = "Campo obrigatório";
+        if (!valor && id !== "complemento") mensagem = "Campo obrigatório";
     }
 
     setErrosCampos((prev) => {
@@ -113,7 +114,8 @@ function AddFamilyScreen() {
       if (currentIndex < focusOrder.length - 1) {
         document.getElementById(focusOrder[currentIndex + 1])?.focus();
       } else {
-        handleConfirmar();
+        // Se for o último input padrão, vai para o input de e-mail (membros)
+        document.getElementById("inputMembros")?.focus();
       }
     }
   };
@@ -154,6 +156,41 @@ function AddFamilyScreen() {
     }
   };
 
+  // Funções para gerenciar o Array de Membros (E-mails)
+  const handleAddMember = () => {
+    if (!currentEmail.trim()) return;
+
+    const erroValidacao = validateEmail(currentEmail);
+    if (erroValidacao) {
+      setErrosCampos((prev) => ({ ...prev, membros: erroValidacao }));
+      return;
+    }
+
+    if (formData.membros.includes(currentEmail)) {
+      setErrosCampos((prev) => ({ ...prev, membros: "E-mail já adicionado" }));
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      membros: [...prev.membros, currentEmail.toLowerCase()],
+    }));
+    setCurrentEmail("");
+
+    setErrosCampos((prev) => {
+      const novosErros = { ...prev };
+      delete novosErros.membros;
+      return novosErros;
+    });
+  };
+
+  const handleRemoveMember = (emailParaRemover) => {
+    setFormData((prev) => ({
+      ...prev,
+      membros: prev.membros.filter((email) => email !== emailParaRemover),
+    }));
+  };
+
   const handleConfirmar = async function () {
     const novosErros = {};
     focusOrder.forEach((id) => {
@@ -183,13 +220,8 @@ function AddFamilyScreen() {
         responseCreationFamily.id
       ) {
         const responseFamilies = await familyService.getFamilies();
-
-        console.log(responseFamilies);
-
         const ultimaFamilia = responseFamilies.Response.at(-1);
         const idFamiliaGerado = ultimaFamilia?.id || ultimaFamilia?.id_familia;
-
-        console.log(idFamiliaGerado);
 
         if (!idFamiliaGerado)
           throw new Error("ID da família não encontrado após a criação.");
@@ -205,25 +237,24 @@ function AddFamilyScreen() {
           numero: formData.numero,
         };
 
-        console.log(formData);
-
         await enderecoService.createEndereco(dadosEndereco);
 
-        console.log(
-          "Tentando adicionar usuário à família com nome:",
-          formData.nomeUsuario,
-        );
+        // Iterando sobre o array de membros para adicionar cada um
+        console.log("Tentando adicionar membros à família:", formData.membros);
 
-        console.log("id da familia", idFamiliaGerado);
+        for (const email of formData.membros) {
+          const familyValid = {
+            email: email,
+            id_familia: idFamiliaGerado,
+          };
+          const responseCreationUserInFamily =
+            await userService.addUserFamily(familyValid);
+          console.log(
+            `Resposta adição membro (${email}):`,
+            responseCreationUserInFamily,
+          );
+        }
 
-        const familyValid = {
-          email: formData.nomeUsuario,
-          id_familia: idFamiliaGerado,
-        };
-        const responseCreationUserInFamily =
-          await userService.addUserFamily(familyValid);
-
-        console.log("Resposta final:", responseCreationUserInFamily);
         navigate("/dashboard");
       } else {
         setErrosCampos({ geral: responseCreationFamily.message });
@@ -405,20 +436,88 @@ function AddFamilyScreen() {
               </div>
 
               <div className="flex flex-col gap-3 mt-4">
-                <div className="w-full bg-brown-dark rounded-2xl flex px-5 py-3 h-20 gap-3">
-                  <input
-                    id="nomeUsuario"
-                    type="text"
-                    placeholder="Nome do usuário"
-                    value={formData.nomeUsuario}
-                    onChange={(e) =>
-                      handleChange("nomeUsuario", e.target.value)
-                    }
-                    onKeyDown={(e) => handleKeyDown(e, "nomeUsuario")}
-                    className="py-2 px-5 bg-orange text-brown-dark placeholder:text-brown-dark/70 rounded-2xl w-full flex items-center text-xl sm:text-2xl font-bold focus:outline-none"
-                  />
+                {/* INICIO DO CAMPO DE MEMBROS (TAGS) */}
+                <div className="flex flex-col w-full">
+                  <div className="w-full bg-[#4A2511] p-3 rounded-2xl flex items-center min-h-[4.5rem] gap-3 shadow-sm">
+                    {/* Input com Tags Visuais */}
+                    <div className="flex-1 bg-[#F9873E] rounded-xl flex flex-wrap items-center gap-2 p-2 min-h-[3rem]">
+                      {formData.membros.map((email, index) => (
+                        <div
+                          key={index}
+                          className="bg-[#BFA8A4] text-black px-3 py-1 rounded-full flex items-center gap-2 shadow-sm"
+                        >
+                          <span className="text-sm font-medium">{email}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveMember(email)}
+                            className="text-[#4A2511] hover:text-red-700 transition-colors flex items-center justify-center p-0.5"
+                            title="Remover e-mail"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <line x1="18" y1="6" x2="6" y2="18"></line>
+                              <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                          </button>
+                        </div>
+                      ))}
+
+                      <input
+                        id="inputMembros"
+                        type="email"
+                        placeholder={
+                          formData.membros.length === 0
+                            ? "E-mail do membro..."
+                            : ""
+                        }
+                        value={currentEmail}
+                        onChange={(e) => {
+                          setCurrentEmail(e.target.value);
+                          if (errosCampos.membros) {
+                            setErrosCampos((prev) => ({
+                              ...prev,
+                              membros: "",
+                            }));
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          // Aciona tanto com Enter quanto com a tecla de Espaço
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            handleAddMember();
+                          }
+                        }}
+                        className="flex-1 bg-transparent min-w-[150px] border-none outline-none text-black placeholder:text-black/60 text-lg px-2"
+                      />
+                    </div>
+
+                    {/* Botão Convidar */}
+                    <button
+                      type="button"
+                      onClick={handleAddMember}
+                      className="bg-[#FC6804] text-white text-xl px-6 h-full min-h-[3rem] rounded-xl font-semibold hover:bg-[#d95802] transition-colors"
+                    >
+                      convidar
+                    </button>
+                  </div>
+                  {errosCampos.membros && (
+                    <span className="text-red-500 text-sm mt-1 ml-2 font-medium">
+                      {errosCampos.membros}
+                    </span>
+                  )}
                 </div>
-                <div className="w-full flex justify-between">
+                {/* FIM DO CAMPO DE MEMBROS */}
+
+                <div className="w-full flex justify-between mt-2">
                   <DefaultButton
                     text="Cancelar"
                     theme={false}

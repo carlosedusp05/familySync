@@ -5,6 +5,7 @@ import MainLayout from "../layouts/Mainlayout";
 import DefaultButton from "../components/ui/DefaultButton";
 import AddExpenses from "../components/ui/AddExpenses";
 import FinancialSelect from "../components/ui/FinancialSelect";
+import EditExpensesList from "../components/ui/EditExpensesList";
 const PERIODOS = ["Dia", "Semana", "Mês", "Ano"];
 const OPCOES_VISUALIZACAO = ["total", "dia", "semana", "mês", "ano"];
 
@@ -13,6 +14,10 @@ function FinancierScreen() {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tipoVisualizacao, setTipoVisualizacao] = useState("total");
+
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [isListModalOpen, setIsListModalOpen] = useState(false);
+  const [expenseToEdit, setExpenseToEdit] = useState(null);
 
   const [dadosPorPeriodo, setDadosPorPeriodo] = useState(() => {
     const saved = localStorage.getItem("@FamilySync:gastos");
@@ -82,29 +87,53 @@ function FinancierScreen() {
     });
   }, []);
 
-  const handleSaveExpense = useCallback((categoria, valor, emoji) => {
-    const novoId = Date.now();
+  const handleSaveExpense = useCallback((categoria, valor, emoji, idToEdit) => {
     setDadosPorPeriodo((prev) => {
       const novosDados = { ...prev };
+
       PERIODOS.forEach((p) => {
-        const index = novosDados[p].findIndex(
-          (item) => item.label === categoria,
-        );
-        if (index !== -1) {
-          const itemAtualizado = { ...novosDados[p][index] };
-          itemAtualizado.valor += valor;
-          novosDados[p][index] = itemAtualizado;
+        if (idToEdit) {
+          const index = novosDados[p].findIndex((item) => item.id === idToEdit);
+          if (index !== -1) {
+            novosDados[p][index] = {
+              ...novosDados[p][index],
+              label: categoria,
+              valor,
+              emoji,
+            };
+          }
         } else {
-          novosDados[p] = [
-            ...novosDados[p],
-            { label: categoria, valor, emoji, id: novoId },
-          ];
+          const novoId = Date.now();
+          const index = novosDados[p].findIndex(
+            (item) => item.label === categoria,
+          );
+          if (index !== -1) {
+            novosDados[p][index].valor += valor;
+          } else {
+            novosDados[p] = [
+              ...novosDados[p],
+              { label: categoria, valor, emoji, id: novoId },
+            ];
+          }
         }
       });
       return novosDados;
     });
-    setIsModalOpen(false);
+    setIsFormModalOpen(false);
+    setExpenseToEdit(null);
   }, []);
+
+  const handleOpenEditForm = (item) => {
+    setExpenseToEdit(item);
+    setIsFormModalOpen(true);
+    setIsListModalOpen(false);
+  };
+
+  const handleOpenAddForm = () => {
+    setExpenseToEdit(null);
+    setIsFormModalOpen(true);
+    setIsListModalOpen(false);
+  };
 
   return (
     <MainLayout>
@@ -186,6 +215,7 @@ function FinancierScreen() {
                       className="relative w-14 h-full flex flex-col justify-end items-center group"
                       onMouseEnter={() => setHoveredIndex(index)}
                       onMouseLeave={() => setHoveredIndex(null)}
+                      onClick={() => handleOpenEditForm(item)}
                     >
                       <AnimatePresence>
                         {hoveredIndex === index && (
@@ -210,7 +240,10 @@ function FinancierScreen() {
                               {percent}%
                             </p>
                             <button
-                              onClick={() => handleDeleteExpense(item.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteExpense(item.id);
+                              }}
                               className="mt-2 text-[12px] text-red-500 hover:underline font-bold uppercase"
                             >
                               Excluir
@@ -238,20 +271,46 @@ function FinancierScreen() {
               </div>
             </div>
 
-            <DefaultButton
-              text="Incluir"
-              another_size="h-14 w-14"
-              onClick={() => setIsModalOpen(true)}
-            />
+            <div className="flex gap-40">
+              <DefaultButton
+                text="Editar"
+                another_size="h-14 w-30"
+                onClick={() => setIsListModalOpen(true)}
+                theme={false}
+              />
+              <DefaultButton
+                text="Incluir"
+                another_size="h-14 w-30"
+                onClick={handleOpenAddForm}
+              />
+            </div>
           </div>
         </LargeCard>
 
-        {isModalOpen && (
-          <AddExpenses
-            onClose={() => setIsModalOpen(false)}
-            onSave={handleSaveExpense}
-          />
-        )}
+        <AnimatePresence>
+          {isListModalOpen && (
+            <EditExpensesList
+              expenses={gastosAtuais}
+              totalGasto={totalGasto}
+              onClose={() => setIsListModalOpen(false)}
+              onEdit={handleOpenEditForm}
+              onDelete={handleDeleteExpense}
+              onAdd={handleOpenAddForm}
+            />
+          )}
+
+          {isFormModalOpen && (
+            <AddExpenses
+              is_edit_expenses={!!expenseToEdit}
+              initialData={expenseToEdit}
+              onClose={() => {
+                setIsFormModalOpen(false);
+                setExpenseToEdit(null);
+              }}
+              onSave={handleSaveExpense}
+            />
+          )}
+        </AnimatePresence>
       </div>
     </MainLayout>
   );
