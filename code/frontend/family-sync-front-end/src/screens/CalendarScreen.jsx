@@ -7,9 +7,20 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { useEffect, useState } from "react";
 import ShowAlert from "../components/ui/ShowAlert";
+import { eventService } from "../services/eventService";
+import jwtDecode from "jwt-decode";
+import Cookies from "js-cookie";
 
 function CalendarScreen() {
-  const user = JSON.parse(localStorage.getItem("@FamilySync:user"));
+  const user = {};
+
+  const token = Cookies.get("@FamilySync:token");
+
+  if (token) {
+    const decoded = jwtDecode(token);
+    user.nome = decoded.nome;
+    user.id = decoded.id;
+  }
 
   const [dateSelected, setDateSelected] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,6 +48,9 @@ function CalendarScreen() {
 
   useEffect(() => {
     localStorage.setItem(`dateEvents`, JSON.stringify(dateEvent));
+    // const getEvents = eventService.listEventsByFamily(
+    //   localStorage.getItem(`family`).id,
+    // );
   }, [dateEvent]);
 
   const handleDelete = (id) => {
@@ -45,19 +59,20 @@ function CalendarScreen() {
 
   const handleSave = (newData) => {
     if (selectedInfo !== null) {
-      setDateEvent((prev) =>
-        prev.map((item) =>
-          item.id === selectedInfo.id
-            ? {
-                ...item,
-                date: newData.date,
-                hours: newData.hours,
-                title: newData.title,
-                desc: newData.description,
-              }
-            : item,
-        ),
-      );
+      const updateItem = {
+        ...item,
+        title: newData.title,
+        hours: newData.hours,
+        desc: newData.description,
+      };
+
+      const updateEvent = eventService.updateEvent(updateItem);
+
+      if (updateEvent.StatusCode == 200) {
+        setDateEvent((prev) =>
+          prev.map((item) => (item.id === selectedInfo.id ? {} : item)),
+        );
+      }
     } else {
       const newItem = {
         id: Date.now(),
@@ -65,9 +80,16 @@ function CalendarScreen() {
         hours: newData.hours,
         title: newData.title,
         desc: newData.description,
-        creator: user.nome,
+        creator: user.id,
       };
+
+      const createEvent = eventService.createEvent(newItem);
+
+      console.log(createEvent);
+
+      // if (createEvent.statusCode == 201) {
       setDateEvent((prev) => [newItem, ...prev]);
+      // }
     }
     handleCloseModal();
   };
@@ -113,7 +135,7 @@ function CalendarScreen() {
         <div className="w-[50%] h-full flex flex-col p-30 gap-7">
           <h2 className="text-5xl text-white font-bold">Calendário</h2>
           <LargeCard
-            color={"bg-yellow-light border border-terracota"}
+            color={"bg-white border border-terracota"}
             p={"px-20 py-5"}
             size={"h-[90%] w-[95%]"}
           >
@@ -144,7 +166,13 @@ function CalendarScreen() {
         <div className="w-[50%] h-full flex flex-col p-30 gap-10  items-center">
           <h2 className="text-5xl text-white font-bold">Eventos Marcados</h2>
           <div className="flex flex-col items-center gap-5 overflow-y-auto max-h-full w-[85%] px-2 ">
-            <MultEventsField events={dateEvent} onEdit={handleOpenModal} />
+            {dateEvent.length > 0 ? (
+              <MultEventsField events={dateEvent} onEdit={handleOpenModal} />
+            ) : (
+              <div className="text-2xl text-terracota font-semibold px-10 py-4 rounded-2xl bg-white">
+                Sua familia não tem eventos cadastrados!
+              </div>
+            )}
           </div>
         </div>
       </div>
