@@ -437,9 +437,9 @@ function AddFamilyScreen() {
               <div className="flex flex-col gap-3 mt-4">
                 {/* INICIO DO CAMPO DE MEMBROS (TAGS) */}
                 <div className="flex flex-col w-full">
-                  <div className="w-full bg-[#4A2511] p-3 rounded-2xl flex items-center min-h-[4.5rem] gap-3 shadow-sm">
+                  <div className="w-full bg-[#4A2511] p-3 rounded-2xl flex items-center min-h-18 gap-3 shadow-sm">
                     {/* Input com Tags Visuais */}
-                    <div className="flex-1 bg-[#F9873E] rounded-xl flex flex-wrap items-center gap-2 p-2 min-h-[3rem]">
+                    <div className="flex-1 bg-[#F9873E] rounded-xl flex flex-wrap items-center gap-2 p-2 min-h-12">
                       {formData.membros.map((email, index) => (
                         <div
                           key={index}
@@ -503,7 +503,7 @@ function AddFamilyScreen() {
                     <button
                       type="button"
                       onClick={handleAddMember}
-                      className="bg-[#FC6804] text-white text-xl px-6 h-full min-h-[3rem] rounded-xl font-semibold hover:bg-[#d95802] transition-colors"
+                      className="bg-[#FC6804] text-white text-xl px-6 h-full min-h-12 rounded-xl font-semibold hover:bg-[#d95802] transition-colors"
                     >
                       convidar
                     </button>

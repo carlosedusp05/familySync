@@ -5,10 +5,10 @@ function MultEventsField({ events = [], onEdit }) {
     return (
       <ItemEvents
         key={index}
-        title={event.title}
-        hours={event.hours}
-        date={event.date}
-        desc={event.desc}
+        title={event.titulo}
+        hours={event.hora}
+        date={event.data}
+        desc={event.descricao}
         creator={event.creator}
         onEdit={() => onEdit(event, true)}
       />

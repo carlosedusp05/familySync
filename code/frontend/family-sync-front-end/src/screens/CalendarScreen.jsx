@@ -8,8 +8,9 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { useEffect, useState } from "react";
 import ShowAlert from "../components/ui/ShowAlert";
 import { eventService } from "../services/eventService";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
+import { create } from "axios";
 
 function CalendarScreen() {
   const user = {};
@@ -19,7 +20,8 @@ function CalendarScreen() {
   if (token) {
     const decoded = jwtDecode(token);
     user.nome = decoded.nome;
-    user.id = decoded.id;
+    user.id = decoded.id_usuario;
+    user.idFamily = decoded.is_familia;
   }
 
   const [dateSelected, setDateSelected] = useState(null);
@@ -42,53 +44,65 @@ function CalendarScreen() {
   };
 
   useEffect(() => {
-    const saved = localStorage.getItem(`dateEvents`);
-    setDateEvent(saved ? JSON.parse(saved) : []);
-  }, []);
-
-  useEffect(() => {
     localStorage.setItem(`dateEvents`, JSON.stringify(dateEvent));
-    // const getEvents = eventService.listEventsByFamily(
-    //   localStorage.getItem(`family`).id,
-    // );
   }, [dateEvent]);
 
-  const handleDelete = (id) => {
+  useEffect(() => {
+    async function loadEvents() {
+      const response = await eventService.listEventsByFamily(user.idFamily);
+
+      setDateEvent(response);
+    }
+
+    loadEvents();
+  }, []);
+
+  const handleDelete = async (id) => {
     setDateEvent((prev) => prev.filter((item) => item.id !== id));
+    const response = await eventService.deleteEvent(id);
+
+    console.log(response);
   };
 
-  const handleSave = (newData) => {
+  const handleSave = async (newData) => {
     if (selectedInfo !== null) {
       const updateItem = {
-        ...item,
-        title: newData.title,
-        hours: newData.hours,
-        desc: newData.description,
+        ...selectedInfo,
+        titulo: newData.title,
+        hora: newData.hours,
+        descricao: newData.description,
       };
 
-      const updateEvent = eventService.updateEvent(updateItem);
+      const updateEvent = await eventService.updateEvent(updateItem);
 
-      if (updateEvent.StatusCode == 200) {
-        setDateEvent((prev) =>
-          prev.map((item) => (item.id === selectedInfo.id ? {} : item)),
-        );
-      }
+      // if (updateEvent.StatusCode == 200) {
+      setDateEvent((prev) =>
+        prev.map((item) => (item.id === selectedInfo.id ? updateItem : item)),
+      );
+      // }
     } else {
       const newItem = {
-        id: Date.now(),
-        date: newData.date,
-        hours: newData.hours,
-        title: newData.title,
-        desc: newData.description,
-        creator: user.id,
+        titulo: newData.title,
+        descricao: newData.description,
+        data: newData.date,
+        hora: newData.hours,
+        id_familia: user.idFamily,
+        id_usuario: user.id,
       };
 
-      const createEvent = eventService.createEvent(newItem);
+      const createEvent = await eventService.createEvent(newItem);
 
       console.log(createEvent);
 
-      // if (createEvent.statusCode == 201) {
-      setDateEvent((prev) => [newItem, ...prev]);
+      const newItemToState = {
+        ...newItem,
+        creator: user.nome,
+      };
+
+      console.log(newItemToState);
+
+      // if (createEvent.StatusCode == 201) {
+      setDateEvent((prev) => [newItemToState, ...prev]);
       // }
     }
     handleCloseModal();

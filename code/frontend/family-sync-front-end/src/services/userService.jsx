@@ -122,33 +122,6 @@ const addUserFamily = async function (data) {
   }
 };
 
-const getUserInfoById = async function (id) {
-  const url = `/usuario-informacao/${id}`;
-
-  try {
-    const response = await api.get(url);
-
-    const dados = response.data;
-
-    return dados;
-  } catch (error) {
-    throw error.response?.data;
-  }
-};
-
-const AddUserInfo = async function (data) {
-  const url = "/usuario-informacao/";
-
-  try {
-    const response = await api.post(url, data);
-    const dados = response.data;
-
-    return dados;
-  } catch (error) {
-    throw error.response?.data;
-  }
-};
-
 export const userService = {
   getUsers,
   getUserById,
@@ -159,6 +132,4 @@ export const userService = {
   listUsersByFamily,
   createUserFamily,
   addUserFamily,
-  getUserInfoById,
-  AddUserInfo,
 };
