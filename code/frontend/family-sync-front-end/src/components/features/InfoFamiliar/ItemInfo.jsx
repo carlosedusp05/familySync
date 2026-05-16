@@ -1,7 +1,7 @@
 import React from "react";
-import { pencilTerracotaIcon } from "../../assets";
+import { pencilTerracotaIcon } from "../../../assets";
 
-function ItemInfo({ item, title, desc, creator, onEditItem, onEditClick }) {
+function ItemInfo({ item, title, desc, onEditItem, onEditClick }) {
   const handleItemClick = () => {
     if (onEditItem) onEditItem(item);
   };
@@ -15,7 +15,7 @@ function ItemInfo({ item, title, desc, creator, onEditItem, onEditClick }) {
     <div
       onClick={handleItemClick}
       className="w-[98%] flex flex-col gap-2 rounded-2xl bg-white-yellow relative p-8 pt-5 py-2 duration-300 cursor-pointer 
-             hover:scale-[1.01] hover:shadow-xl border border-white/5 will-change-transform"
+           scale-[0.99] hover:scale-100 hover:shadow-xl border border-white/5 transition-all origin-center"
     >
       <div className="px-10 flex absolute top-5 left-0 py-1 rounded-tl-2xl">
         <h3 className="text-orange flex text-3xl font-medium">{title}</h3>
@@ -32,11 +32,9 @@ function ItemInfo({ item, title, desc, creator, onEditItem, onEditClick }) {
         />
       </div>
 
-      <p className="w-[90%] text-terracota font-bold text-[18px] flex-wrap">
+      <p className="w-[90%] text-terracota font-bold px-1 text-[18px] flex-wrap">
         {desc}
       </p>
-
-      <span className="text-red text-[16px] font-bold">{creator}</span>
     </div>
   );
 }

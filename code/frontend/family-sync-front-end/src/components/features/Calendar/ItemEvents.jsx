@@ -1,4 +1,4 @@
-import { pencilTerracotaIcon } from "../../assets";
+import { pencilTerracotaIcon } from "../../../assets";
 
 function ItemEvents(props) {
   return (

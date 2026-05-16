@@ -1,7 +1,10 @@
 import { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import DefaultButton from "./DefaultButton";
-import { formatToBRL, validateExpenseValue } from "../../utils/formatters.js";
+import DefaultButton from "../../ui/DefaultButton.jsx";
+import {
+  formatToBRL,
+  validateExpenseValue,
+} from "../../../utils/formatters.js";
 
 const FINANCE_EMOJIS = [
   { icon: "🛍️", label: "Compras" },
@@ -44,7 +47,6 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
     const isCatValid = validate("categoria", categoria);
 
     if (isValorValid && isCatValid) {
-      // Passamos o ID de volta se estivermos editando
       onSave(categoria, valor, emojiSelecionado, initialData?.id);
     }
   }, [validate, valor, categoria, emojiSelecionado, onSave, initialData]);

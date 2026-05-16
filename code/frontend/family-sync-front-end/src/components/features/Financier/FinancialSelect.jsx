@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { dollarIcon, sortDownIcon } from "../../assets";
+import { dollarIcon, sortDownIcon } from "../../../assets";
 
 const FinancialSelect = ({ value, onChange, options }) => {
   const [isOpen, setIsOpen] = useState(false);

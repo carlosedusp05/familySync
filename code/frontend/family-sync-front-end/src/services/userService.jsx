@@ -109,7 +109,7 @@ const createUserFamily = async function (data) {
   }
 };
 
-const addUserFamily = async function (data) {
+const addUserFamilyByEmail = async function (data) {
   const url = "/usuario-familia/email/";
 
   try {
@@ -131,5 +131,5 @@ export const userService = {
   loginUser,
   listUsersByFamily,
   createUserFamily,
-  addUserFamily,
+  addUserFamilyByEmail,
 };

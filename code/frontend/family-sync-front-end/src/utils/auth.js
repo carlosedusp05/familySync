@@ -13,9 +13,8 @@ export const isTokenExpired = (token) => {
 };
 
 export const getUserFromToken = () => {
-  const token = Cookies.get("@FamilySync:token");
+  const token = Cookies.get("familysync_token");
   if (!token) return null;
-
   try {
     return jwtDecode(token);
   } catch (error) {
@@ -24,6 +23,6 @@ export const getUserFromToken = () => {
 };
 
 export const logout = () => {
-  Cookies.remove("@FamilySync:token");
+  Cookies.remove("familysync_token", { path: "/" });
   window.location.href = "/auth/login";
 };

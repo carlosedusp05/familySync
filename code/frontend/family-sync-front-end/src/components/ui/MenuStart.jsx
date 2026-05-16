@@ -12,6 +12,16 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
+const prefetchRoutes = {
+  list: () => import("../../screens/ListScreen").catch(console.error),
+  calendar: () => import("../../screens/CalendarScreen").catch(console.error),
+  newFamily: () => import("../../screens/AddFamilyScreen").catch(console.error),
+  financier: () => import("../../screens/FinancierScreen").catch(console.error),
+  manageFamily: () => import("../../screens/ManageFamily").catch(console.error),
+  infoFamiliar: () =>
+    import("../../screens/InfoFamiliarScreen").catch(console.error),
+};
+
 function MenuStart(props) {
   const hover = "transition-all duration-400 hover:scale-103 transition-ease";
   const navigate = useNavigate();
@@ -23,42 +33,6 @@ function MenuStart(props) {
       easing: "ease-out-cubic",
     });
   }, []);
-
-  const prefetchList = () => {
-    import("../../screens/ListScreen").catch(() =>
-      console.log("Erro ao pré-carregar"),
-    );
-  };
-
-  const prefetchCalendar = () => {
-    import("../../screens/CalendarScreen").catch(() =>
-      console.log("Erro ao pré-carregar"),
-    );
-  };
-
-  const prefetchNewFamily = () => {
-    import("../../screens/AddFamilyScreen").catch(() =>
-      console.log("Erro ao pré-carregar"),
-    );
-  };
-
-  const prefetchFinancier = () => {
-    import("../../screens/FinancierScreen").catch(() =>
-      console.log("Erro ao pré-carregar"),
-    );
-  };
-
-  const prefetchManageFamily = () => {
-    import("../../screens/ManageFamily").catch(() =>
-      console.log("Erro ao pré-carregar"),
-    );
-  };
-
-  const prefetchInfoFamiliar = () => {
-    import("../../screens/InfoFamiliarScreen").catch(() =>
-      console.log("Erro ao pré-carregar"),
-    );
-  };
 
   return (
     <LargeCard
@@ -109,7 +83,7 @@ function MenuStart(props) {
           >
             <div
               className={`w-full h-full flex items-center justify-center gap-4 bg-orange py-10 rounded-2xl ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
-              onMouseEnter={prefetchList}
+              onMouseEnter={prefetchRoutes.list}
               onClick={() => navigate("/dashboard/lists")}
             >
               <img className="h-27" src={listIcon} alt="Icon List" />
@@ -127,7 +101,7 @@ function MenuStart(props) {
           >
             <div
               className={`w-full h-full flex flex-col rounded-2xl pt-5 px-9 bg-default gap-4 ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
-              onMouseEnter={prefetchCalendar}
+              onMouseEnter={prefetchRoutes.calendar}
               onClick={() => navigate("/dashboard/calendar")}
             >
               <div className="flex w-full rounded-2xl overflow-hidden bg-white">
@@ -160,7 +134,7 @@ function MenuStart(props) {
           >
             <div
               className={`w-full h-full flex items-center justify-center p-12 rounded-2xl bg-orange-dark ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
-              onMouseEnter={prefetchNewFamily}
+              onMouseEnter={prefetchRoutes.newFamily}
               onClick={() => navigate("/dashboard/family/add")}
             >
               <img className="w-[90%] h-[90%]" src={plusIcon} alt="Plus Icon" />
@@ -178,7 +152,7 @@ function MenuStart(props) {
           >
             <div
               className={`w-full h-full flex flex-col gap-5 items-center rounded-2xl bg-terracota p-5 ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
-              onMouseEnter={prefetchFinancier}
+              onMouseEnter={prefetchRoutes.financier}
               onClick={() => navigate("/dashboard/finance")}
             >
               <div className="flex gap-[4.81%] bg-default w-full h-[50%] items-end rounded-2xl">
@@ -208,7 +182,7 @@ function MenuStart(props) {
           >
             <div
               className={`w-full h-full flex bg-yellow-cream rounded-2xl ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
-              onMouseEnter={prefetchManageFamily}
+              onMouseEnter={prefetchRoutes.manageFamily}
               onClick={() => navigate("/dashboard/family")}
             >
               <div className="h-full flex p-5 rounded-l-2xl items-center justify-center bg-orange">
@@ -230,7 +204,7 @@ function MenuStart(props) {
           >
             <div
               className={`w-full h-full flex flex-col items-center justify-center bg-brown-dark rounded-2xl gap-3 ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
-              onMouseEnter={prefetchInfoFamiliar}
+              onMouseEnter={prefetchRoutes.infoFamiliar}
               onClick={() => navigate("/dashboard/family/info")}
             >
               <div className="flex items-center justify-center gap-2">

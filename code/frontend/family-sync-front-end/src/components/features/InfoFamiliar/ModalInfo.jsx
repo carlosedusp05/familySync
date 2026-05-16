@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { pencilTerracotaIcon } from "../../assets";
-import DefaultButton from "./DefaultButton";
+import { pencilTerracotaIcon } from "../../../assets";
+import DefaultButton from "../../ui/DefaultButton";
 
 function ModalInfo({
   isOpen,
@@ -29,14 +29,15 @@ function ModalInfo({
     if (isOpen) {
       setIsConfirmingDelete(false);
       setErrors({ title: false, description: false });
-      setTitle(data?.title || "");
-      setDescription(data?.desc || "");
+      setTitle(data?.titulo || "");
+      setDescription(data?.descricao || "");
       setEditableFields({
         title: !isEdit,
         description: !isEdit,
       });
     }
   }, [isOpen, data, isEdit]);
+
   const toggleEdit = (field, ref) => {
     setEditableFields((prev) => {
       const isNowEditable = !prev[field];
@@ -67,7 +68,7 @@ function ModalInfo({
   return (
     <div>
       {isOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-9999 flex items-center justify-center p-4">
           <div
             transition={{ duration: 0.2, ease: "easeInOut" }}
             className="absolute inset-0 bg-black/60"
@@ -292,7 +293,7 @@ function ModalInfo({
                   />
                   <DefaultButton
                     onClick={() => {
-                      onDelete && onDelete(data.id);
+                      onDelete && onDelete(data.id_info);
                       onClose();
                     }}
                     another_color="bg-red-light"

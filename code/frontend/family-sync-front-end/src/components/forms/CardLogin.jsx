@@ -80,13 +80,17 @@ function CardLogin({
             hasError={!!errosCampos?.email}
             maxLength={100}
           />
-          {errosCampos?.email && (
-            <div className="grid grid-rows-[1fr] opacity-100 transition-all duration-300">
-              <span className="text-red-500 text-sm px-2">
-                {errosCampos.email}
-              </span>
-            </div>
-          )}
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-in-out w-full flex ${
+              errosCampos?.email
+                ? "max-h-5 opacity-100 mt-1"
+                : "max-h-0 opacity-0"
+            }`}
+          >
+            <span className="text-red-500 text-sm px-2 block">
+              {errosCampos?.email}
+            </span>
+          </div>
         </div>
 
         <div className="w-full flex flex-col gap-1">
@@ -109,13 +113,17 @@ function CardLogin({
             maxLength={100}
             onClickIcon={togglePasswordVisibility}
           />
-          {errosCampos?.senha && (
-            <div className="grid grid-rows-[1fr] opacity-100 transition-all duration-300">
-              <span className="text-red-500 text-sm px-2">
-                {errosCampos.senha}
-              </span>
-            </div>
-          )}
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-in-out w-full flex ${
+              errosCampos?.senha
+                ? "max-h-5 opacity-100 mt-1"
+                : "max-h-0 opacity-0"
+            }`}
+          >
+            <span className="text-red-500 text-sm px-2 block">
+              {errosCampos?.senha}
+            </span>
+          </div>
         </div>
       </div>
 

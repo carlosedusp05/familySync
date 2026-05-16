@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { chevronDownBrownIcon } from "../../assets";
+import { chevronDownBrownIcon } from "../../../assets";
 
 const estadosBrasil = [
   { sigla: "AC", nome: "Acre" },

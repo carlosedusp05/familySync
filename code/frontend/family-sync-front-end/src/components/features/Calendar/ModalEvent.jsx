@@ -1,7 +1,7 @@
-import LargeCard from "./LargeCard";
-import { pencilTerracotaIcon } from "../../assets";
+import LargeCard from "../../ui/LargeCard";
+import { pencilTerracotaIcon } from "../../../assets";
 import { useEffect, useRef, useState } from "react";
-import DefaultButton from "./DefaultButton";
+import DefaultButton from "../../ui/DefaultButton";
 import { motion, AnimatePresence } from "framer-motion";
 import { div } from "framer-motion/client";
 

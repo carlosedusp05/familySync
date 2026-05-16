@@ -3,11 +3,12 @@ import { isTokenExpired } from "../../utils/auth";
 import Cookies from "js-cookie";
 
 function ProtectedRoute() {
-  const token = Cookies.get("@FamilySync:token");
+  const token = Cookies.get("familysync_token");
 
   if (!token || isTokenExpired(token)) {
-    Cookies.remove("@FamilySync:token");
-    return <Navigate to="/auth/login" replace />;
+    Cookies.remove("familysync_token", { path: "/" });
+    localStorage.clear();
+    return <Navigate to="/auth/start" replace />;
   }
 
   return <Outlet />;

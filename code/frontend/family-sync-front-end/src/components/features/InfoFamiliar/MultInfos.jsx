@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import ItemInfo from "./ItemInfo";
+
 const truncate = (text, limit) => {
   if (!text) return "";
   return text.length > limit ? text.substring(0, limit) + "..." : text;
@@ -9,10 +10,10 @@ function MultInfos({ infos = [], onEditItem, onEditClick }) {
   const renderedList = useMemo(() => {
     return infos.map((info) => (
       <ItemInfo
-        key={info.id}
+        key={info.id_info}
         item={info}
-        title={truncate(info.title, 60)}
-        desc={truncate(info.desc, 80)}
+        title={truncate(info.titulo, 60)}
+        desc={truncate(info.descricao, 80)}
         onEditItem={onEditItem}
         onEditClick={onEditClick}
       />

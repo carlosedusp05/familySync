@@ -1,6 +1,6 @@
 import { memo, useCallback } from "react";
 import { motion } from "framer-motion";
-import DefaultButton from "./DefaultButton";
+import DefaultButton from "../../ui/DefaultButton";
 
 const ExpenseItem = memo(({ item, totalGasto, onEdit, onDelete }) => {
   const percent =
