@@ -3,6 +3,7 @@ import BackgroundImage from "../components/ui/BackgroundImage";
 import DefaultHeader from "../components/layout/DefaultHeader";
 import { useNavigate } from "react-router-dom";
 import { imageBackground2 } from "../assets";
+import Cookies from "js-cookie";
 
 function InicioScreen() {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ function InicioScreen() {
       console.log("Erro ao pré-carregar a tela");
     });
   };
+  const token = Cookies.get("familysync_token");
 
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden">
@@ -37,7 +39,9 @@ function InicioScreen() {
           <DefaultButton
             text="USAR WEBSITE"
             onMouseEnter={prefetchLogin}
-            onClick={() => navigate("/auth/login")}
+            onClick={() =>
+              token ? navigate("/dashboard") : navigate("/auth/login")
+            }
           />
         </div>
       </main>

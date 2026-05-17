@@ -1,11 +1,8 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
-// Layouts
 import App from "./App";
 import RootLayout from "./components/ui/RootLayout";
 import ProtectedRoute from "./components/ui/ProtectedRoute";
-
-// Telas normais (não lazy)
 import InicioScreen from "./screens/InicioScreen";
 import StartScreen from "./screens/StartScreen";
 
