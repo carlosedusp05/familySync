@@ -43,6 +43,8 @@ export function usePerfil() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const hoje = new Date().toISOString().split("T")[0];
+  const token = Cookies.get("familysync_token");
+  const decoded = jwtDecode(token);
 
   useEffect(() => {
     const loadData = async () => {
@@ -194,13 +196,15 @@ export function usePerfil() {
   const handleDeleteAccount = async () => {
     setIsLoading(true);
     try {
-      const storedUser = JSON.parse(localStorage.getItem("@FamilySync:user"));
-      const id_usuario = parseInt(storedUser.id_usuario);
+      const id_usuario = parseInt(decoded.id_usuario);
 
-      await userService.deleteUser(id_usuario);
+      const deleteUser = await userService.deleteUser(id_usuario);
 
-      localStorage.clear();
-      navigate("/");
+      if (deleteUser.StatusCode == 200) {
+        Cookies.remove("familysync_token", { path: "/" });
+        localStorage.clear();
+        navigate("/");
+      }
     } catch (error) {
       console.error("Erro ao excluir conta:", error);
     } finally {

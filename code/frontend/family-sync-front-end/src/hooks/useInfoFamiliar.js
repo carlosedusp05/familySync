@@ -9,33 +9,7 @@ const MOCK_MEMBERS = [
   { id: "3", name: "Bruno Oliveira", role: "FAMILY" },
 ];
 
-const INITIAL_MOCK_INFOS = {
-  me: [
-    {
-      id_info: 101,
-      titulo: "Alergia a Amendoim",
-      descricao: "Reação alérgica severa, manter epinefrina por perto.",
-      creator: "Adicionado por: Você",
-    },
-  ],
-  1: [
-    {
-      id_info: 102,
-      titulo: "Tipo Sanguíneo",
-      descricao: "A Positivo",
-      creator: "Adicionado por: Você",
-    },
-  ],
-  2: [
-    {
-      id_info: 103, // Baseado no print 4 da sua API
-      titulo: "Divisão de tarefas domésticas",
-      descricao: "Asma: Usa bombinha em caso de crise (Salbutamol).",
-      creator: "Adicionado por: Você",
-    },
-  ],
-  3: [],
-};
+const INITIAL_MOCK_INFOS = {};
 
 const STORAGE_KEY = "@FamilySync:infos";
 

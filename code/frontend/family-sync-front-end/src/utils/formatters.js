@@ -70,3 +70,26 @@ export const validateExpenseValue = (value) => {
   const num = Number(value);
   return !isNaN(num) && num > 0;
 };
+
+export const formatMoneyMask = (value) => {
+  const cleanValue = value.replace(/\D/g, "");
+
+  if (!cleanValue) return "";
+
+  const options = { minimumFractionDigits: 2, maximumFractionDigits: 2 };
+  const result = (Number(cleanValue) / 100).toLocaleString("pt-BR", options);
+
+  return `R$ ${result}`;
+};
+
+export const parseMoneyToFloat = (formattedValue) => {
+  if (!formattedValue) return 0;
+
+  const clean = formattedValue
+    .replace("R$", "")
+    .replace(/\./g, "")
+    .replace(",", ".")
+    .trim();
+
+  return parseFloat(clean) || 0;
+};
