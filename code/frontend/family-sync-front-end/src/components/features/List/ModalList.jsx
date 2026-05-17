@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import DefaultButton from "../../ui/DefaultButton";
+import { formatMoneyMask, parseMoneyToFloat } from "../../../utils/formatters";
 
 function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
   const [listName, setListName] = useState("");
@@ -28,8 +29,7 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
   const handleAddLocalItem = () => {
     if (!newItemName.trim()) return;
 
-    const priceParsed =
-      parseFloat(newItemPrice.toString().replace(",", ".")) || 0;
+    const priceParsed = parseMoneyToFloat(newItemPrice);
     const unitsParsed = parseInt(newItemUnits, 10) || 1;
 
     const newItem = {
@@ -68,6 +68,13 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
     });
   };
 
+  const handlePriceChange = (e) => {
+    const rawValue = e.target.value;
+    console.log("Valor digitado:", rawValue);
+    console.log("Valor retornado pela máscara:", formatMoneyMask(rawValue));
+    setNewItemPrice(formatMoneyMask(rawValue));
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all p-4">
       <div className="bg-[#FDF6E3] max-w-4xl w-full rounded-2xl p-6 md:p-8 shadow-2xl flex flex-col gap-6 border border-white/40 max-h-[90vh] overflow-y-auto">
@@ -93,6 +100,7 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
               value={listName}
               onChange={(e) => setListName(e.target.value)}
               placeholder="Ex: Compras do Mês, Feira, Viagem..."
+              maxLength={50}
               className="w-full bg-white rounded-2xl h-14 px-4 text-xl indent-2 text-[#5C2B10] placeholder:text-gray-400 font-medium outline-none border border-[#FDBA74] focus:border-[#E65C00] focus:ring-2 focus:ring-[#E65C00]/20 transition-all shadow-sm"
               autoFocus
             />
@@ -110,6 +118,7 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
                 onChange={(e) => setNewItemName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleAddLocalItem()}
                 placeholder="Nome do item..."
+                maxLength={100}
                 className="flex-1 bg-white rounded-2xl h-14 px-4 text-xl indent-2 text-[#5C2B10] placeholder:text-gray-400 font-medium outline-none border border-[#FDBA74] focus:border-[#E65C00] focus:ring-2 focus:ring-[#E65C00]/20 transition-all shadow-sm"
               />
 
@@ -125,14 +134,13 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
                 </div>
 
                 <div className="flex items-center bg-white rounded-lg px-2 h-8 w-50 shadow-inner">
-                  <span className="text-xl text-[#E65C00]/70 font-bold mr-1">
-                    R$
-                  </span>
                   <input
                     type="text"
+                    inputMode="numeric"
                     value={newItemPrice}
-                    onChange={(e) => setNewItemPrice(e.target.value)}
-                    placeholder="0,00"
+                    onChange={handlePriceChange}
+                    maxLength={16}
+                    placeholder="R$0,00"
                     disabled={!isPurchaseList}
                     className="w-full bg-transparent text-center text-xl text-[#E65C00]  px-2  font-bold outline-none disabled:opacity-40"
                   />
@@ -141,11 +149,17 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
                 <input
                   type="number"
                   value={newItemUnits}
-                  onChange={(e) => setNewItemUnits(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value.length <= 3) {
+                      setNewItemUnits(value);
+                    }
+                  }}
                   placeholder="1"
                   min="1"
+                  max="999"
                   disabled={!isPurchaseList}
-                  className="w-12 h-8 bg-white rounded-lg text-center text-xl text-[#E65C00] font-bold outline-none shadow-inner disabled:opacity-40"
+                  className="w-20 h-8 bg-white rounded-lg text-center text-xl text-[#E65C00] font-bold outline-none shadow-inner disabled:opacity-40"
                 />
               </div>
               <DefaultButton
@@ -169,7 +183,7 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
                 {items.map((item) => (
                   <div
                     key={item.id}
-                    className="bg-[#FF8B40] text-white rounded-xl flex items-center justify-between px-8 py-2.5 shadow-sm transition-all hover:translate-y-[-1px]"
+                    className="bg-[#FF8B40] text-white rounded-xl flex items-center justify-between px-8 py-2.5 shadow-sm transition-all hover:-translate-y-px"
                   >
                     <span className="flex-1 font-semibold truncate pr-3 text-xl">
                       {item.name}
@@ -178,7 +192,7 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
                       <span className="text-white/80 font-medium text-xl">
                         R$ {formatCurrency(item.price)} × {item.units}
                       </span>
-                      <div className="bg-white text-[#E65C00] font-bold px-2.5 py-1 rounded-lg text-xl shadow-inner min-w-[80px] text-right">
+                      <div className="bg-white text-[#E65C00] font-bold px-2.5 py-1 rounded-lg text-xl shadow-inner min-w-20 text-right">
                         R$ {formatCurrency(item.price * item.units)}
                       </div>
                       <button

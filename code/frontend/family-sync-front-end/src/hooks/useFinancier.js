@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 
 const PERIODOS = ["Dia", "Semana", "Mês", "Ano"];
 const OPCOES_VISUALIZACAO = ["total", "dia", "semana", "mês", "ano"];
+const STORAGE_KEY = "@FamilySync:gastos";
 
 export function useFinancier() {
   const [periodo, setPeriodo] = useState("Mês");
@@ -15,7 +16,7 @@ export function useFinancier() {
   const [expenseToEdit, setExpenseToEdit] = useState(null);
 
   const [dadosPorPeriodo, setDadosPorPeriodo] = useState(() => {
-    const saved = localStorage.getItem("@FamilySync:gastos");
+    const saved = localStorage.getItem(STORAGE_KEY);
     return saved
       ? JSON.parse(saved)
       : { Dia: [], Semana: [], Mês: [], Ano: [] };
@@ -34,7 +35,7 @@ export function useFinancier() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("@FamilySync:gastos", JSON.stringify(dadosPorPeriodo));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dadosPorPeriodo));
   }, [dadosPorPeriodo]);
 
   const gastosAtuais = dadosPorPeriodo[periodo] || [];

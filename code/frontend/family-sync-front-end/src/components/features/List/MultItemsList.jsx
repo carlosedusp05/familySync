@@ -31,7 +31,7 @@ function MultItemsList({
   };
 
   return (
-    <div className="flex flex-col gap-2 h-full overflow-y-auto px-2 [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#282828] [&::-webkit-scrollbar-thumb]:rounded-md">
+    <div className="flex flex-col gap-2 h-[85%] overflow-y-auto px-2 [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#282828] [&::-webkit-scrollbar-thumb]:rounded-md">
       {items_list.map((item) => (
         <ItemList
           key={item.id}

@@ -9,54 +9,75 @@ function ItemList({
   onToggle,
   onDelete,
 }) {
+  const hasPrice = price > 0;
   const formattedPrice = formatToBRL(price);
   const formattedResult = formatToBRL(units * price);
 
+  const nameSizeClass = name.length > 20 ? "text-xl" : "text-3xl";
+
   return (
-    <div className="relative w-full bg-[#FFF8E7] flex flex-col px-6 py-4 rounded-[25px] shadow-sm min-h-25 scale-95 hover:scale-98 active:scale-95 transition-all duration-500 ease-out hover:brightness-95 group">
+    <div className="relative w-full bg-[#FFF8E7] flex items-center justify-between px-6 py-5 rounded-[25px] shadow-sm min-h-35 scale-95 hover:scale-98 active:scale-95 transition-all duration-300 ease-out hover:brightness-95 group">
       <button
         type="button"
         onClick={(e) => {
           e.stopPropagation();
           onDelete();
         }}
-        className="absolute top-3 right-6 text-brown-dark/40 hover:text-red-light font-bold text-xl  px-2 rounded-full transition-colors cursor-pointer hidden group-hover:block hover:bg-black/20"
+        className="absolute top-3 right-6 text-brown-dark/40 hover:text-red-light font-bold text-xl px-2 rounded-full transition-colors cursor-pointer hidden group-hover:block hover:bg-black/10 z-10"
         title="Excluir item"
       >
         ✕
       </button>
 
-      {/* Título do Item */}
-      <p className="text-brown-dark text-[22px] font-semibold text-center w-full leading-tight truncate mb-3 pr-4">
-        {name}
-      </p>
+      <div className="flex-1 min-w-0 flex flex-col justify-center pr-4">
+        {hasPrice ? (
+          <div className="flex flex-col gap-3">
+            <p
+              className={`text-brown-dark ${nameSizeClass} font-semibold leading-tight truncate`}
+              title={name}
+            >
+              {name}
+            </p>
 
-      {/* Grid de Informações e Ações */}
-      <div className="grid grid-cols-[1fr_100px_24px] gap-4 items-center w-full px-2">
-        <div className="flex justify-start">
-          <div className="bg-orange-dark px-3 py-1 rounded-full font-black text-white text-[18px] flex items-center whitespace-nowrap">
-            {units} x {formattedPrice}
+            <div className="flex flex-col gap-1.5 items-start">
+              <div
+                className="bg-orange-dark/15 text-orange-dark px-3 py-0.5 rounded-full font-bold text-[14px] max-w-full truncate"
+                title={`${units} x ${formattedPrice}`}
+              >
+                {units} x {formattedPrice}
+              </div>
+
+              <span
+                className="font-black text-[20px] text-orange-dark max-w-full truncate pl-1"
+                title={formattedResult}
+              >
+                {formattedResult}
+              </span>
+            </div>
           </div>
-        </div>
+        ) : (
+          <p
+            className={`text-brown-dark ${nameSizeClass} font-semibold leading-tight truncate`}
+            title={name}
+          >
+            {name}
+          </p>
+        )}
+      </div>
 
-        <div className="text-right">
-          <span className="font-bold text-[18px] text-orange-dark whitespace-nowrap">
-            {formattedResult}
-          </span>
-        </div>
-
-        {/* Checkbox customizado */}
-        <div
-          onClick={onToggle}
-          className={`
-            h-7 w-7 rounded-[10px] cursor-pointer transition-colors duration-200 flex items-center justify-center
-            ${isSelected ? "bg-orange-dark" : "bg-amber-900"}
-          `}
-        >
-          {isSelected && (
-            <img src={checkIcon} alt="Checked Icon" className="h-5 w-5" />
-          )}
-        </div>
+      {/* Lado Direito Estático: Checkbox Customizado (Sempre no mesmo lugar!) */}
+      <div
+        onClick={onToggle}
+        className={`h-8 w-8 rounded-[11px] cursor-pointer transition-all duration-200 flex items-center justify-center shrink-0 shadow-sm hover:scale-105 active:scale-95
+          ${isSelected ? "bg-orange-dark" : "bg-amber-950"}`}
+      >
+        {isSelected && (
+          <img
+            src={checkIcon}
+            alt="Checked Icon"
+            className="h-5 w-5 animate-scaleIn"
+          />
+        )}
       </div>
     </div>
   );
