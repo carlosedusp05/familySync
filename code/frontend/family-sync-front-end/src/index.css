@@ -42,58 +42,10 @@
   }
 }
 
-/* Calendário Estilização */
-
-.fc {
-  background: transparent !important;
-  border: none !important;
-}
-
-/* dias */
-.fc-daygrid-day {
-  background: transparent !important;
-  border: 1px solid var(--color-terracota) !important;
-  cursor: pointer;
-
-  transition: all 0.2s ease !important;
-}
-
-.fc-daygrid-day:hover {
-  transform: scale(1.05) !important;
-  background-color: #fed7aa !important;
-  border: 1px solid black;
-}
-
-.fc-toolbar-title {
-  color: var(--color-terracota) !important;
-  font-weight: bold !important;
-}
-
-.fc-button {
-  background-color: #f97316 !important;
-  border: none !important;
-  transition: all 0.2s ease;
-}
-
-.fc-button:hover {
-  transform: scale(1.1) !important;
-}
-
-.fc-day-today {
-  background-color: #ff813320 !important;
-}
-
-.fc-col-header-cell {
-  color: var(--color-terracota);
-  font-weight: bold;
-}
-
-.fc-theme-standard th {
-  border: 1px solid var(--color-terracota);
-  border-right: none;
-}
-.fc-theme-standard .fc-scrollgrid {
-  border: 1px solid var(--color-terracota);
+.ajuste-desfoque {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
@@ -102,10 +54,4 @@ body {
 
 body {
   -moz-osx-font-smoothing: grayscale;
-}
-
-.ajuste-desfoque {
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-  -webkit-font-smoothing: antialiased;
 }

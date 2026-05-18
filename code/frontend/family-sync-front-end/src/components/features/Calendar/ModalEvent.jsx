@@ -15,6 +15,8 @@ function ModalEvents({
   isInitialEdit,
 }) {
   const isEdit = Boolean(data);
+
+  const [date, setDate] = useState("");
   const [hours, setHours] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -38,9 +40,9 @@ function ModalEvents({
     if (isOpen) {
       setIsConfirmingDelete(false);
       setErrors({ hours: false, title: false, description: false });
-      setHours(data?.hours || "");
-      setTitle(data?.title || "");
-      setDescription(data?.desc || "");
+      setHours(data?.hora || "");
+      setTitle(data?.titulo || "");
+      setDescription(data?.descricao || "");
 
       setEditableFields({
         hours: !isEdit,
@@ -72,8 +74,6 @@ function ModalEvents({
     const descError = !currentDesc.trim();
 
     setErrors({ hours: hoursError, title: titleError, description: descError });
-
-    console.log(currentHours, currentTitle);
 
     if (!hoursError && !titleError && !descError) {
       onSave({
@@ -366,6 +366,7 @@ function ModalEvents({
                   />
                   <DefaultButton
                     onClick={() => {
+                      console.log(data);
                       onDelete && onDelete(data.id);
                       onClose();
                     }}

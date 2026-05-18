@@ -1,0 +1,103 @@
+/* Calendário Estilização */
+
+.fc {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* quadrado do dia */
+.fc-daygrid-day-frame {
+  min-height: 120px;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 4px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.fc-daygrid-day-frame:hover {
+  background: #ffe2ba98;
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+/* container do número */
+.fc-daygrid-day-top {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+/* número */
+.fc-daygrid-day-number {
+  padding: 0 !important;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* área dos eventos */
+.fc-daygrid-day-events {
+  width: 100%;
+  margin-top: auto; /* empurra eventos pra baixo */
+  padding: 0 3px;
+}
+
+/* evento */
+.fc-event {
+  background: var(--color-orange) !important;
+  border: none !important;
+  border-radius: 8px !important;
+
+  width: 100% !important;
+  max-width: 110px;
+
+  font-size: 0.72rem;
+  text-align: center;
+
+  padding: 4px 6px !important;
+  margin: 3px auto !important;
+
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.fc-daygrid-day-top {
+  width: 100%;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.fc-daygrid-day-number {
+  position: static !important;
+  padding: 0 !important;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.fc-toolbar-title {
+  color: var(--color-terracota) !important;
+  font-weight: bold !important;
+}
+
+.fc-button {
+  background-color: #f97316 !important;
+  border: none !important;
+  transition: all 0.2s ease;
+}
+
+.fc-button:hover {
+  transform: scale(1.1) !important;
+}
+
+.fc-day-today {
+  background-color: var(--color-yellow-light) !important;
+}
+
+.fc-col-header-cell {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--color-terracota);
+}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import MainLayout from "../../../layouts/MainLayout.jsx";
 import LargeCard from "../../ui/LargeCard.jsx";
 import MultEventsField from "./MultEventsFIeld.jsx";
@@ -21,6 +21,7 @@ function CalendarView({
   handleSave,
   handleDelete,
   handleOpenModal,
+  eventCount,
 }) {
   return (
     <MainLayout>
@@ -28,8 +29,8 @@ function CalendarView({
         <div className="w-[50%] h-full flex flex-col p-30 gap-7">
           <h2 className="text-5xl text-white font-bold">Calendário</h2>
           <LargeCard
-            color={"bg-white border border-terracota"}
-            p={"px-20 py-5"}
+            color={"bg-white "}
+            p={"px-[80.3px] py-5"}
             size={"h-[90%] w-[95%]"}
           >
             <div className="w-full h-full p-6">
@@ -38,6 +39,7 @@ function CalendarView({
                 initialView="dayGridMonth"
                 height="100%"
                 dateClick={handleDateClick}
+                events={eventCount}
               />
 
               <ShowAlert warning={warning} showWarning={showWarning} />
