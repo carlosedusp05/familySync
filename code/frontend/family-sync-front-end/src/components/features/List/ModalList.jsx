@@ -9,6 +9,11 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
   const [newItemPrice, setNewItemPrice] = useState("");
   const [newItemUnits, setNewItemUnits] = useState(1);
   const [isPurchaseList, setIsPurchaseList] = useState(true);
+  const [errors, setErrors] = useState({
+    tema_nome: false,
+    item_nome: false,
+    valor: false,
+  });
 
   useEffect(() => {
     if (data && isEdit) {
@@ -22,15 +27,26 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
     setNewItemPrice("");
     setNewItemUnits(1);
     setIsPurchaseList(true);
+    setErrors({ tema_nome: false, item_nome: false, valor: false });
   }, [data, isEdit, isOpen]);
 
   if (!isOpen) return null;
 
   const handleAddLocalItem = () => {
-    if (!newItemName.trim()) return;
-
     const priceParsed = parseMoneyToFloat(newItemPrice);
     const unitsParsed = parseInt(newItemUnits, 10) || 1;
+
+    const temErroNome = !newItemName.trim();
+    const temErroPreco = isPurchaseList && priceParsed <= 0;
+
+    if (temErroNome || temErroPreco) {
+      setErrors((prev) => ({
+        ...prev,
+        item_nome: temErroNome,
+        valor: temErroPreco,
+      }));
+      return;
+    }
 
     const newItem = {
       id: Date.now(),
@@ -45,6 +61,7 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
     setNewItemName("");
     setNewItemPrice("");
     setNewItemUnits(1);
+    setErrors((prev) => ({ ...prev, item_nome: false, valor: false }));
   };
 
   const handleRemoveLocalItem = (itemId) => {
@@ -52,7 +69,11 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
   };
 
   const handleSave = () => {
-    if (!listName.trim()) return;
+    if (!listName.trim()) {
+      setErrors((prev) => ({ ...prev, tema_nome: true }));
+      return;
+    }
+
     onSave({ name: listName, items: items });
   };
 
@@ -70,9 +91,11 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
 
   const handlePriceChange = (e) => {
     const rawValue = e.target.value;
-    console.log("Valor digitado:", rawValue);
-    console.log("Valor retornado pela máscara:", formatMoneyMask(rawValue));
     setNewItemPrice(formatMoneyMask(rawValue));
+
+    if (errors.valor) {
+      setErrors((prev) => ({ ...prev, valor: false }));
+    }
   };
 
   return (
@@ -98,80 +121,136 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
             <input
               type="text"
               value={listName}
-              onChange={(e) => setListName(e.target.value)}
+              onChange={(e) => {
+                setListName(e.target.value);
+                if (errors.tema_nome)
+                  setErrors((prev) => ({ ...prev, tema_nome: false }));
+              }}
               placeholder="Ex: Compras do Mês, Feira, Viagem..."
               maxLength={50}
-              className="w-full bg-white rounded-2xl h-14 px-4 text-xl indent-2 text-[#5C2B10] placeholder:text-gray-400 font-medium outline-none border border-[#FDBA74] focus:border-[#E65C00] focus:ring-2 focus:ring-[#E65C00]/20 transition-all shadow-sm"
+              className={`w-full bg-white rounded-2xl h-14 px-4 text-xl indent-2 text-[#5C2B10] placeholder:text-gray-400 font-medium outline-none border transition-all shadow-sm focus:ring-2 ${
+                errors.tema_nome
+                  ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                  : "border-[#FDBA74] focus:border-[#E65C00] focus:ring-[#E65C00]/20"
+              }`}
               autoFocus
             />
+            <div
+              className={`overflow-hidden transition-all duration-300 ease-in-out w-full flex ${
+                errors.tema_nome
+                  ? "max-h-12 opacity-100 mt-1"
+                  : "max-h-0 opacity-0"
+              }`}
+            >
+              <span className="text-red-500 text-sm px-2 block font-medium">
+                Qual é o tema da lista? Escreva aqui em cima.
+              </span>
+            </div>
           </div>
 
           <div className="flex flex-col gap-1.5">
             <label className="text-[#E65C00] font-bold text-xl tracking-wider px-1">
               Adicionar itens à lista
             </label>
-
-            <div className="flex flex-col lg:flex-row gap-3 items-stretch">
-              <input
-                type="text"
-                value={newItemName}
-                onChange={(e) => setNewItemName(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleAddLocalItem()}
-                placeholder="Nome do item..."
-                maxLength={100}
-                className="flex-1 bg-white rounded-2xl h-14 px-4 text-xl indent-2 text-[#5C2B10] placeholder:text-gray-400 font-medium outline-none border border-[#FDBA74] focus:border-[#E65C00] focus:ring-2 focus:ring-[#E65C00]/20 transition-all shadow-sm"
-              />
-
-              <div className="flex items-center gap-2  rounded-xl h-12 px-3 shadow-md">
+            <div className="flex flex-col lg:flex-row gap-3 items-start w-full">
+              <div className="flex-1 w-full flex flex-col">
+                <input
+                  type="text"
+                  value={newItemName}
+                  onChange={(e) => {
+                    setNewItemName(e.target.value);
+                    if (errors.item_nome)
+                      setErrors((prev) => ({ ...prev, item_nome: false }));
+                  }}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddLocalItem()}
+                  placeholder="Nome do item..."
+                  maxLength={100}
+                  className={`w-full bg-white rounded-2xl h-14 px-4 text-xl indent-2 text-[#5C2B10] placeholder:text-gray-400 font-medium outline-none border transition-all shadow-sm focus:ring-2 ${
+                    errors.item_nome
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                      : "border-[#FDBA74] focus:border-[#E65C00] focus:ring-[#E65C00]/20"
+                  }`}
+                />
                 <div
-                  onClick={() => setIsPurchaseList(!isPurchaseList)}
-                  title="Ativar/Desativar modo de compras"
-                  className="w-8 h-8 rounded-full border-2 border-orange flex items-center justify-center cursor-pointer transition-transform active:scale-95 shrink-0"
+                  className={`overflow-hidden transition-all duration-300 ease-in-out w-full flex ${
+                    errors.item_nome
+                      ? "max-h-12 opacity-100 mt-1"
+                      : "max-h-0 opacity-0"
+                  }`}
                 >
-                  {isPurchaseList && (
-                    <div className="w-4 h-4 bg-orange rounded-full animate-fade-in" />
-                  )}
+                  <span className="text-red-500 text-sm px-2 block font-medium">
+                    Qual é o nome do item? Escreva aqui em cima.
+                  </span>
                 </div>
+              </div>
+              <div className="flex flex-col w-full lg:w-auto">
+                <div className="flex items-center gap-2 rounded-xl h-14 px-3 shadow-md bg-white/50">
+                  <div
+                    onClick={() => setIsPurchaseList(!isPurchaseList)}
+                    title="Ativar/Desativar modo de compras"
+                    className="w-8 h-8 rounded-full border-2 border-orange flex items-center justify-center cursor-pointer transition-transform active:scale-95 shrink-0"
+                  >
+                    {isPurchaseList && (
+                      <div className="w-4 h-4 bg-orange rounded-full animate-fade-in" />
+                    )}
+                  </div>
 
-                <div className="flex items-center bg-white rounded-lg px-2 h-8 w-50 shadow-inner">
+                  <div
+                    className={`flex items-center bg-white rounded-lg px-2 h-8 w-50 shadow-inner border ${
+                      errors.valor ? "border-red-500" : "border-transparent"
+                    }`}
+                  >
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={newItemPrice}
+                      onChange={handlePriceChange}
+                      maxLength={16}
+                      placeholder="R$0,00"
+                      disabled={!isPurchaseList}
+                      className="w-full bg-transparent text-center text-xl text-[#E65C00] px-2 font-bold outline-none disabled:opacity-40"
+                    />
+                  </div>
+
                   <input
-                    type="text"
-                    inputMode="numeric"
-                    value={newItemPrice}
-                    onChange={handlePriceChange}
-                    maxLength={16}
-                    placeholder="R$0,00"
+                    type="number"
+                    value={newItemUnits}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.length <= 3) {
+                        setNewItemUnits(value);
+                      }
+                    }}
+                    placeholder="1"
+                    min="1"
+                    max="999"
                     disabled={!isPurchaseList}
-                    className="w-full bg-transparent text-center text-xl text-[#E65C00]  px-2  font-bold outline-none disabled:opacity-40"
+                    className="w-20 h-8 bg-white rounded-lg text-center text-xl text-[#E65C00] font-bold outline-none shadow-inner disabled:opacity-40"
                   />
                 </div>
-
-                <input
-                  type="number"
-                  value={newItemUnits}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value.length <= 3) {
-                      setNewItemUnits(value);
-                    }
-                  }}
-                  placeholder="1"
-                  min="1"
-                  max="999"
-                  disabled={!isPurchaseList}
-                  className="w-20 h-8 bg-white rounded-lg text-center text-xl text-[#E65C00] font-bold outline-none shadow-inner disabled:opacity-40"
+                <div
+                  className={`overflow-hidden transition-all duration-300 ease-in-out w-full flex ${
+                    errors.valor
+                      ? "max-h-12 opacity-100 mt-1"
+                      : "max-h-0 opacity-0"
+                  }`}
+                >
+                  <span className="text-red-500 text-sm px-2 block font-medium">
+                    Você esqueceu de informar o preço deste item.
+                  </span>
+                </div>
+              </div>
+              <div className="h-14 flex items-center justify-center self-start lg:self-auto">
+                <DefaultButton
+                  onClick={handleAddLocalItem}
+                  text="+"
+                  another_size={"h-12 w-12"}
+                  another_text_size={"text-3xl"}
+                  another_color={"bg-brown-dark"}
                 />
               </div>
-              <DefaultButton
-                onClick={handleAddLocalItem}
-                text="+"
-                another_size={"h-12 w-12"}
-                another_text_size={"text-3xl"}
-                another_color={"bg-brown-dark"}
-              />
             </div>
           </div>
-
           <div className="border border-orange/70 rounded-xl p-3 h-70 overflow-y-auto bg-white/40 shadow-inner [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#282828] [&::-webkit-scrollbar-thumb]:rounded-md">
             {items.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-orange-dark/70 font-medium gap-1 text-center p-4 ">
@@ -207,12 +286,11 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
               </div>
             )}
           </div>
-
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2 border-t border-[#E65C00]/10">
             <div>
               {isPurchaseList && (
                 <h3 className="text-[#E65C00] font-extrabold text-xl flex items-center">
-                  Total da compra:{" "}
+                  Total da compra:
                   <span className="text-[#5C2B10] bg-white text-xl px-3 py-1 rounded-lg border border-[#FDBA74] ml-1 shadow-sm ">
                     R$ {formatCurrency(totalPurchase)}
                   </span>

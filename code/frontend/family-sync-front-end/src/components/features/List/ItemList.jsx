@@ -64,8 +64,6 @@ function ItemList({
           </p>
         )}
       </div>
-
-      {/* Lado Direito Estático: Checkbox Customizado (Sempre no mesmo lugar!) */}
       <div
         onClick={onToggle}
         className={`h-8 w-8 rounded-[11px] cursor-pointer transition-all duration-200 flex items-center justify-center shrink-0 shadow-sm hover:scale-105 active:scale-95
