@@ -18,6 +18,7 @@ import {
   formatUserName,
   formatDateForInput,
 } from "../utils/formatters";
+import { familyService } from "../services/familyService";
 
 export function usePerfil() {
   const navigate = useNavigate();
@@ -68,14 +69,19 @@ export function usePerfil() {
 
         const [response, familias] = await Promise.all([
           userService.getUserById(id_usuario),
-          Promise.resolve([
-            { id: 1, nome: "Família Silva" },
-            { id: 2, nome: "Família Oliveira" },
-            { id: 3, nome: "Família Souza" },
-          ]),
+          userService.getUsersFamily(),
         ]);
 
         const user = response.Response[0];
+
+        const familiasDoUsuario = familias.dados.filter((familia) =>
+          familia.membros.some((membro) => membro.id_usuario === id_usuario)
+        );
+
+        const familiasFormatadas = familiasDoUsuario.map((f) => ({
+          id: f.id_familia,
+          nome: f.nome_familia,
+        }));
 
         setFormData({
           nome: user.nome || "",
@@ -87,8 +93,10 @@ export function usePerfil() {
 
         if (user.foto_perfil) setPreview(user.foto_perfil);
 
-        setFamiliasDisponiveis(familias);
-        setFamiliasSelecionadas(user.familias?.map((f) => f.id) || [1]);
+        setFamiliasDisponiveis(familiasFormatadas);
+
+        const idsFamilias = familiasFormatadas.map((f) => f.id);
+        setFamiliasSelecionadas(idsFamilias);
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
       } finally {
@@ -168,7 +176,7 @@ export function usePerfil() {
 
       if (formData.senha) {
         dadosUpdate.senha = CryptoJS.SHA256(formData.senha).toString(
-          CryptoJS.enc.Hex,
+          CryptoJS.enc.Hex
         );
       } else {
         delete dadosUpdate.senha;

@@ -83,6 +83,19 @@ const loginUser = async function (data) {
   }
 };
 
+const getUsersFamily = async function () {
+  const url = `/usuarios-familia/`;
+
+  try {
+    const response = await api.get(url);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 const listUsersByFamily = async function (idFamily) {
   const url = `/usuario/familia/${idFamily}`;
 
@@ -132,4 +145,5 @@ export const userService = {
   listUsersByFamily,
   createUserFamily,
   addUserFamilyByEmail,
+  getUsersFamily,
 };
