@@ -150,8 +150,8 @@ function ModalEvents({
                      errors.hours
                        ? "border-b-2 border-red-500"
                        : editableFields.hours
-                         ? "border-b-2 border-[#5D2A11]/30"
-                         : "border-b-2 border-transparent"
+                       ? "border-b-2 border-[#5D2A11]/30"
+                       : "border-b-2 border-transparent"
                    }`}
                       style={{ textIndent: "5px" }}
                     />
@@ -230,8 +230,8 @@ function ModalEvents({
                       errors.title
                         ? "border-b-2 border-red-500"
                         : editableFields.title
-                          ? "border-b-2 border-[#5D2A11]/30"
-                          : "border-b-2 border-transparent"
+                        ? "border-b-2 border-[#5D2A11]/30"
+                        : "border-b-2 border-transparent"
                     }`}
                         style={{ textIndent: "5px" }}
                       />
@@ -303,8 +303,8 @@ function ModalEvents({
                   errors.description
                     ? "border-2 border-red-500"
                     : editableFields.description
-                      ? "border border-[#5D2A11]/10 bg-white/50"
-                      : "bg-[#E0E0E0]/50"
+                    ? "border border-[#5D2A11]/10 bg-white/50"
+                    : "bg-[#E0E0E0]/50"
                 }`}
                   />
                 ) : (

@@ -33,7 +33,7 @@ function CalendarView({
             p={"px-[80.3px] py-5"}
             size={"h-[90%] w-[95%]"}
           >
-            <div className="w-full h-full p-6">
+            <div className="w-full h-full p-6 overflow-y-hidden">
               <FullCalendar
                 plugins={[dayGridPlugin, interactionPlugin]}
                 initialView="dayGridMonth"

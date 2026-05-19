@@ -3,6 +3,7 @@
 .fc {
   background: transparent !important;
   border: none !important;
+  overflow-y: block;
 }
 
 /* quadrado do dia */
@@ -14,10 +15,11 @@
   padding: 10px 4px;
   position: relative;
   transition: all 0.2s ease;
+  overflow-y: block;
 }
 
 .fc-daygrid-day-frame:hover {
-  background: #ffe2ba98;
+  background: #ffe2ba;
   transform: scale(1.05);
   cursor: pointer;
 }
@@ -27,7 +29,6 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 6px;
 }
 
 /* número */
@@ -40,7 +41,7 @@
 /* área dos eventos */
 .fc-daygrid-day-events {
   width: 100%;
-  margin-top: auto; /* empurra eventos pra baixo */
+  overflow-y: block;
   padding: 0 3px;
 }
 
@@ -68,6 +69,7 @@
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
+  overflow-y: block;
 }
 
 .fc-daygrid-day-number {
@@ -80,6 +82,7 @@
 .fc-toolbar-title {
   color: var(--color-terracota) !important;
   font-weight: bold !important;
+  overflow-y: block;
 }
 
 .fc-button {
@@ -100,4 +103,8 @@
   font-weight: 600;
   font-size: 1.1rem;
   color: var(--color-terracota);
+}
+
+.fc-scroller {
+  overflow: hidden !important;
 }

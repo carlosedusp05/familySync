@@ -76,7 +76,7 @@ export function useCalendar() {
 
     if (response.statusCode !== 200) {
       triggerAlert(
-        "Não foi possível deletar o evento... Tente novamente mais tarde!",
+        "Não foi possível deletar o evento... Tente novamente mais tarde!"
       );
     }
   };
@@ -96,35 +96,39 @@ export function useCalendar() {
 
       if (updateEvent.statusCode !== 200) {
         triggerAlert(
-          "Não foi possível atualizar o evento... Tente novamente mais tarde",
+          "Não foi possível atualizar o evento... Tente novamente mais tarde"
         );
         handleCloseModal();
         return;
       }
 
       setDateEvent((prev) =>
-        prev.map((item) => (item.id === selectedInfo.id ? updateItem : item)),
+        prev.map((item) => (item.id === selectedInfo.id ? updateItem : item))
       );
     } else {
       const newItem = {
-        id: Date.now(),
         titulo: newData.title,
         descricao: newData.description,
         data: newData.date,
         hora: newData.hours,
-        id_familia: user.idFamily,
+        // id_familia: user.idFamily,
+        id_familia: 4,
         id_usuario: user.id,
       };
 
+      console.log(newItem);
+
       const createEvent = await eventService.createEvent(newItem);
 
-      // if (createEvent.statusCode !== 201) {
-      //   triggerAlert(
-      //     "Não foi possível criar o evento... Tente novamente mais tarde",
-      //   );
-      //   handleCloseModal();
-      //   return;
-      // }
+      console.log(createEvent);
+
+      if (createEvent.StatusCode !== 201) {
+        triggerAlert(
+          "Não foi possível criar o evento... Tente novamente mais tarde"
+        );
+        handleCloseModal();
+        return;
+      }
 
       const newItemToState = {
         ...newItem,
