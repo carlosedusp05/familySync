@@ -7,11 +7,11 @@ import { useUserData } from "../hooks/useUserData";
 function StartScreen(props) {
   const { userData, infos } = useUserData();
 
-  const invites_family = localStorage.getItem("family_invite_token");
+  const invites_family = sessionStorage.getItem("family_invite_token");
 
   if (invites_family) {
     // lugar para requisição do convite
-    localStorage.removeItem("family_invite_token");
+    sessionStorage.removeItem("family_invite_token");
   }
 
   return (
