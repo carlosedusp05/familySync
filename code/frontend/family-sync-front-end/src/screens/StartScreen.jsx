@@ -7,6 +7,13 @@ import { useUserData } from "../hooks/useUserData";
 function StartScreen(props) {
   const { userData, infos } = useUserData();
 
+  const invites_family = localStorage.getItem("family_invite_token");
+
+  if (invites_family) {
+    // lugar para requisição do convite
+    localStorage.removeItem("family_invite_token");
+  }
+
   return (
     <div className="flex flex-col w-full h-screen overflow-hidden">
       <BackgroundImage

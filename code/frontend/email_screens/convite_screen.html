@@ -4,89 +4,47 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Convite para Família</title>
+    <style>
+      button:hover {
+        background-color: #e05700 !important;
+        cursor: pointer;
+      }
+      button:active {
+        background-color: #b34500 !important;
+        transform: scale(0.9);
+      }
+    </style>
   </head>
-  <body>
-    <div>
+  <body
+    style="
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+      height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    "
+  >
+    <div
+      style="
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 50px;
+        flex-direction: column;
+        font-family: sans-serif;
+        font-weight: bold;
+        text-align: center;
+      "
+    >
       <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 950 260"
-        width="100%"
-        height="100%"
-      >
-        <g fill="#F27419">
-          <path d="M78 84h59v19H99v25h32v19H99v47H78V84z" />
-
-          <path
-            d="M181 120v52h-18v-8c-4 6-12 10-21 10-18 0-29-12-29-27s12-26 31-26h19v-5c0-10-6-15-17-15-9 0-18 3-25 8l-7-14c10-7 24-11 36-11 23 0 35 11 35 32zm-18 16h-15c-11 0-16 4-16 11 0 7 5 11 13 11 10 0 18-6 18-16v-7z"
-          />
-
-          <path
-            d="M202 110c5-6 13-10 22-10 12 0 20 6 23 15 5-9 13-15 24-15 17 0 25 11 25 29v45h-19v-40c0-10-4-14-11-14-8 0-14 5-14 15v39h-19v-40c0-10-4-14-11-14-8 0-14 5-14 15v39h-19v-62h18v8z"
-          />
-
-          <path d="M320 112v62h-19v-62h19z" />
-
-          <g transform="translate(300.5, 76)">
-            <path
-              d="M10.5 0C17.4 0 23 5.6 23 12.5S17.4 25 10.5 25 0 19.4 0 12.5 5.6 0 10.5 0zm0 3C5.3 3 1 7.3 1 12.5S5.3 22 10.5 22 20 17.7 20 12.5 15.7 3 10.5 3z"
-            />
-            <circle cx="7.5" cy="9.5" r="1.5" />
-            <circle cx="13.5" cy="9.5" r="1.5" />
-            <path
-              d="M6.5 13.5c1 2.5 3 4 4 4s3-1.5 4-4"
-              fill="none"
-              stroke="#F27419"
-              stroke-width="1.8"
-              stroke-linecap="round"
-            />
-          </g>
-
-          <path d="M346 80h19v94h-19V80z" />
-
-          <path
-            d="M375 112h19l13 36 12-36h19l-24 64c-5 13-13 20-26 20-4 0-9-1-13-2l2-17c3 1 6 1 8 1 7 0 11-3 13-9l4-10-27-47z"
-          />
-
-          <path
-            d="M485 125c0-16-13-25-33-25-13 0-25 4-33 10l-7-15c11-8 26-12 42-12 33 0 52 16 52 41 0 36-41 41-41 53h43v17h-65c0-21 42-27 42-50z"
-          />
-
-          <path
-            d="M518 112h19l13 36 12-36h19l-24 64c-5 13-13 20-26 20-4 0-9-1-13-2l2-17c3 1 6 1 8 1 7 0 11-3 13-9l4-10-27-47z"
-          />
-
-          <path
-            d="M608 110c5-6 14-10 24-10 18 0 26 11 26 29v45h-19v-41c0-10-4-14-12-14-8 0-14 5-14 15v40h-19v-62h18v8z"
-          />
-
-          <path
-            d="M718 143c0 20-13 31-31 31-20 0-32-14-32-31s12-33 32-33c12 0 23 5 29 12l-11 13c-4-5-10-8-17-8-10 0-14 8-14 16 0 9 5 15 14 15 8 0 13-4 16-9l14 9z"
-          />
-
-          <circle cx="759" cy="81" r="14" />
-
-          <path
-            d="M748 102c-8 0-14 6-14 14v45c0 14 8 23 15 33 3 4 7 1 6-4l-6-30 8-12s5 26 13 42c3 5 8 4 7-2l-11-47c4-2 7-6 7-11v-16c0-8-6-14-14-14z"
-          />
-
-          <path
-            d="M756 120c8 4 15 11 25 14 3 1 5-2 3-4-10-4-17-10-24-15-2-1-5 2-4 5z"
-          />
-
-          <circle cx="851" cy="85" r="14" />
-
-          <path
-            d="M862 106c8 0 14 6 14 14v45c0 14-8 23-15 33-3 4-7 1-6-4l6-30-8-12s-5 26-13 42c-3 5-8 4-7-2l11-47c-4-2-7-6-7-11v-16c0-8 6-14 14-14z"
-          />
-
-          <path
-            d="M854 124c-8 4-15 11-25 14-3 1-5-2-3-4 10-4 17-10 24-15 2-1 5 2 4 5z"
-          />
-        </g>
-      </svg>
-      <svg
-        width="1222"
-        height="300"
+        width="340"
+        height="100"
         viewBox="0 0 1222 300"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -114,6 +72,67 @@
           />
         </defs>
       </svg>
+      <h1 style="color: #ff6200">Você recebeu um convite!</h1>
+      <h4 style="color: #662700; margin-inline: 30px"></h4>
+      <button
+        style="
+          height: 50px;
+          width: 200px;
+          outline: none;
+          background-color: #ff6200;
+          color: white;
+          font-weight: bold;
+          font-size: 20px;
+          border: none;
+          transition: 0.2s;
+        "
+      >
+        Aceitar Convite
+      </button>
     </div>
+    <div
+      style="
+        height: 150px;
+        width: 100%;
+        background-color: #ff6200;
+        color: white;
+        font-weight: bold;
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      "
+    >
+      <h3 style="font-size: 12px; margin-inline: 10px"></h3>
+      <div style="border-top: 2px solid white; width: 80%; margin-inline: 10%">
+        <h5 style="font-size: 11px">
+          © 2026 FamilySync. Todos os direitos reservados.
+        </h5>
+      </div>
+    </div>
+    <script>
+      "use strict";
+      var cabecalho_ = document.querySelector("h4");
+      var info_footer = document.querySelector("h3");
+      const button_submit = document.querySelector("button");
+
+      var dono_familia = "Pedrio";
+
+      cabecalho_.textContent = `${dono_familia} quer ter adicionar á dele! Junte-se para compartilhar listas, organizar a rotina e manter todos conectados`;
+      info_footer.textContent = `Se você não conhece ${dono_familia} ou não esperava este convite, pode ignorar este e-mail com segurança.`;
+
+      button_submit.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        const token_family =
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjo3LCJlbWFpbCI6InZpdG9yQGdtYWlsLmNvbSIsIm5vbWUiOiJWaXRvciBNaWd1ZWwiLCJpYXQiOjE3NzkxNTAzNzksImV4cCI6MTc3OTE1Mzk3OX0.g7LHXhMcqKSrNP0V1dUwZrm_PZnT_M-fWMC4ZgYHx-M";
+
+        const url = `http://localhost:5173/auth/start/${token_family}`;
+
+        window.open(url, "_blank");
+      });
+    </script>
   </body>
 </html>

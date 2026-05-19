@@ -25,16 +25,16 @@ export const router = createBrowserRouter([
       {
         path: "/auth",
         children: [
-          { path: "start", element: <InicioScreen /> },
+          { path: "start/:token?", element: <InicioScreen /> },
           {
-            path: "login",
+            path: "login/:token?",
             lazy: () =>
               import("./screens/LoginScreen").then((m) => ({
                 Component: m.default,
               })),
           },
           {
-            path: "register",
+            path: "register/:token?",
             lazy: () =>
               import("./screens/RegisterScreen").then((m) => ({
                 Component: m.default,

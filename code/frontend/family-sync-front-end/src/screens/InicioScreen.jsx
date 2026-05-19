@@ -4,9 +4,18 @@ import DefaultHeader from "../components/layout/DefaultHeader";
 import { useNavigate } from "react-router-dom";
 import { imageBackground2 } from "../assets";
 import Cookies from "js-cookie";
+import { useParams } from "react-router-dom";
+import { useEffect } from "react";
 
 function InicioScreen() {
   const navigate = useNavigate();
+  const { token: tokenConvite } = useParams();
+
+  useEffect(() => {
+    if (tokenConvite) {
+      sessionStorage.setItem("family_invite_token", tokenConvite);
+    }
+  }, [tokenConvite]);
 
   const prefetchLogin = () => {
     import("./LoginScreen").catch(() => {
