@@ -39,21 +39,21 @@ export function useCalendar() {
     setSelectedInfo(null);
   };
 
-  // useEffect(() => {
-  //   localStorage.setItem(`dateEvents`, JSON.stringify(dateEvent));
-  // }, [dateEvent]);
-
   useEffect(() => {
-    async function loadEvents() {
-      if (!user.idFamily) return;
-      const response = await eventService.listEventsByFamily(user.idFamily);
+    localStorage.setItem(`dateEvents`, JSON.stringify(dateEvent));
+  }, [dateEvent]);
 
-      console.log("API RESPONSE:", response);
-      setDateEvent(response);
-    }
+  // useEffect(() => {
+  //   async function loadEvents() {
+  //     if (!user.idFamily) return;
+  //     const response = await eventService.listEventsByFamily(user.idFamily);
 
-    loadEvents();
-  }, [user.idFamily]);
+  //     console.log("API RESPONSE:", response);
+  //     setDateEvent(response);
+  //   }
+
+  //   loadEvents();
+  // }, [user.idFamily]);
 
   useEffect(() => {
     const grouped = dateEvent.reduce((acc, event) => {
