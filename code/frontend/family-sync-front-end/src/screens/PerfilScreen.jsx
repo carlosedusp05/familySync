@@ -29,6 +29,7 @@ function PerfilScreen() {
     removeImagem,
     handleDeleteAccount,
     handleLogout,
+    handleSelectFamily,
   } = usePerfil();
 
   return (
@@ -62,6 +63,7 @@ function PerfilScreen() {
         removeImagem={removeImagem}
         handleDeleteAccount={handleDeleteAccount}
         handleLogout={handleLogout}
+        handleSelectFamily={handleSelectFamily}
       />
     </div>
   );

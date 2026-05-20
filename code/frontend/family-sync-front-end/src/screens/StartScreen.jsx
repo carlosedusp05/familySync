@@ -3,15 +3,40 @@ import DefaultHeader from "../components/layout/DefaultHeader";
 import BackgroundImage from "../components/ui/BackgroundImage";
 import MenuStart from "../components/ui/MenuStart";
 import { useUserData } from "../hooks/useUserData";
+import AddFamilyForm from "../components/features/AddFamiliar/AddFamilyForm";
+import { useAddFamily } from "../hooks/useAddFamily";
 
 function StartScreen(props) {
-  const { userData, infos } = useUserData();
+  const { userData, infos, isFamily } = useUserData();
+  const addFamilyProps = useAddFamily();
 
   const invites_family = sessionStorage.getItem("family_invite_token");
 
   if (invites_family) {
-    // lugar para requisição do convite
     sessionStorage.removeItem("family_invite_token");
+  }
+
+  const estaCarregando = !userData || isFamily === null;
+
+  let userDataSincronizado = userData;
+
+  if (!estaCarregando && isFamily && isFamily.length > 0) {
+    const activeFamilyId = localStorage.getItem("activeFamilyId");
+
+    if (!activeFamilyId) {
+      localStorage.setItem("activeFamilyId", isFamily[0].id);
+    }
+
+    const familiaAtiva = isFamily.find(
+      (f) => f.id === parseInt(activeFamilyId || isFamily[0].id),
+    );
+
+    if (familiaAtiva) {
+      userDataSincronizado = {
+        ...userData,
+        nomeFamilia: familiaAtiva.nome || familiaAtiva.nomeFamilia,
+      };
+    }
   }
 
   return (
@@ -23,7 +48,16 @@ function StartScreen(props) {
       />
       <DefaultHeader />
       <div className="w-full flex justify-center items-center h-full ">
-        <MenuStart props={props} userData={userData} infos={infos} />
+        {estaCarregando ? null : isFamily && isFamily.length > 0 ? (
+          /* Passamos o userDataSincronizado com o nome da família atualizado */
+          <MenuStart
+            props={props}
+            userData={userDataSincronizado}
+            infos={infos}
+          />
+        ) : (
+          <AddFamilyForm {...addFamilyProps} />
+        )}
       </div>
     </div>
   );

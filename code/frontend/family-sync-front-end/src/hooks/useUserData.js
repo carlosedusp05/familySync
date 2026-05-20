@@ -3,15 +3,11 @@ import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import { formatUserName } from "../utils/formatters";
 import { infoService } from "../services/infoService";
+import { userService } from "../services/userService";
 
 export function useUserData() {
-  const [userData, setUserData] = useState({
-    id_usuario: 0,
-    nome: "Usuário",
-    email: "Carregando...",
-    nomeFamilia: "Carregando...",
-  });
-
+  const [userData, setUserData] = useState(null);
+  const [isFamily, setIsFamily] = useState(null);
   const [infos, setInfos] = useState(null);
 
   useEffect(() => {
@@ -21,6 +17,13 @@ export function useUserData() {
       if (token) {
         try {
           const decoded = jwtDecode(token);
+
+          const dadosFamily = await userService.getFamiliesByUser(
+            decoded.id_usuario,
+          );
+
+          setIsFamily(dadosFamily.family);
+
           const nomeBruto = decoded.nome || "Usuário";
           const nomeFormatado = formatUserName(nomeBruto);
 
@@ -28,13 +31,16 @@ export function useUserData() {
             id_usuario: decoded.id_usuario,
             nome: nomeFormatado,
             email: decoded.email || "E-mail não encontrado",
-            nomeFamilia: decoded.nome_familia || "Minha Família",
+            nomeFamilia: dadosFamily.family[0]?.nome || "",
           });
 
-          const IdUsuario = parseInt(decoded.id_usuario);
-          const response = await infoService.getInfosById(IdUsuario);
-
-          setInfos(response);
+          if (dadosFamily.family.length > 0) {
+            const IdUsuario = parseInt(decoded.id_usuario);
+            const response = await infoService.getInfosById(IdUsuario);
+            setInfos(response);
+          } else {
+            setInfos({});
+          }
         } catch (error) {
           console.error("Erro ao carregar dados:", error);
         }
@@ -44,5 +50,5 @@ export function useUserData() {
     loadData();
   }, []);
 
-  return { userData, infos };
+  return { userData, infos, isFamily };
 }

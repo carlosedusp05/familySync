@@ -21,6 +21,7 @@ export const useAddFamily = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentEmail, setCurrentEmail] = useState("");
   const [errosCampos, setErrosCampos] = useState({});
+  const [hasFamily, setHasFamily] = useState(true);
 
   const [formData, setFormData] = useState({
     nomeFamilia: "",
@@ -46,6 +47,34 @@ export const useAddFamily = () => {
     "numero",
     "complemento",
   ];
+  useEffect(() => {
+    const verificarFamiliaUsuario = async () => {
+      const token = Cookies.get("familysync_token");
+      if (token) {
+        try {
+          const decoded = jwtDecode(token);
+          const dadosFamily = await userService.getFamiliesByUser(
+            decoded.id_usuario,
+          );
+
+          if (!dadosFamily.family || dadosFamily.family.length === 0) {
+            setHasFamily(false);
+          }
+        } catch (error) {
+          console.error("Erro ao verificar vínculo familiar:", error);
+        }
+      }
+    };
+    verificarFamiliaUsuario();
+  }, []);
+
+  const handleCancelar = () => {
+    if (!hasFamily) {
+      navigate("/");
+    } else {
+      navigate(-1);
+    }
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -226,26 +255,25 @@ export const useAddFamily = () => {
           numero: formData.numero,
         };
 
-        await enderecoService.createEndereco(dadosEndereco);
-
         const dadosUserFamily = {
           email: user.email,
           id_familia: idFamiliaGerado,
         };
 
-        await userService.addUserFamilyByEmail(dadosUserFamily);
-
-        let i = 0;
-        while (formData.membros.length > i) {
-          const familyValid = {
-            email: formData.membros[i],
+        const promessasMembros = formData.membros.map((emailMembro) =>
+          userService.addUserFamilyByEmail({
+            email: emailMembro,
             id_familia: idFamiliaGerado,
-          };
-          await userService.addUserFamilyByEmail(familyValid);
-          i++;
-        }
+          }),
+        );
 
-        navigate("/dashboard");
+        await Promise.all([
+          enderecoService.createEndereco(dadosEndereco),
+          userService.addUserFamilyByEmail(dadosUserFamily),
+          ...promessasMembros,
+        ]);
+
+        window.location.href = "/dashboard";
       } else {
         setErrosCampos({ geral: responseCreationFamily.message });
       }
@@ -271,6 +299,7 @@ export const useAddFamily = () => {
 
   return {
     navigate,
+    handleCancelar,
     fileInputRef,
     preview,
     isLoading,

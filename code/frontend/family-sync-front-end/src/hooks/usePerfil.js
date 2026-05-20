@@ -18,7 +18,6 @@ import {
   formatUserName,
   formatDateForInput,
 } from "../utils/formatters";
-import { familyService } from "../services/familyService";
 
 export function usePerfil() {
   const navigate = useNavigate();
@@ -66,37 +65,36 @@ export function usePerfil() {
 
       try {
         const id_usuario = parseInt(decodedUser.id_usuario);
-
-        const [response, familias] = await Promise.all([
-          userService.getUserById(id_usuario),
-          userService.getUsersFamily(),
-        ]);
-
-        const user = response.Response[0];
-
-        const familiasDoUsuario = familias.dados.filter((familia) =>
-          familia.membros.some((membro) => membro.id_usuario === id_usuario)
-        );
-
-        const familiasFormatadas = familiasDoUsuario.map((f) => ({
-          id: f.id_familia,
-          nome: f.nome_familia,
-        }));
+        const response = await userService.getFamiliesByUser(id_usuario);
 
         setFormData({
-          nome: user.nome || "",
-          email: user.email || "",
-          cpf: formatCPF(user.cpf || ""),
-          dataNascimento: formatDateForInput(user.data_nascimento),
+          nome: response.user.nome || "",
+          email: response.user.email || "",
+          cpf: formatCPF(response.user.cpf || ""),
+          dataNascimento: formatDateForInput(response.user.data_nascimento),
           senha: "",
         });
 
-        if (user.foto_perfil) setPreview(user.foto_perfil);
+        if (response.user.foto_perfil) setPreview(response.user.foto_perfil);
 
-        setFamiliasDisponiveis(familiasFormatadas);
+        setFamiliasDisponiveis(response.family);
 
-        const idsFamilias = familiasFormatadas.map((f) => f.id);
-        setFamiliasSelecionadas(idsFamilias);
+        if (response.family && response.family.length > 0) {
+          const familiaAtivaSalva = localStorage.getItem("activeFamilyId");
+
+          // Se existir e fizer parte das famílias do usuário, mantém ela ativa, senão pega a primeira
+          const familiaIdParaAtivar =
+            familiaAtivaSalva &&
+            response.family.some((f) => f.id === parseInt(familiaAtivaSalva))
+              ? parseInt(familiaAtivaSalva)
+              : response.family[0].id;
+
+          setFamiliasSelecionadas([familiaIdParaAtivar]);
+          localStorage.setItem("activeFamilyId", familiaIdParaAtivar);
+        } else {
+          setFamiliasSelecionadas([]);
+        }
+        // ----------------------------------------
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
       } finally {
@@ -106,6 +104,12 @@ export function usePerfil() {
 
     loadData();
   }, [navigate]);
+
+  const handleSelectFamily = (id) => {
+    setFamiliasSelecionadas([id]);
+    localStorage.setItem("activeFamilyId", id);
+    setIsFamiliesOpen(false);
+  };
 
   const validateFieldOnBlur = (id, valor) => {
     if (!editableFields[id]) return;
@@ -176,7 +180,7 @@ export function usePerfil() {
 
       if (formData.senha) {
         dadosUpdate.senha = CryptoJS.SHA256(formData.senha).toString(
-          CryptoJS.enc.Hex
+          CryptoJS.enc.Hex,
         );
       } else {
         delete dadosUpdate.senha;
@@ -236,7 +240,7 @@ export function usePerfil() {
     setFormData,
     familiasDisponiveis,
     familiasSelecionadas,
-    setFamiliasSelecionadas,
+    handleSelectFamily,
     isFamiliesOpen,
     setIsFamiliesOpen,
     editableFields,

@@ -33,6 +33,7 @@ function AccountEdit({
   removeImagem,
   handleDeleteAccount,
   handleLogout,
+  handleSelectFamily,
 }) {
   const fileInputRef = useRef(null);
 
@@ -158,10 +159,7 @@ function AccountEdit({
             toggleOpen={() => setIsFamiliesOpen(!isFamiliesOpen)}
             disponiveis={familiasDisponiveis}
             selecionadas={familiasSelecionadas}
-            onSelect={(id) => {
-              setFamiliasSelecionadas([id]);
-              setIsFamiliesOpen(false);
-            }}
+            onSelect={handleSelectFamily}
           />
         </div>
 

@@ -135,6 +135,33 @@ const addUserFamilyByEmail = async function (data) {
   }
 };
 
+const getFamiliesByUser = async function (id) {
+  try {
+    const [response, familias] = await Promise.all([
+      userService.getUserById(id),
+      userService.getUsersFamily(),
+    ]);
+
+    const familiasDoUsuario = familias.dados.filter((familia) =>
+      familia.membros.some((membro) => membro.id_usuario === id),
+    );
+
+    const familiasFormatadas = familiasDoUsuario.map((f) => ({
+      id: f.id_familia,
+      nome: f.nome_familia,
+    }));
+
+    const result = {
+      user: response.Response[0],
+      family: familiasFormatadas,
+    };
+
+    return result;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 export const userService = {
   getUsers,
   getUserById,
@@ -146,4 +173,5 @@ export const userService = {
   createUserFamily,
   addUserFamilyByEmail,
   getUsersFamily,
+  getFamiliesByUser,
 };

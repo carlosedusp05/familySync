@@ -6,7 +6,7 @@ function InputAddFamily({ w, type, placeholder, error, ...props }) {
         type={type}
         placeholder={placeholder}
         className={`flex p-3 text-[20px] border-2 rounded-4xl px-6 w-full text-black focus:outline-none focus:ring-0 bg-white transition-colors ${
-          error ? "border-red-500" : "border-orange"
+          error ? "border-red-500" : "border-orange-dark"
         }`}
       />
       <div
