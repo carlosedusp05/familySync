@@ -3,9 +3,19 @@ import IconPerfil from "../icons/IconPerfil";
 import DefaultButton from "../ui/DefaultButton";
 import { useNavigate } from "react-router-dom";
 import { notificationsIcon } from "../../assets/index";
+import { useState } from "react";
 
 function DefaultHeader({ disconnected }) {
   const navigate = useNavigate();
+
+  const family_session = localStorage.getItem("activeFamilyId");
+  const hasFamily = Boolean(family_session && family_session.trim().length > 0);
+
+  const handleNotificationClick = () => {
+    if (hasFamily) {
+      navigate("/dashboard/notifications");
+    }
+  };
 
   const prefetchLogin = () => {
     import("../../screens/LoginScreen").catch(() => {
@@ -49,8 +59,8 @@ function DefaultHeader({ disconnected }) {
       <IconPerfil is_white_backgroud={false} />
       <div
         className="bg-orange-dark flex items-center justify-center h-fit p-4 rounded-lg cursor-pointer duration-300 transition-all hover:scale-110"
-        onMouseEnter={prefetchNotifications}
-        onClick={() => navigate("/dashboard/notifications")}
+        onMouseEnter={hasFamily ? prefetchNotifications : undefined}
+        onClick={handleNotificationClick}
       >
         <img
           className="w-8 h-8 "
