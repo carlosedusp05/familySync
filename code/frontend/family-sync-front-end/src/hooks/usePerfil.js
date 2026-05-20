@@ -43,8 +43,6 @@ export function usePerfil() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const hoje = new Date().toISOString().split("T")[0];
-  const token = Cookies.get("familysync_token");
-  const decoded = jwtDecode(token);
 
   useEffect(() => {
     const loadData = async () => {
@@ -54,16 +52,16 @@ export function usePerfil() {
         return navigate("/auth/login");
       }
 
-      const decodedUser = jwtDecode(token);
-
-      setFormData((prev) => ({
-        ...prev,
-        nome: decodedUser.nome || "",
-        email: decodedUser.email || "",
-      }));
-      setIsLoading(true);
-
       try {
+        const decodedUser = jwtDecode(token);
+
+        setFormData((prev) => ({
+          ...prev,
+          nome: decodedUser.nome || "",
+          email: decodedUser.email || "",
+        }));
+        setIsLoading(true);
+
         const id_usuario = parseInt(decodedUser.id_usuario);
         const response = await userService.getFamiliesByUser(id_usuario);
 
@@ -82,7 +80,6 @@ export function usePerfil() {
         if (response.family && response.family.length > 0) {
           const familiaAtivaSalva = localStorage.getItem("activeFamilyId");
 
-          // Se existir e fizer parte das famílias do usuário, mantém ela ativa, senão pega a primeira
           const familiaIdParaAtivar =
             familiaAtivaSalva &&
             response.family.some((f) => f.id === parseInt(familiaAtivaSalva))
@@ -94,7 +91,6 @@ export function usePerfil() {
         } else {
           setFamiliasSelecionadas([]);
         }
-        // ----------------------------------------
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
       } finally {
@@ -104,6 +100,14 @@ export function usePerfil() {
 
     loadData();
   }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    Object.keys(Cookies.get()).forEach((cookieName) => {
+      Cookies.remove(cookieName, { path: "/" });
+    });
+    navigate("/");
+  };
 
   const handleSelectFamily = (id) => {
     setFamiliasSelecionadas([id]);
@@ -115,7 +119,6 @@ export function usePerfil() {
     if (!editableFields[id]) return;
 
     let erroMensagem = "";
-
     switch (id) {
       case "nome":
         erroMensagem = validateName(valor);
@@ -208,14 +211,22 @@ export function usePerfil() {
   const handleDeleteAccount = async () => {
     setIsLoading(true);
     try {
+      const token = Cookies.get("familysync_token");
+      if (!token) return handleLogout();
+
+      const decoded = jwtDecode(token);
       const id_usuario = parseInt(decoded.id_usuario);
 
-      const deleteUser = await userService.deleteUser(id_usuario);
+      const response = await userService.deleteUser(id_usuario);
 
-      if (deleteUser.StatusCode == 200) {
-        Cookies.remove("familysync_token", { path: "/" });
-        localStorage.clear();
-        navigate("/");
+      const isSuccess =
+        response &&
+        (response.status === 200 ||
+          response.status === 204 ||
+          response.StatusCode === 200);
+
+      if (isSuccess || !response?.error) {
+        handleLogout();
       }
     } catch (error) {
       console.error("Erro ao excluir conta:", error);
@@ -223,14 +234,6 @@ export function usePerfil() {
       setIsLoading(false);
       setIsDeleteModalOpen(false);
     }
-  };
-
-  const handleLogout = () => {
-    localStorage.clear();
-    Object.keys(Cookies.get()).forEach((cookieName) => {
-      Cookies.remove(cookieName, { path: "/" });
-    });
-    navigate("/");
   };
 
   return {
