@@ -47,6 +47,8 @@ export function useCalendar() {
     async function loadEvents() {
       if (!user.idFamily) return;
       const response = await eventService.listEventsByFamily(user.idFamily);
+
+      console.log("API RESPONSE:", response);
       setDateEvent(response);
     }
 
@@ -71,14 +73,18 @@ export function useCalendar() {
   }, [dateEvent]);
 
   const handleDelete = async (id) => {
-    setDateEvent((prev) => prev.filter((item) => item.id !== id));
     const response = await eventService.deleteEvent(id);
 
-    if (response.statusCode !== 200) {
-      triggerAlert(
-        "Não foi possível deletar o evento... Tente novamente mais tarde!"
-      );
-    }
+    console.log(response);
+
+    // if (response.statusCode !== 200) {
+    //   triggerAlert(
+    //     "Não foi possível deletar o evento... Tente novamente mais tarde!",
+    //   );
+    //   return;
+    // }
+
+    setDateEvent((prev) => prev.filter((item) => item.id_eventos !== id));
   };
 
   const handleSave = async (newData) => {
@@ -90,20 +96,29 @@ export function useCalendar() {
         descricao: newData.description,
       };
 
-      const updateEvent = await eventService.updateEvent(updateItem);
+      console.log("selectedInfo:", selectedInfo);
+      console.log("id enviado:", selectedInfo.id_eventos);
+      console.log("payload:", updateItem);
+
+      const updateEvent = await eventService.updateEvent(
+        selectedInfo.id_eventos,
+        updateItem,
+      );
 
       console.log(updateEvent);
 
-      if (updateEvent.statusCode !== 200) {
-        triggerAlert(
-          "Não foi possível atualizar o evento... Tente novamente mais tarde"
-        );
-        handleCloseModal();
-        return;
-      }
+      // if (updateEvent.statusCode !== 200) {
+      //   triggerAlert(
+      //     "Não foi possível atualizar o evento... Tente novamente mais tarde",
+      //   );
+      //   handleCloseModal();
+      //   return;
+      // }
 
       setDateEvent((prev) =>
-        prev.map((item) => (item.id === selectedInfo.id ? updateItem : item))
+        prev.map((item) =>
+          item.id_eventos === selectedInfo.id_eventos ? updateItem : item,
+        ),
       );
     } else {
       const newItem = {
@@ -116,19 +131,17 @@ export function useCalendar() {
         id_usuario: user.id,
       };
 
-      console.log(newItem);
-
       const createEvent = await eventService.createEvent(newItem);
 
       console.log(createEvent);
 
-      if (createEvent.StatusCode !== 201) {
-        triggerAlert(
-          "Não foi possível criar o evento... Tente novamente mais tarde"
-        );
-        handleCloseModal();
-        return;
-      }
+      // if (createEvent.StatusCode !== 201) {
+      //   triggerAlert(
+      //     "Não foi possível criar o evento... Tente novamente mais tarde",
+      //   );
+      //   handleCloseModal();
+      //   return;
+      // }
 
       const newItemToState = {
         ...newItem,
