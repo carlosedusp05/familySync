@@ -1,4 +1,4 @@
-import MainLayout from "../layouts/Mainlayout";
+import MainLayout from "../layouts/MainLayout";
 import DefaultButton from "../components/ui/DefaultButton";
 import InputWhite from "../components/ui/InputWhite";
 import IconPerfil from "../components/icons/IconPerfil";

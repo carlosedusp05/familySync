@@ -1,4 +1,4 @@
-import MainLayout from "../layouts/Mainlayout";
+import MainLayout from "../layouts/MainLayout";
 import InfoFamiliarContent from "../components/features/InfoFamiliar/InfoFamiliarContent";
 import { useInfoFamiliar } from "../hooks/useInfoFamiliar";
 
