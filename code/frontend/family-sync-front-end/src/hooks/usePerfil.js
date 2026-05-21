@@ -78,7 +78,9 @@ export function usePerfil() {
         setFamiliasDisponiveis(response.family);
 
         if (response.family && response.family.length > 0) {
-          const familiaAtivaSalva = localStorage.getItem("activeFamilyId");
+          const familiaAtivaSalva = sessionStorage.getItem(
+            "@FamilySync:family:id",
+          );
 
           const familiaIdParaAtivar =
             familiaAtivaSalva &&
@@ -87,7 +89,7 @@ export function usePerfil() {
               : response.family[0].id;
 
           setFamiliasSelecionadas([familiaIdParaAtivar]);
-          localStorage.setItem("activeFamilyId", familiaIdParaAtivar);
+          sessionStorage.setItem("@FamilySync:family:id", familiaIdParaAtivar);
         } else {
           setFamiliasSelecionadas([]);
         }

@@ -21,10 +21,10 @@ function StartScreen(props) {
   let userDataSincronizado = userData;
 
   if (!estaCarregando && isFamily && isFamily.length > 0) {
-    const activeFamilyId = localStorage.getItem("activeFamilyId");
+    const activeFamilyId = sessionStorage.getItem("@FamilySync:family:id");
 
     if (!activeFamilyId) {
-      localStorage.setItem("activeFamilyId", isFamily[0].id);
+      sessionStorage.setItem("@FamilySync:family:id", isFamily[0].id);
     }
 
     const familiaAtiva = isFamily.find(
@@ -49,7 +49,6 @@ function StartScreen(props) {
       <DefaultHeader />
       <div className="w-full flex justify-center items-center h-full ">
         {estaCarregando ? null : isFamily && isFamily.length > 0 ? (
-          /* Passamos o userDataSincronizado com o nome da família atualizado */
           <MenuStart
             props={props}
             userData={userDataSincronizado}
