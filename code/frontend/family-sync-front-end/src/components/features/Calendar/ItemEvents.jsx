@@ -1,6 +1,7 @@
 import { pencilTerracotaIcon } from "../../../assets";
 
 function ItemEvents(props) {
+  console.log(props);
   return (
     <div className="w-[90%] flex flex-col gap-2 rounded-2xl bg-white-yellow relative pl-5 pr-8 pt-2 pb-10 transition-all duration-400 hover:scale-103">
       <div className="px-10 flex absolute top-0 left-0 bg-terracota py-1 rounded-tl-2xl ">

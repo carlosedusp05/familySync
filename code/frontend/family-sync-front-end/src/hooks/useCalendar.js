@@ -39,21 +39,22 @@ export function useCalendar() {
     setSelectedInfo(null);
   };
 
+  const familiaAtivaSalva = sessionStorage.getItem("@FamilySync:family:id");
+
   // useEffect(() => {
   //   localStorage.setItem(`dateEvents`, JSON.stringify(dateEvent));
   // }, [dateEvent]);
 
   useEffect(() => {
     async function loadEvents() {
-      if (!user.idFamily) return;
-      const response = await eventService.listEventsByFamily(user.idFamily);
+      if (familiaAtivaSalva) return;
+      const response = await eventService.listEventsByFamily(familiaAtivaSalva);
 
-      console.log("API RESPONSE:", response);
       setDateEvent(response);
     }
 
     loadEvents();
-  }, [user.idFamily]);
+  }, [dateEvent]);
 
   useEffect(() => {
     const grouped = dateEvent.reduce((acc, event) => {
@@ -74,8 +75,6 @@ export function useCalendar() {
 
   const handleDelete = async (id) => {
     const response = await eventService.deleteEvent(id);
-
-    console.log(response);
 
     if (response.statusCode !== 200) {
       triggerAlert(
@@ -120,13 +119,11 @@ export function useCalendar() {
         descricao: newData.description,
         data: newData.date,
         hora: newData.hours,
-        id_familia: user.idFamily,
+        id_familia: familiaAtivaSalva,
         id_usuario: user.id,
       };
 
       const createEvent = await eventService.createEvent(newItem);
-
-      console.log(createEvent);
 
       if (createEvent.StatusCode !== 201) {
         triggerAlert(
@@ -138,6 +135,7 @@ export function useCalendar() {
 
       const newItemToState = {
         ...newItem,
+        id_evento: createEvent.Response.id_evento,
         creator: user.nome,
       };
 

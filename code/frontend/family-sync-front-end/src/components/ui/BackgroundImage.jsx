@@ -2,7 +2,7 @@ function BackgroundImage(props) {
   return (
     <div className="-z-1 fixed inset-0 overflow-hidden bg-white ">
       <img
-        className={`w-screen h-screen object-cover scale-102 ${
+        className={`w-full h-screen object-cover scale-102 ${
           props.blur_or_glass === "blur" ? "blur-[9px]" : ""
         }`}
         src={props.src}

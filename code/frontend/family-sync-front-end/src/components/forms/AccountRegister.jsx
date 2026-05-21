@@ -153,8 +153,8 @@ function AccountRegister({
   };
 
   return (
-    <DefaultCard h={"pb-20"}>
-      <div className="w-30 h-30 relative rounded-full border-2 border-orange flex items-center justify-center bg-white">
+    <DefaultCard h={"pb-20 max-sm:pb-10 max-sm:px-5 max-sm:py-5"}>
+      <div className="w-30 max-sm:w-25 relative rounded-full border-2 border-orange flex items-center justify-center bg-white">
         {preview ? (
           <img
             src={preview}
@@ -178,7 +178,7 @@ function AccountRegister({
           <DefaultButton
             onClick={preview ? removeImagem : handleButtonClick}
             another_padding={"px-0 pb-1"}
-            another_size={"h-12 w-12"}
+            another_size={"w-12 h-12 max-sm:h-10 max-sm:w-10"}
             another_text_size={"text-3xl"}
             most_radius={true}
             text={preview ? "×" : "+"}
@@ -186,9 +186,9 @@ function AccountRegister({
         </div>
       </div>
 
-      <h1 className="text-orange text-3xl -mt-6">Eu</h1>
+      <h1 className="text-orange text-3xl -mt-6 max-sm:text-2xl">Eu</h1>
 
-      <div className="w-[90%] flex flex-col justify-center items-center gap-5">
+      <div className="w-[90%] flex flex-col justify-center items-center gap-5 max-sm:gap-4">
         {camposInput.map((campo, index) => (
           <div key={campo.id} className="w-full flex flex-col gap-1">
             <DefaultTextField
@@ -248,8 +248,8 @@ function AccountRegister({
         ))}
       </div>
 
-      <div className="flex items-center justify-center flex-col h-14 pt-15 gap-3 w-[90%]">
-        <div className="flex h-14 gap-15 items-center justify-center">
+      <div className="flex items-center justify-center flex-col h-14 pt-15 max-sm:p-0 gap-3 w-[90%]">
+        <div className="flex h-14 gap-15 items-center justify-center w-full">
           <DefaultButton
             text="Cancelar"
             theme={false}

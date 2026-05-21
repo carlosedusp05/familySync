@@ -60,9 +60,11 @@ function CardLogin({
   return (
     <DefaultCard h={"h-fit"}>
       <IconFamilySync />
-      <h2 className="text-orange-dark font-bold text-4xl">Login</h2>
+      <h2 className="text-orange-dark font-bold text-2xl sm:text-3xl md:text-4xl">
+        Login
+      </h2>
 
-      <div className="w-[88%] flex flex-col gap-6 justify-center items-center">
+      <div className="w-full sm:w-[90%] md:w-[88%] flex flex-col gap-4 md:gap-6 justify-center items-center">
         <div className="w-full flex flex-col gap-1">
           <DefaultTextField
             placeholder="Email"
@@ -127,9 +129,10 @@ function CardLogin({
         </div>
       </div>
 
-      <div className="flex w-[40%] flex-col gap-1 mt-2">
+      <div className="flex w-[70%] max-sm:w-[50%] md:w-[50%] lg:w-[40%] flex-col gap-1 mt-2">
         <DefaultButton
           text="Entrar"
+          another_size={"w[80%]"}
           theme={true}
           type="submit"
           onMouseEnter={prefetchLoggedIn}
@@ -146,6 +149,7 @@ function CardLogin({
 
         <DefaultButton
           text="Cadastrar"
+          another_size={"w[80%]"}
           theme={false}
           border={true}
           type="button"
