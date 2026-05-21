@@ -39,21 +39,22 @@ export function useCalendar() {
     setSelectedInfo(null);
   };
 
-  useEffect(() => {
-    localStorage.setItem(`dateEvents`, JSON.stringify(dateEvent));
-  }, [dateEvent]);
+  const familiaAtivaSalva = sessionStorage.getItem("@FamilySync:family:id");
 
   // useEffect(() => {
-  //   async function loadEvents() {
-  //     if (!user.idFamily) return;
-  //     const response = await eventService.listEventsByFamily(user.idFamily);
+  //   localStorage.setItem(`dateEvents`, JSON.stringify(dateEvent));
+  // }, [dateEvent]);
 
-  //     console.log("API RESPONSE:", response);
-  //     setDateEvent(response);
-  //   }
+  useEffect(() => {
+    async function loadEvents() {
+      if (familiaAtivaSalva) return;
+      const response = await eventService.listEventsByFamily(familiaAtivaSalva);
 
-  //   loadEvents();
-  // }, [user.idFamily]);
+      setDateEvent(response);
+    }
+
+    loadEvents();
+  }, [dateEvent]);
 
   useEffect(() => {
     const grouped = dateEvent.reduce((acc, event) => {
@@ -75,14 +76,12 @@ export function useCalendar() {
   const handleDelete = async (id) => {
     const response = await eventService.deleteEvent(id);
 
-    console.log(response);
-
-    // if (response.statusCode !== 200) {
-    //   triggerAlert(
-    //     "Não foi possível deletar o evento... Tente novamente mais tarde!",
-    //   );
-    //   return;
-    // }
+    if (response.statusCode !== 200) {
+      triggerAlert(
+        "Não foi possível deletar o evento... Tente novamente mais tarde!",
+      );
+      return;
+    }
 
     setDateEvent((prev) => prev.filter((item) => item.id_eventos !== id));
   };
@@ -96,24 +95,18 @@ export function useCalendar() {
         descricao: newData.description,
       };
 
-      console.log("selectedInfo:", selectedInfo);
-      console.log("id enviado:", selectedInfo.id_eventos);
-      console.log("payload:", updateItem);
-
       const updateEvent = await eventService.updateEvent(
         selectedInfo.id_eventos,
         updateItem,
       );
 
-      console.log(updateEvent);
-
-      // if (updateEvent.statusCode !== 200) {
-      //   triggerAlert(
-      //     "Não foi possível atualizar o evento... Tente novamente mais tarde",
-      //   );
-      //   handleCloseModal();
-      //   return;
-      // }
+      if (updateEvent.statusCode !== 200) {
+        triggerAlert(
+          "Não foi possível atualizar o evento... Tente novamente mais tarde",
+        );
+        handleCloseModal();
+        return;
+      }
 
       setDateEvent((prev) =>
         prev.map((item) =>
@@ -126,25 +119,23 @@ export function useCalendar() {
         descricao: newData.description,
         data: newData.date,
         hora: newData.hours,
-        // id_familia: user.idFamily,
-        id_familia: 4,
+        id_familia: familiaAtivaSalva,
         id_usuario: user.id,
       };
 
       const createEvent = await eventService.createEvent(newItem);
 
-      console.log(createEvent);
-
-      // if (createEvent.StatusCode !== 201) {
-      //   triggerAlert(
-      //     "Não foi possível criar o evento... Tente novamente mais tarde",
-      //   );
-      //   handleCloseModal();
-      //   return;
-      // }
+      if (createEvent.StatusCode !== 201) {
+        triggerAlert(
+          "Não foi possível criar o evento... Tente novamente mais tarde",
+        );
+        handleCloseModal();
+        return;
+      }
 
       const newItemToState = {
         ...newItem,
+        id_evento: createEvent.Response.id_evento,
         creator: user.nome,
       };
 

@@ -60,14 +60,14 @@ function DefaultTextField(props) {
 
   const wrapperBaseClasses =
     "flex flex-row w-full justify-between items-center bg-white";
-  const wrapperDefaultClasses = `px-5 h-14 rounded-full border ${defaultBorderColor}`;
+  const wrapperDefaultClasses = `px-4 sm:px-5 h-12 sm:h-14 rounded-full border ${defaultBorderColor}`;
   const wrapperProfileClasses = "px-4 py-3 rounded-lg shadow-sm";
 
   const wrapperClasses = `${wrapperBaseClasses} ${isProfile ? wrapperProfileClasses : wrapperDefaultClasses} ${props.grid || ""}`;
 
   const inputBaseClasses =
-    "flex-1 h-full border-none focus:outline-none focus:ring-0 bg-transparent";
-  const inputDefaultClasses = `text-[1.1rem] ${defaultTextColor}`;
+    "flex-1 min-w-0 h-full border-none focus:outline-none focus:ring-0 bg-transparent";
+  const inputDefaultClasses = `text-base sm:text-lg placeholder:text-sm sm:placeholder: text-base ${defaultTextColor}`;
   const inputProfileClasses =
     "text-xl text-[#4a2511] font-bold placeholder:text-[#4a2511] placeholder:font-bold";
 
@@ -75,7 +75,7 @@ function DefaultTextField(props) {
 
   const iconBaseClasses =
     "object-contain cursor-pointer transition-all duration-300 shrink-0";
-  const iconDefaultClasses = "w-9 h-9";
+  const iconDefaultClasses = "w-7 h-7 sm:w-9 sm:h-9";
   const iconProfileClasses = "w-10 h-10 opacity-90";
 
   const iconClasses = `${iconBaseClasses} ${isProfile ? iconProfileClasses : iconDefaultClasses}`;

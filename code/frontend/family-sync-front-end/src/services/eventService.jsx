@@ -58,8 +58,6 @@ const createEvent = async function (data) {
 
 // PUT - Editar Evento
 const updateEvent = async function (id, data) {
-  console.log("SERVICE ID:", id);
-  console.log("SERVICE DATA:", data);
   const url = `/evento/${id}`;
 
   try {

@@ -55,15 +55,18 @@ function DefaultHeader({ disconnected }) {
       />
     </div>
   ) : (
-    <div className="flex gap-12 items-center justify-center">
-      <IconPerfil is_white_backgroud={false} />
+    <div className="flex gap-12 max-md:gap-8 items-center justify-center">
+      <IconPerfil
+        is_white_backgroud={false}
+        another_size={"max-md:h-7 max-md:w-7"}
+      />
       <div
-        className="bg-orange-dark flex items-center justify-center h-fit p-4 rounded-lg cursor-pointer duration-300 transition-all hover:scale-110"
+        className="bg-orange-dark flex items-center justify-center h-fit p-4 max-md:p-4 rounded-lg cursor-pointer duration-300 transition-all hover:scale-110"
         onMouseEnter={hasFamily ? prefetchNotifications : undefined}
         onClick={handleNotificationClick}
       >
         <img
-          className="w-8 h-8 "
+          className="w-12 h-12 max-md:w-6 max-md:h-6"
           src={notificationsIcon}
           alt="Notificações"
           draggable={false}

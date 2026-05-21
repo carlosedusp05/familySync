@@ -16,7 +16,6 @@ function ModalEvents({
 }) {
   const isEdit = Boolean(data);
 
-  const [date, setDate] = useState("");
   const [hours, setHours] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");

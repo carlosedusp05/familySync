@@ -26,7 +26,9 @@ function DefaultButton({
     <img src={logoutIcon} alt="sair" className="w-12.5 h-15" />
   ) : null;
   const border_radius = most_radius ? "rounded-[50%]" : "rounded-[15px]";
-  const size = another_size ? another_size : "h-12 md:h-14 w-full flex-1";
+  const size = another_size
+    ? another_size
+    : "h-12 md:h-14 w-full max-sm-90 flex-1";
   const textSize = another_text_size
     ? another_text_size
     : "text-sm sm:text-base";
