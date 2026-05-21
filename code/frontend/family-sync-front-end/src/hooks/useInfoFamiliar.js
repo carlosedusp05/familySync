@@ -1,16 +1,10 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
-
-const MOCK_MEMBERS = [
-  { id: "me", name: "VOCÊ", role: "USER" },
-  { id: "1", name: "Kauan Silva", role: "FAMILY" },
-  { id: "2", name: "Ana Souza", role: "FAMILY" },
-  { id: "3", name: "Bruno Oliveira", role: "FAMILY" },
-];
+import { infoService } from "../services/infoService";
+import { userService } from "../services/userService";
 
 const INITIAL_MOCK_INFOS = {};
-
 const STORAGE_KEY = "@FamilySync:infos";
 
 const getInitialInfosFromStorage = () => {
@@ -26,10 +20,8 @@ const getInitialInfosFromStorage = () => {
 };
 
 export function useInfoFamiliar() {
-  const [members, setMembers] = useState(MOCK_MEMBERS);
-  const [activeMemberId, setActiveMemberId] = useState(
-    MOCK_MEMBERS[0]?.id || null,
-  );
+  const [members, setMembers] = useState([]);
+  const [activeMemberId, setActiveMemberId] = useState(null);
 
   const [allInfosDict, setAllInfosDict] = useState(getInitialInfosFromStorage);
   const [infos, setInfos] = useState([]);
@@ -40,19 +32,46 @@ export function useInfoFamiliar() {
   const [selectedInfo, setSelectedInfo] = useState(null);
   const [isModeEdition, setIsModeEdition] = useState(false);
 
-  let decodedUser = { nome: "Você", id_usuario: "me" };
-  try {
-    const token = Cookies.get("familysync_token");
-    if (token) {
-      decodedUser = jwtDecode(token);
+  const decodedUser = useMemo(() => {
+    let user = { nome: "Você", id_usuario: "me" };
+    try {
+      const token = Cookies.get("familysync_token");
+      if (token) {
+        user = jwtDecode(token);
+      }
+    } catch (error) {
+      console.error("Erro ao decodificar token. Usando usuário padrão.", error);
     }
-  } catch (error) {
-    console.error("Erro ao decodificar token. Usando usuário padrão.", error);
-  }
+    return user;
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(allInfosDict));
-  }, [allInfosDict]);
+    const fetchMembers = async () => {
+      setIsLoading(true);
+      try {
+        const idFamilia = sessionStorage.getItem("@FamilySync:family:id");
+        if (!idFamilia) {
+          console.warn("ID da família não encontrado no sessionStorage");
+          return;
+        }
+
+        const response = await userService.listUsersByFamily(idFamilia);
+        const fetchedMembers = response.dados.membros || [];
+
+        setMembers(fetchedMembers);
+
+        if (fetchedMembers.length > 0) {
+          setActiveMemberId(fetchedMembers[0].id_usuario);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar membros:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMembers();
+  }, []);
 
   useEffect(() => {
     if (!activeMemberId) return;
@@ -60,23 +79,22 @@ export function useInfoFamiliar() {
     const fetchInformacoes = async () => {
       setIsLoading(true);
       try {
-        // --- AQUI ENTRARÁ O GET ---
-        // Exemplo:
-        // const targetId = activeMemberId === "me" ? decodedUser.id_usuario : activeMemberId;
-        // const response = await api.get(`/v1/familysync/usuario-informacao/${targetId}`);
-        // setInfos(response.data.dados);
+        const targetId =
+          activeMemberId === "me" ? decodedUser.id_usuario : activeMemberId;
+        const response = await infoService.getInfosById(targetId);
 
-        // --- Lógica Mock atual ---
-        setInfos(allInfosDict[activeMemberId] || []);
+        const dados = response.data?.dados || response.data || [];
+        setInfos(dados);
       } catch (error) {
-        console.error("Erro ao buscar informações do membro", error);
+        console.error("Erro ao buscar informações:", error);
+        setInfos(allInfosDict[activeMemberId] || []);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchInformacoes();
-  }, [activeMemberId, allInfosDict]);
+  }, [activeMemberId, decodedUser.id_usuario]);
 
   const handleOpenModal = useCallback((item = null, isEditMode = true) => {
     setSelectedInfo(item);
@@ -93,13 +111,12 @@ export function useInfoFamiliar() {
   }, []);
 
   const handleDelete = useCallback(
-    (id_info) => {
-      // aqui terá um await api.delete(`/v1/familysync/informacoes/${id_info}`)
+    async (id_info) => {
+      await infoService.deleteInfo(id_info);
       setAllInfosDict((prevDict) => {
         const currentMemberInfos = prevDict[activeMemberId] || [];
         return {
           ...prevDict,
-          // Usando a chave correta: id_info
           [activeMemberId]: currentMemberInfos.filter(
             (info) => info.id_info !== id_info,
           ),
@@ -110,49 +127,60 @@ export function useInfoFamiliar() {
   );
 
   const handleSave = useCallback(
-    (data) => {
-      // data vem do form (provavelmente do react-hook-form)
+    async (data) => {
       const { title, description } = data;
+      setIsLoading(true);
 
-      setAllInfosDict((prevDict) => {
-        const currentMemberInfos = prevDict[activeMemberId] || [];
-        let updatedMemberInfos;
-
+      try {
         if (selectedInfo) {
-          // Editando (No futuro: PUT /v1/familysync/informacoes/:id_info)
-          updatedMemberInfos = currentMemberInfos.map((info) =>
-            info.id_info === selectedInfo.id_info
-              ? { ...info, titulo: title, descricao: description } // Mapeando para o padrão da API
-              : info,
-          );
-        } else {
-          // Criando (No futuro: POST /v1/familysync/informacoes/)
-          const newInfo = {
-            id_info: Date.now(),
-            id_usuario: decodedUser.id_usuario,
+          const infoAtualizada = {
+            id_info: selectedInfo.id_info,
             titulo: title,
             descricao: description,
           };
-          updatedMemberInfos = [newInfo, ...currentMemberInfos];
+          await infoService.updateInfo(infoAtualizada);
+          setInfos((prev) =>
+            prev.map((info) =>
+              info.id_info === selectedInfo.id_info
+                ? { ...info, titulo: title, descricao: description }
+                : info,
+            ),
+          );
+        } else {
+          const newInfoPayload = {
+            titulo: title,
+            descricao: description,
+          };
+
+          await infoService.createInfo(newInfoPayload);
+
+          const responseAll = await infoService.getInfos();
+
+          const listaInfos = responseAll.data?.dados || responseAll.dados || [];
+          const ultimaInfo = listaInfos[listaInfos.length - 1];
+
+          if (ultimaInfo) {
+            const idGerado = ultimaInfo.id || ultimaInfo.id_info;
+
+            await infoService.createInfoWithUser({
+              id_info: idGerado,
+              id_usuario: decodedUser.id_usuario,
+            });
+
+            setInfos((prev) => [ultimaInfo, ...prev]);
+          }
         }
 
-        return {
-          ...prevDict,
-          [activeMemberId]: updatedMemberInfos,
-        };
-      });
-
-      handleCloseModal();
+        handleCloseModal();
+      } catch (error) {
+        console.error("Erro ao salvar:", error);
+        alert("Erro ao salvar. Verifique o console para mais detalhes.");
+      } finally {
+        setIsLoading(false);
+      }
     },
-    [
-      selectedInfo,
-      activeMemberId,
-      handleCloseModal,
-      decodedUser.nome,
-      decodedUser.id_usuario,
-    ],
+    [selectedInfo, handleCloseModal, decodedUser.id_usuario],
   );
-
   return {
     members,
     activeMemberId,

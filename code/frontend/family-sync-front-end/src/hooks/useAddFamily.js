@@ -224,18 +224,24 @@ export const useAddFamily = () => {
       const decoded = jwtDecode(token);
       const user = decoded;
 
-      const dadosFamily = {
+      const dadosFamilyEndereco = {
         nome: formData.nomeFamilia.trim(),
-        telefone_residencial: formatPhone(formData.telefone),
+        telefone: formatPhone(formData.telefone),
+        cep: formData.cep,
+        logradouro: formData.logradouro,
+        bairro: formData.bairro,
+        complemento: formData.complemento || "",
+        cidade: formData.cidade,
+        estado: formData.uf,
+        numero: formData.numero,
       };
 
-      const responseCreationFamily =
-        await familyService.createFamily(dadosFamily);
+      const responseFamilyCreation =
+        await familyService.createFamilyEndereco(dadosFamilyEndereco);
 
       if (
-        responseCreationFamily.StatusCode == 201 ||
-        responseCreationFamily.StatusCode == 200 ||
-        responseCreationFamily.id
+        responseFamilyCreation.StatusCode == 201 ||
+        responseFamilyCreation.StatusCode == 200
       ) {
         const responseFamilies = await familyService.getFamilies();
         const ultimaFamilia = responseFamilies.Response.at(-1);
@@ -244,15 +250,8 @@ export const useAddFamily = () => {
         if (!idFamiliaGerado)
           throw new Error("ID da família não encontrado após a criação.");
 
-        const dadosEndereco = {
+        const dadosOwnerFamily = {
           id_familia: idFamiliaGerado,
-          cep: formData.cep,
-          logradouro: formData.logradouro,
-          bairro: formData.bairro,
-          complemento: formData.complemento || "",
-          cidade: formData.cidade,
-          estado: formData.uf,
-          numero: formData.numero,
         };
 
         const dadosUserFamily = {
@@ -268,14 +267,13 @@ export const useAddFamily = () => {
         );
 
         await Promise.all([
-          enderecoService.createEndereco(dadosEndereco),
           userService.addUserFamilyByEmail(dadosUserFamily),
           ...promessasMembros,
         ]);
 
         window.location.href = "/dashboard";
       } else {
-        setErrosCampos({ geral: responseCreationFamily.message });
+        setErrosCampos({ geral: responseFamilyCreation.message });
       }
     } catch (error) {
       console.log(error);

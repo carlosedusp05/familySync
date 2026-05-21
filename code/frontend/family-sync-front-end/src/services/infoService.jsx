@@ -2,6 +2,19 @@ import api from "./api";
 
 // GET - Listar informações
 const getInfos = async function () {
+  const url = "/informacoes";
+
+  try {
+    const response = await api.get(url);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
+const getInfosUser = async function () {
   const url = "/usuarios-informacoes";
 
   try {
@@ -28,8 +41,22 @@ const getInfosById = async function (id) {
 };
 
 // POST - Criar Informação
-const createInfo = async function (data) {
+const createInfoWithUser = async function (data) {
   const url = "/usuario-informacao";
+
+  try {
+    const response = await api.post(url, data);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
+// POST - Criar Informação
+const createInfo = async function (data) {
+  const url = "/informacao";
 
   try {
     const response = await api.post(url, data);
@@ -71,8 +98,10 @@ const deleteInfo = async function (id) {
 
 export const infoService = {
   getInfos,
+  getInfosUser,
   getInfosById,
   createInfo,
   updateInfo,
   deleteInfo,
+  createInfoWithUser,
 };

@@ -39,8 +39,22 @@ const createFamily = async function (data) {
   }
 };
 
+const createFamilyEndereco = async function (data) {
+  const url = "/familia/endereco/";
+
+  try {
+    const response = await api.post(url, data);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 export const familyService = {
   getFamilies,
   getFamily,
   createFamily,
+  createFamilyEndereco,
 };

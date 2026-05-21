@@ -18,27 +18,22 @@ function InfoFamiliarContent({
 }) {
   const renderedMembers = useMemo(() => {
     return members.map((member) => {
-      const isActive = activeMemberId === member.id;
+      const id = member.id_usuario;
+      const nome = member.nome_usuario;
+
+      const isActive = activeMemberId === id;
+
       return (
         <div
-          key={member.id}
-          onClick={() => setActiveMemberId(member.id)}
+          key={id}
+          onClick={() => setActiveMemberId(id)}
           className="flex flex-col items-center gap-1 w-full group cursor-pointer"
         >
           <div
-            className={`rounded-full h-24 w-24 flex items-center justify-center shadow-md transition-[transform,background-color,border-color] border-4 duration-300 ease-out will-change-transform
-            ${
-              isActive
-                ? "bg-brown-dark border-brown-dark scale-105"
-                : "bg-yellow-cream border-yellow-cream hover:scale-105 active:scale-95"
-            }`}
+            className={`rounded-full h-24 w-24 flex items-center justify-center shadow-md ... 
+          ${isActive ? "bg-brown-dark" : "bg-yellow-cream"}`}
           />
-          <span
-            className={`text-xs font-bold uppercase tracking-widest transition-colors duration-300
-            ${isActive ? "text-[#5D2A11]" : "text-[#5D2A11]/60"}`}
-          >
-            {member.name}
-          </span>
+          <span className="text-xs font-bold uppercase ...">{nome}</span>
         </div>
       );
     });

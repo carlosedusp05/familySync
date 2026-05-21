@@ -1,26 +1,20 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
+import { financeService } from "../services/financeService";
 
 const PERIODOS = ["Dia", "Semana", "Mês", "Ano"];
-const OPCOES_VISUALIZACAO = ["total", "dia", "semana", "mês", "ano"];
-const STORAGE_KEY = "@FamilySync:gastos";
 
 export function useFinancier() {
   const [periodo, setPeriodo] = useState("Mês");
   const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [tipoVisualizacao, setTipoVisualizacao] = useState("total");
 
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isListModalOpen, setIsListModalOpen] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState(null);
 
-  const [dadosPorPeriodo, setDadosPorPeriodo] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved
-      ? JSON.parse(saved)
-      : { Dia: [], Semana: [], Mês: [], Ano: [] };
-  });
+  const [gastosAtuais, setGastosAtuais] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const authorName = useMemo(() => {
     try {
@@ -34,17 +28,50 @@ export function useFinancier() {
     }
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(dadosPorPeriodo));
-  }, [dadosPorPeriodo]);
+  const idFamilia = sessionStorage.getItem("@FamilySync:family:id");
 
-  const gastosAtuais = dadosPorPeriodo[periodo] || [];
+  const fetchGastos = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      let dados = null;
+
+      if (periodo === "Dia")
+        dados = await financeService.getFinancasDailyByIdFamily(idFamilia);
+      if (periodo === "Semana")
+        dados = await financeService.getFinancasWeekByIdFamily(idFamilia);
+      if (periodo === "Mês")
+        dados = await financeService.getFinancasMonthlyByIdFamily(idFamilia);
+      if (periodo === "Ano")
+        dados = await financeService.getFinancasYearlyByIdFamily(idFamilia);
+
+      console.log(dados);
+
+      if (dados && Array.isArray(dados)) {
+        setGastosAtuais(dados);
+      } else if (dados && Array.isArray(dados.Response)) {
+        setGastosAtuais(dados.Response);
+      } else {
+        setGastosAtuais([]);
+      }
+    } catch (error) {
+      console.error(`Erro ao buscar os gastos do tipo: ${periodo}`, error);
+      setGastosAtuais([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [periodo, idFamilia]);
+
+  useEffect(() => {
+    fetchGastos();
+  }, [fetchGastos]);
 
   const { totalGasto, valorMaximo } = useMemo(() => {
-    const total = gastosAtuais.reduce((acc, curr) => acc + curr.valor, 0);
+    const listaValida = Array.isArray(gastosAtuais) ? gastosAtuais : [];
+
+    const total = listaValida.reduce((acc, curr) => acc + (curr.valor || 0), 0);
     const max =
-      gastosAtuais.length > 0
-        ? Math.max(...gastosAtuais.map((item) => item.valor))
+      listaValida.length > 0
+        ? Math.max(...listaValida.map((item) => item.valor || 0))
         : 1000;
     return { totalGasto: total, valorMaximo: max };
   }, [gastosAtuais]);
@@ -81,51 +108,47 @@ export function useFinancier() {
     };
   }, []);
 
-  const handleDeleteExpense = useCallback((id) => {
-    setDadosPorPeriodo((prev) => {
-      const novosDados = { ...prev };
-      PERIODOS.forEach((p) => {
-        novosDados[p] = novosDados[p].filter((item) => item.id !== id);
-      });
-      return novosDados;
-    });
+  const handleDeleteExpense = useCallback(async (id) => {
+    try {
+      await financeService.deleteFinancas(id);
+      setGastosAtuais((prev) =>
+        Array.isArray(prev) ? prev.filter((item) => item.id !== id) : [],
+      );
+    } catch (error) {
+      console.error("Erro ao deletar gasto:", error);
+    }
   }, []);
 
-  const handleSaveExpense = useCallback((categoria, valor, emoji, idToEdit) => {
-    setDadosPorPeriodo((prev) => {
-      const novosDados = { ...prev };
+  const handleSaveExpense = useCallback(
+    async (categoria, valor, emoji, descricao, idToEdit) => {
+      try {
+        const payload = {
+          id_familia: idFamilia,
+          tipo: categoria,
+          valor,
+          icone: emoji,
+          descricao: descricao,
+        };
 
-      PERIODOS.forEach((p) => {
+        console.log(payload);
+
         if (idToEdit) {
-          const index = novosDados[p].findIndex((item) => item.id === idToEdit);
-          if (index !== -1) {
-            novosDados[p][index] = {
-              ...novosDados[p][index],
-              label: categoria,
-              valor,
-              emoji,
-            };
-          }
+          await financeService.updateFinancas(idToEdit, payload);
         } else {
-          const novoId = Date.now();
-          const index = novosDados[p].findIndex(
-            (item) => item.label === categoria,
-          );
-          if (index !== -1) {
-            novosDados[p][index].valor += valor;
-          } else {
-            novosDados[p] = [
-              ...novosDados[p],
-              { label: categoria, valor, emoji, id: novoId },
-            ];
-          }
+          const financas_retorno = await financeService.createFinancas(payload);
+          console.log(financas_retorno);
         }
-      });
-      return novosDados;
-    });
-    setIsFormModalOpen(false);
-    setExpenseToEdit(null);
-  }, []);
+
+        await fetchGastos();
+
+        setIsFormModalOpen(false);
+        setExpenseToEdit(null);
+      } catch (error) {
+        console.error("Erro ao salvar gasto:", error);
+      }
+    },
+    [fetchGastos, idFamilia],
+  );
 
   const handleOpenEditForm = (item) => {
     setExpenseToEdit(item);
@@ -141,13 +164,10 @@ export function useFinancier() {
 
   return {
     PERIODOS,
-    OPCOES_VISUALIZACAO,
     periodo,
     setPeriodo,
     hoveredIndex,
     setHoveredIndex,
-    tipoVisualizacao,
-    setTipoVisualizacao,
     isFormModalOpen,
     setIsFormModalOpen,
     isListModalOpen,
@@ -155,11 +175,12 @@ export function useFinancier() {
     expenseToEdit,
     setExpenseToEdit,
     authorName,
-    gastosAtuais,
+    gastosAtuais: Array.isArray(gastosAtuais) ? gastosAtuais : [],
     totalGasto,
     valorMaximo,
     yAxisValues,
     labelsData,
+    isLoading,
     handleDeleteExpense,
     handleSaveExpense,
     handleOpenEditForm,

@@ -97,7 +97,7 @@ const getUsersFamily = async function () {
 };
 
 const listUsersByFamily = async function (idFamily) {
-  const url = `/usuario/familia/${idFamily}`;
+  const url = `/usuario-familia/${idFamily}`;
 
   try {
     const response = await api.get(url);

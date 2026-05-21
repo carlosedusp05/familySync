@@ -26,6 +26,9 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
   const [categoria, setCategoria] = useState(
     initialData ? initialData.label : "",
   );
+  const [descricao, setDescricao] = useState(
+    initialData?.descricao ? initialData.descricao : "",
+  );
   const [emojiSelecionado, setEmojiSelecionado] = useState(
     initialData ? initialData.emoji : "🛍️",
   );
@@ -37,6 +40,7 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
       msg = "Insira um valor maior que zero";
     if (campo === "categoria" && !val.trim())
       msg = "O nome da categoria é obrigatório";
+    if (campo === "descricao" && !val.trim()) msg = "A descrição é obrigatória";
 
     setErrors((prev) => ({ ...prev, [campo]: msg }));
     return !msg;
@@ -45,11 +49,20 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
   const handleConfirm = useCallback(() => {
     const isValorValid = validate("valor", valor);
     const isCatValid = validate("categoria", categoria);
+    const isDescValid = validate("descricao", descricao);
 
-    if (isValorValid && isCatValid) {
-      onSave(categoria, valor, emojiSelecionado, initialData?.id);
+    if (isValorValid && isCatValid && isDescValid) {
+      onSave(categoria, valor, emojiSelecionado, descricao, initialData?.id);
     }
-  }, [validate, valor, categoria, emojiSelecionado, onSave, initialData]);
+  }, [
+    validate,
+    valor,
+    categoria,
+    emojiSelecionado,
+    descricao,
+    onSave,
+    initialData,
+  ]);
 
   const handleValorChange = useCallback(
     (e) => {
@@ -69,33 +82,48 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
     [errors.categoria],
   );
 
+  const handleDescricaoChange = useCallback(
+    (e) => {
+      setDescricao(e.target.value);
+      if (errors.descricao) setErrors((prev) => ({ ...prev, descricao: "" }));
+    },
+    [errors.descricao],
+  );
+
   const displayValor = useMemo(
     () => (valor > 0 ? formatToBRL(valor).replace("R$", "").trim() : ""),
     [valor],
   );
+
   const emojiGrid = useMemo(
     () => (
-      <div className="grid grid-cols-4 gap-4 max-h-52 overflow-y-auto pr-2 custom-scrollbar py-2">
-        {FINANCE_EMOJIS.map((item) => (
-          <motion.button
-            key={item.label}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setEmojiSelecionado(item.icon)}
-            className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-colors border-[3px] shadow-sm
-            ${emojiSelecionado === item.icon ? "bg-orange border-orange" : "bg-white border-orange/30 hover:border-orange"}`}
-          >
-            <span
-              className={
+      <div className="w-full flex justify-center pt-2">
+        <div className="grid grid-cols-6 gap-4 max-h-52 overflow-y-auto pr-2 custom-scrollbar py-2">
+          {FINANCE_EMOJIS.map((item) => (
+            <motion.button
+              key={item.label}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setEmojiSelecionado(item.icon)}
+              className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-colors border-[3px] shadow-sm
+              ${
                 emojiSelecionado === item.icon
-                  ? "brightness-110"
-                  : "grayscale-[0.5]"
-              }
+                  ? "bg-orange border-orange"
+                  : "bg-white border-orange/30 hover:border-orange"
+              }`}
             >
-              {item.icon}
-            </span>
-          </motion.button>
-        ))}
+              <span
+                className={
+                  emojiSelecionado === item.icon
+                    ? "brightness-110"
+                    : "grayscale-[0.5]"
+                }
+              >
+                {item.icon}
+              </span>
+            </motion.button>
+          ))}
+        </div>
       </div>
     ),
     [emojiSelecionado],
@@ -115,7 +143,7 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
         exit={{ scale: 0.95, opacity: 0, y: 20 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-[500px] bg-white rounded-[40px] flex flex-col items-center py-8 px-10 shadow-2xl border border-orange-100 will-change-transform"
+        className="w-175 bg-white rounded-[40px] flex flex-col items-center py-8 px-10 shadow-2xl border border-orange-100 will-change-transform"
       >
         <h1 className="text-[26px] font-black text-brown-dark mb-8">
           {is_edit_expenses ? "Editar gastos" : "Adicionar gastos"}
@@ -123,7 +151,9 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
 
         <div className="flex flex-col items-center w-full mb-8">
           <div
-            className={`flex items-end gap-3 border-b-2 transition-colors px-6 pb-2 ${errors.valor ? "border-red-500" : "border-orange"}`}
+            className={`flex items-end gap-3 border-b-2 transition-colors px-6 pb-2 ${
+              errors.valor ? "border-red-500" : "border-orange"
+            }`}
           >
             <input
               type="text"
@@ -152,12 +182,16 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
         </div>
 
         <div className="w-full bg-[#FFF4D1] rounded-[35px] p-6 flex flex-col gap-6 shadow-inner">
-          <div className="w-full">
+          <div className="w-full flex flex-col gap-4">
             <div className="flex flex-col items-center w-full">
               <input
                 type="text"
                 placeholder="Nome da categoria"
-                className={`w-full h-14 rounded-full outline-none border-2 px-6 text-lg font-bold bg-white transition-colors ${errors.categoria ? "border-red-400" : "border-transparent focus:border-orange"}`}
+                className={`w-full h-14 rounded-full outline-none border-2 px-6 text-lg font-bold bg-white transition-colors ${
+                  errors.categoria
+                    ? "border-red-400"
+                    : "border-transparent focus:border-orange"
+                }`}
                 value={categoria}
                 onChange={handleCategoriaChange}
                 onBlur={() => validate("categoria", categoria)}
@@ -176,14 +210,48 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
                 )}
               </AnimatePresence>
             </div>
+
+            <div className="flex flex-col items-center w-full">
+              <textarea
+                placeholder="Descrição"
+                rows={2}
+                className={`w-full min-h-50 max-h-100 rounded-xl outline-none border-2 px-6 py-3 text-lg font-bold bg-white transition-colors resize-none custom-scrollbar ${
+                  errors.descricao
+                    ? "border-red-400"
+                    : "border-transparent focus:border-orange"
+                }`}
+                value={descricao}
+                onChange={handleDescricaoChange}
+                onBlur={() => validate("descricao", descricao)}
+              />
+              <AnimatePresence>
+                {errors.descricao && (
+                  <motion.p
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="text-red-500 text-xs font-bold mt-2 uppercase overflow-hidden"
+                  >
+                    {errors.descricao}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
           {emojiGrid}
         </div>
 
-        <div className="flex gap-6 mt-10 w-full justify-center">
-          <DefaultButton onClick={onClose} text="Cancelar" theme={false} />
+        <div className="flex gap-40 mt-5 w-full justify-center">
+          <DefaultButton
+            onClick={onClose}
+            text="Cancelar"
+            another_size={"h-14 w-40"}
+            theme={false}
+          />
           <DefaultButton
             onClick={handleConfirm}
+            another_size={"h-14 w-40"}
             text={is_edit_expenses ? "Salvar" : "Adicionar"}
           />
         </div>

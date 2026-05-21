@@ -37,13 +37,10 @@ function FinancierView({
       <div className="flex flex-col items-center justify-center py-12 h-full">
         <LargeCard size="h-[85%] w-[65%]" display="flex justify-center">
           <div className="w-full h-full flex flex-col items-center bg-white p-10 rounded-3xl relative">
-            {/* Header */}
             <div className="flex flex-col items-center mb-6">
-              <FinancialSelect
-                value={tipoVisualizacao}
-                onChange={setTipoVisualizacao}
-                options={OPCOES_VISUALIZACAO}
-              />
+              <span className="text-orange font-bold uppercase tracking-wider text-[18px] mb-1">
+                Gastos do {periodo}
+              </span>
               <h2 className="text-brown-dark font-extrabold text-[40px]">
                 R$ {totalGasto.toLocaleString("pt-BR")}
               </h2>
@@ -168,16 +165,16 @@ function FinancierView({
               </div>
             </div>
 
-            <div className="flex gap-40">
+            <div className="flex gap-50">
               <DefaultButton
                 text="Editar"
-                another_size="h-14 w-30"
+                another_size="h-14 w-40"
                 onClick={() => setIsListModalOpen(true)}
                 theme={false}
               />
               <DefaultButton
                 text="Incluir"
-                another_size="h-14 w-30"
+                another_size="h-14 w-40"
                 onClick={handleOpenAddForm}
               />
             </div>
