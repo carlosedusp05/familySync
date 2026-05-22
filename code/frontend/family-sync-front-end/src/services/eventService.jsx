@@ -1,4 +1,5 @@
 import api from "./api";
+import { userService } from "./userService";
 
 // GET - Listar eventos
 const getEvent = async function () {
@@ -16,14 +17,19 @@ const getEvent = async function () {
 
 // GET - Listar eventos por Id da Familia
 const listEventsByFamily = async function (idFamily) {
-  const url = `/familia/eventos/${idFamily}`;
+  const url = `eventos/familia/${idFamily}`;
 
   try {
     const response = await api.get(url);
-    const dados = response.data;
+    const dados = response.data.Response;
+
+    const getUser = userService.getUserById(dados.id_usuario);
+
+    console.log(getUser);
 
     return dados;
   } catch (error) {
+    console.log(error);
     throw error.response?.data;
   }
 };
