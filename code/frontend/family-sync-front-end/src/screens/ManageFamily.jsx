@@ -42,8 +42,8 @@ function ManageFamily() {
     <MainLayout>
       <div className="flex flex-col gap-4 items-center justify-center py-15 h-full">
         <div className="w-[80%] h-full flex gap-8">
-          <div className="max-h-full flex-1 bg-yellow-light rounded-[60px] flex flex-col items-center pt-20 text-center text-4xl font-bold text-orange gap-5">
-            <div className="relative w-[48%] aspect-square">
+          <div className="max-h-full flex-1 bg-white rounded-[60px] flex flex-col items-center pt-20 text-center text-3xl font-bold text-orange gap-10">
+            {/* <div className="relative w-[48%] aspect-square">
               <div className="w-full h-full bg-white border-4 border-orange rounded-full flex items-center justify-center overflow-hidden">
                 {preview ? (
                   <img
@@ -78,7 +78,7 @@ function ManageFamily() {
                   onChange={handleFileChange}
                 />
               </div>
-            </div>
+            </div> */}
 
             <h1>Membros</h1>
             <MultFamiliars
@@ -96,11 +96,45 @@ function ManageFamily() {
               ]}
             />
           </div>
-
-          {/* COLUNA DA DIREITA: FORMULÁRIO E CONVITE */}
           <div className="flex justify-between flex-col items-center flex-2 gap-10 px-4 ">
-            {/* Card de Informações da Família */}
             <div className="bg-yellow-light rounded-4xl px-15 pt-10 pb-25 relative h-fit w-[90%]">
+              <div className="relative h-70 w-70 aspect-square">
+                <div className="w-full h-full bg-white border-4 border-orange rounded-full flex items-center justify-center overflow-hidden">
+                  {preview ? (
+                    <img
+                      src={preview}
+                      alt="Preview"
+                      className="w-full h-full object-cover cursor-pointer"
+                      onClick={handleButtonClick}
+                    />
+                  ) : (
+                    <IconPerfil
+                      is_family_icon={true}
+                      another_size={"h-full w-full"}
+                      onClickNew={handleButtonClick}
+                    />
+                  )}
+                </div>
+                <div className="absolute -right-2 -bottom-2">
+                  <DefaultButton
+                    onClick={preview ? removeImagem : handleButtonClick}
+                    another_padding={"px-0 pb-2"}
+                    another_size={"h-20 w-20"}
+                    another_text_size={"text-7xl"}
+                    most_radius={true}
+                    text={preview ? "×" : "+"}
+                  />
+
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                </div>
+              </div>
+
               <div className="w-full text-orange text-5xl font-bold flex items-center py-14 gap-3">
                 <h1>Nome da familia</h1>
                 <img
@@ -110,7 +144,7 @@ function ManageFamily() {
                 />
               </div>
 
-              <div className="flex flex-wrap gap-10">
+              <div className="flex flex-wrap gap-5">
                 <InputWhite text={"00000-000"} styleFlex={"flex-1"} />
                 <InputWhite text={"Cidade"} styleFlex={"flex-1"} />
 

@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from "react";
 import { imageBackground } from "../assets";
 import DefaultHeader from "../components/layout/DefaultHeader";
 import BackgroundImage from "../components/ui/BackgroundImage";
@@ -10,34 +11,40 @@ function StartScreen(props) {
   const { userData, infos, isFamily } = useUserData();
   const addFamilyProps = useAddFamily();
 
-  const invites_family = sessionStorage.getItem("family_invite_token");
-
-  if (invites_family) {
-    sessionStorage.removeItem("family_invite_token");
-  }
+  useEffect(() => {
+    const invites_family = sessionStorage.getItem("family_invite_token");
+    if (invites_family) {
+      sessionStorage.removeItem("family_invite_token");
+    }
+  }, []);
 
   const estaCarregando = !userData || isFamily === null;
 
-  let userDataSincronizado = userData;
+  const userDataSincronizado = useMemo(() => {
+    if (estaCarregando || !isFamily || isFamily.length === 0) {
+      return userData;
+    }
 
-  if (!estaCarregando && isFamily && isFamily.length > 0) {
-    const activeFamilyId = sessionStorage.getItem("@FamilySync:family:id");
+    let activeFamilyId = sessionStorage.getItem("@FamilySync:family:id");
 
     if (!activeFamilyId) {
-      sessionStorage.setItem("@FamilySync:family:id", isFamily[0].id);
+      activeFamilyId = isFamily[0].id;
+      sessionStorage.setItem("@FamilySync:family:id", activeFamilyId);
     }
 
     const familiaAtiva = isFamily.find(
-      (f) => f.id === parseInt(activeFamilyId || isFamily[0].id),
+      (f) => f.id === parseInt(activeFamilyId),
     );
 
     if (familiaAtiva) {
-      userDataSincronizado = {
+      return {
         ...userData,
         nomeFamilia: familiaAtiva.nome || familiaAtiva.nomeFamilia,
       };
     }
-  }
+
+    return userData;
+  }, [userData, isFamily, estaCarregando]);
 
   return (
     <div className="flex flex-col w-full h-screen overflow-hidden">
