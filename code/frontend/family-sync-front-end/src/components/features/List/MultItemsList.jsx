@@ -53,7 +53,7 @@ function MultItemsList({
         <button
           type="button"
           onClick={() => setIsCreating(true)}
-          className="w-full bg-white/5 border-2 border-dashed border-[#D6CFC2]/40 hover:border-orange-dark hover:bg-white/10 flex flex-col items-center justify-center py-5 rounded-[25px] transition-all duration-300 group min-h-25 scale-95 hover:scale-98 active:scale-95 cursor-pointer"
+          className="w-full bg-white/15 border-2 border-dashed border-[#D6CFC2]/40 hover:border-orange-dark hover:bg-white/25 flex flex-col items-center justify-center py-5 rounded-[25px] transition-all duration-300 group min-h-25 scale-95 hover:scale-98 active:scale-95 cursor-pointer"
         >
           <span className="text-orange-dark text-6xl font-light leading-none transition-transform group-hover:scale-110">
             +

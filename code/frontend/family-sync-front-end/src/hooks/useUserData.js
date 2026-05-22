@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 import { formatUserName } from "../utils/formatters";
 import { infoService } from "../services/infoService";
 import { userService } from "../services/userService";
+import { eventService } from "../services/eventService";
 
 export function useUserData() {
   const [userData, setUserData] = useState(null);

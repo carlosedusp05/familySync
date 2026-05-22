@@ -68,12 +68,21 @@ export function useFinancier() {
   const { totalGasto, valorMaximo } = useMemo(() => {
     const listaValida = Array.isArray(gastosAtuais) ? gastosAtuais : [];
 
-    const total = listaValida.reduce((acc, curr) => acc + (curr.valor || 0), 0);
-    const max =
+    const total = listaValida.reduce(
+      (acc, curr) => acc + Number(curr.total || curr.valor || 0),
+      0,
+    );
+
+    const maiorGastoAtual =
       listaValida.length > 0
-        ? Math.max(...listaValida.map((item) => item.valor || 0))
-        : 1000;
-    return { totalGasto: total, valorMaximo: max };
+        ? Math.max(
+            ...listaValida.map((item) => Number(item.total || item.valor || 0)),
+          )
+        : 0;
+
+    const maxFinal = maiorGastoAtual > 0 ? maiorGastoAtual : 1000;
+
+    return { totalGasto: total, valorMaximo: maxFinal };
   }, [gastosAtuais]);
 
   const yAxisValues = useMemo(() => {

@@ -42,7 +42,10 @@ function FinancierView({
                 Gastos do {periodo}
               </span>
               <h2 className="text-brown-dark font-extrabold text-[40px]">
-                R$ {totalGasto.toLocaleString("pt-BR")}
+                R${" "}
+                {totalGasto.toLocaleString("pt-BR", {
+                  minimumFractionDigits: 2,
+                })}
               </h2>
             </div>
 
@@ -78,9 +81,7 @@ function FinancierView({
               {labelsData[periodo]}
             </div>
 
-            {/* Gráfico */}
             <div className="relative w-full max-w-300 h-150 mt-2 mb-10">
-              {/* Eixo Y */}
               <div className="absolute inset-0 flex flex-col justify-between z-0">
                 {yAxisValues.map((val, i) => (
                   <div key={i} className="flex items-center w-full h-0">
@@ -93,19 +94,22 @@ function FinancierView({
                 <div className="absolute top-0 bottom-0 left-12 border-l border-gray-300"></div>
               </div>
 
-              {/* Barras */}
               <div className="relative z-10 w-full h-full flex items-end justify-around pl-15 pr-4">
                 {gastosAtuais.map((item, index) => {
+                  const idFinanca = item.id_financas;
+                  const valorItem = Number(item.total || item.valor || 0);
+                  const labelItem = item.ano || periodo;
+
                   const alturaBarra =
-                    valorMaximo > 0 ? (item.valor / valorMaximo) * 100 : 0;
+                    valorMaximo > 0 ? (valorItem / valorMaximo) * 100 : 0;
                   const percent =
                     totalGasto > 0
-                      ? ((item.valor / totalGasto) * 100).toFixed(1)
+                      ? ((valorItem / totalGasto) * 100).toFixed(1)
                       : 0;
 
                   return (
                     <div
-                      key={item.id}
+                      key={idFinanca}
                       className="relative w-14 h-full flex flex-col justify-end items-center group"
                       onMouseEnter={() => setHoveredIndex(index)}
                       onMouseLeave={() => setHoveredIndex(null)}
@@ -120,15 +124,20 @@ function FinancierView({
                             className="absolute top-full -mt-60 z-30 w-52 bg-white border border-orange-200 shadow-2xl rounded-2xl p-4 flex flex-col items-center"
                           >
                             <span className="text-4xl mb-2">
-                              {item.emoji || "💰"}
+                              {item.icone || "💰"}
                             </span>
                             <p className="text-xl font-black text-brown-dark">
-                              R$ {item.valor.toLocaleString("pt-BR")}
+                              R${" "}
+                              {valorItem.toLocaleString("pt-BR", {
+                                minimumFractionDigits: 2,
+                              })}
                             </p>
-                            <p className="text-[11px] text-gray-400 font-bold uppercase">
+                            <p className="text-[11px] text-gray-400 font-bold uppercase mt-1">
                               Adicionado por:
                             </p>
-                            <p>{authorName}</p>
+                            <p className="text-xs text-center text-gray-700">
+                              {authorName}
+                            </p>
                             <div className="w-full h-px bg-gray-100 my-2" />
                             <p className="text-orange font-black text-lg">
                               {percent}%
@@ -136,7 +145,7 @@ function FinancierView({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleDeleteExpense(item.id);
+                                handleDeleteExpense(idFinanca);
                               }}
                               className="mt-2 text-[12px] text-red-500 hover:underline font-bold uppercase"
                             >
@@ -156,8 +165,8 @@ function FinancierView({
                           bounce: 0.3,
                         }}
                       />
-                      <span className="absolute top-full mt-1 text-base font-bold text-[#5B3E31] w-24 text-center wrap-break-word">
-                        {item.label}
+                      <span className="absolute top-full mt-1 text-base font-bold text-[#5B3E31] w-24 text-center break-words">
+                        {labelItem}
                       </span>
                     </div>
                   );
@@ -165,7 +174,7 @@ function FinancierView({
               </div>
             </div>
 
-            <div className="flex gap-50">
+            <div className="flex gap-10 mt-4">
               <DefaultButton
                 text="Editar"
                 another_size="h-14 w-40"

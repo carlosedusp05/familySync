@@ -30,10 +30,14 @@ function InfoFamiliarContent({
           className="flex flex-col items-center gap-1 w-full group cursor-pointer"
         >
           <div
-            className={`rounded-full h-24 w-24 flex items-center justify-center shadow-md ... 
+            className={`rounded-full h-24 w-24 flex items-center justify-center transition-all shadow-md ... 
           ${isActive ? "bg-brown-dark" : "bg-yellow-cream"}`}
           />
-          <span className="text-xs font-bold uppercase ...">{nome}</span>
+          <span
+            className={`text-xs font-bold uppercase ${isActive ? "text-brown-dark" : "text-yellow-cream"} ...`}
+          >
+            {nome}
+          </span>
         </div>
       );
     });

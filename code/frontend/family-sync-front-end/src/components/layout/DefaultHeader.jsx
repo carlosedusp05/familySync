@@ -8,7 +8,7 @@ import { useState } from "react";
 function DefaultHeader({ disconnected }) {
   const navigate = useNavigate();
 
-  const family_session = localStorage.getItem("activeFamilyId");
+  const family_session = sessionStorage.getItem("@FamilySync:family:id");
   const hasFamily = Boolean(family_session && family_session.trim().length > 0);
 
   const handleNotificationClick = () => {

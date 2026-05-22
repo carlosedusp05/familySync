@@ -16,7 +16,7 @@ const getEvent = async function () {
 
 // GET - Listar eventos por Id da Familia
 const listEventsByFamily = async function (idFamily) {
-  const url = `/evento/familia/${idFamily}`;
+  const url = `/familia/eventos/${idFamily}`;
 
   try {
     const response = await api.get(url);
