@@ -93,3 +93,15 @@ export const parseMoneyToFloat = (formattedValue) => {
 
   return parseFloat(clean) || 0;
 };
+
+export function formatDate(dateString) {
+  if (!dateString) return "";
+
+  return dateString.split("T")[0];
+}
+
+export function formatHour(timeString) {
+  if (!timeString) return "";
+
+  return timeString.slice(0, 5);
+}

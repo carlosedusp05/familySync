@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { eventService } from "../services/eventService";
-import { create } from "axios";
+import { formatDate, formatHour } from "../utils/formatters";
 
 export function useCalendar() {
   const token = Cookies.get("familysync_token");
@@ -24,10 +24,7 @@ export function useCalendar() {
   const [warning, setWarning] = useState("");
   const [showWarning, setShowWarning] = useState(false);
 
-  const [dateEvent, setDateEvent] = useState(() => {
-    const saved = localStorage.getItem(`dateEvents`);
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [dateEvent, setDateEvent] = useState([]);
 
   const [selectedInfo, setSelectedInfo] = useState(null);
   const [isModeEdition, setIsModeEdition] = useState(false);
@@ -47,14 +44,19 @@ export function useCalendar() {
 
   useEffect(() => {
     async function loadEvents() {
-      if (familiaAtivaSalva) return;
       const response = await eventService.listEventsByFamily(familiaAtivaSalva);
 
-      setDateEvent(response);
+      const formattedEvents = response.map((event) => ({
+        ...event,
+        data: formatDate(event.data),
+        hora: formatHour(event.hora),
+      }));
+
+      setDateEvent(formattedEvents);
     }
 
     loadEvents();
-  }, [dateEvent]);
+  }, [familiaAtivaSalva]);
 
   useEffect(() => {
     const grouped = dateEvent.reduce((acc, event) => {
