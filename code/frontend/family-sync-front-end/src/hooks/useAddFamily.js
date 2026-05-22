@@ -252,7 +252,10 @@ export const useAddFamily = () => {
 
         const dadosOwnerFamily = {
           id_familia: idFamiliaGerado,
+          id_usuario: user.id_usuario,
         };
+
+        await userService.createUserFamily(dadosOwnerFamily);
 
         const dadosUserFamily = {
           email: user.email,
