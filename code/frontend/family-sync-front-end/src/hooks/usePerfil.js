@@ -105,6 +105,7 @@ export function usePerfil() {
 
   const handleLogout = () => {
     localStorage.clear();
+    sessionStorage.clear();
     Object.keys(Cookies.get()).forEach((cookieName) => {
       Cookies.remove(cookieName, { path: "/" });
     });
@@ -113,7 +114,7 @@ export function usePerfil() {
 
   const handleSelectFamily = (id) => {
     setFamiliasSelecionadas([id]);
-    localStorage.setItem("activeFamilyId", id);
+    sessionStorage.setItem("@FamilySync:family:id", id);
     setIsFamiliesOpen(false);
   };
 

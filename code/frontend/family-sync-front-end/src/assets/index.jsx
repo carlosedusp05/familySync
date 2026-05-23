@@ -43,6 +43,10 @@ import editBoxIcon from "./edit_box_icon.svg";
 import deleteRedIcon from "./delete_red_icon.svg";
 import chevronDownBrownIcon from "./chevron_down_brown_icon.svg";
 import editPencilBrownIcon from "./edit_pencil_brown_icon.svg";
+import trashIconRed from "./trash_icon_red.svg";
+import settingsOrange from "./settings_orange.svg";
+import eyeWhite from "./eye_white.svg";
+import eyeMostOrange from "./eye_most_orange.svg";
 
 export {
   eyeIcon,
@@ -90,4 +94,8 @@ export {
   deleteRedIcon,
   chevronDownBrownIcon,
   editPencilBrownIcon,
+  trashIconRed,
+  settingsOrange,
+  eyeWhite,
+  eyeMostOrange,
 };
