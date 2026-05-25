@@ -9,7 +9,7 @@ function MultEventsField({ events = [], onEdit }) {
         hours={event.hora}
         date={event.data}
         desc={event.descricao}
-        creator={event.creator}
+        creator={event.usuario}
         onEdit={() => onEdit(event, true)}
       />
     );

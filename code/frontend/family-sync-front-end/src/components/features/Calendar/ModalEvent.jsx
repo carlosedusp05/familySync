@@ -3,7 +3,6 @@ import { pencilTerracotaIcon } from "../../../assets";
 import { useEffect, useRef, useState } from "react";
 import DefaultButton from "../../ui/DefaultButton";
 import { motion, AnimatePresence } from "framer-motion";
-import { div } from "framer-motion/client";
 
 function ModalEvents({
   isOpen,
@@ -13,6 +12,7 @@ function ModalEvents({
   onDelete,
   onSave,
   isInitialEdit,
+  isLoading,
 }) {
   const isEdit = Boolean(data);
 
@@ -30,7 +30,6 @@ function ModalEvents({
     title: false,
     description: false,
   });
-
   const hoursRef = useRef(null);
   const titleRef = useRef(null);
   const descRef = useRef(null);
@@ -129,7 +128,8 @@ function ModalEvents({
 
             <div className="flex justify-between items-center py-10">
               <div className="font-bold text-2xl">
-                <p>DIA: {selectedDate}</p>
+                {console.log(data)}
+                {data ? <p>DIA: {data.data}</p> : <p>DIA: {selectedDate}</p>}
               </div>
               <div className="flex items-center justify-center text-center flex-col">
                 <div className="flex gap-3 items-center justify-center">
@@ -338,6 +338,7 @@ function ModalEvents({
                         another_text_size="text-[20px]"
                         another_size="h-14 w-50"
                         onClick={handleSave}
+                        disabled={isLoading}
                       />
                       {isEdit && (
                         <DefaultButton
@@ -365,8 +366,7 @@ function ModalEvents({
                   />
                   <DefaultButton
                     onClick={() => {
-                      console.log(data);
-                      onDelete && onDelete(data.id_eventos);
+                      onDelete(data.id_eventos);
                       onClose();
                     }}
                     another_color="bg-red-light"

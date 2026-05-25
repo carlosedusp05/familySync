@@ -23,13 +23,19 @@ const listEventsByFamily = async function (idFamily) {
     const response = await api.get(url);
     const dados = response.data.Response;
 
-    const getUser = userService.getUserById(dados.id_usuario);
+    const dadosUsers = await Promise.all(
+      dados.map(async (item) => {
+        const users = await userService.getUserById(item.id_usuario);
 
-    console.log(getUser);
+        return {
+          ...item,
+          usuario: users.Response[0].nome,
+        };
+      }),
+    );
 
-    return dados;
+    return dadosUsers;
   } catch (error) {
-    console.log(error);
     throw error.response?.data;
   }
 };
