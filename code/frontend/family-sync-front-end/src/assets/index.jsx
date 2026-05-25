@@ -47,6 +47,7 @@ import trashIconRed from "./trash_icon_red.svg";
 import settingsOrange from "./settings_orange.svg";
 import eyeWhite from "./eye_white.svg";
 import eyeMostOrange from "./eye_most_orange.svg";
+import logoutIconRed from "./logout_icon_red.svg";
 
 export {
   eyeIcon,
@@ -98,4 +99,5 @@ export {
   settingsOrange,
   eyeWhite,
   eyeMostOrange,
+  logoutIconRed,
 };

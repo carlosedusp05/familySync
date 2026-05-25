@@ -1,4 +1,5 @@
 import { logoutIcon } from "../../assets";
+import { logoutIconRed } from "../../assets";
 
 function DefaultButton({
   theme = true,
@@ -15,6 +16,7 @@ function DefaultButton({
   onClick,
   onMouseEnter,
   another_padding,
+  logout_red = false,
   ...rest
 }) {
   const backgroundColor =
@@ -23,7 +25,11 @@ function DefaultButton({
     another_text_color || (theme ? "text-white" : "text-orange");
   const IsExistBorder = border ? "border border-orange" : "";
   const HaveLogout = logout_image ? (
-    <img src={logoutIcon} alt="sair" className="w-12.5 h-15" />
+    logout_red ? (
+      <img src={logoutIconRed} alt="sair" className="w-12.5 h-15" />
+    ) : (
+      <img src={logoutIcon} alt="sair" className="w-12.5 h-15" />
+    )
   ) : null;
   const border_radius = most_radius ? "rounded-[50%]" : "rounded-[15px]";
   const size = another_size

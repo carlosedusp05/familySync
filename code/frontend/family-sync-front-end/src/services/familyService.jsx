@@ -52,9 +52,37 @@ const createFamilyEndereco = async function (data) {
   }
 };
 
+const getFamilyComplete = async function (id) {
+  const url = `/familia/${id}/completa`;
+
+  try {
+    const response = await api.get(url, id);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
+const createMemberByEmailFamily = async function (data) {
+  const url = "/usuariio-familia/email/";
+
+  try {
+    const response = await api.post(url, data);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 export const familyService = {
   getFamilies,
   getFamily,
   createFamily,
   createFamilyEndereco,
+  getFamilyComplete,
+  createMemberByEmailFamily,
 };
