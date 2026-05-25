@@ -15,6 +15,7 @@ function DefaultButton({
   onClick,
   onMouseEnter,
   another_padding,
+  disabled = false,
   ...rest
 }) {
   const backgroundColor =
@@ -40,6 +41,7 @@ function DefaultButton({
   return (
     <button
       type={type}
+      disabled={disabled}
       className={`${backgroundColor} ${textColor} ${IsExistBorder} ${border_radius} 
         ${size} ${textStyle} ${padding}
         cursor-pointer

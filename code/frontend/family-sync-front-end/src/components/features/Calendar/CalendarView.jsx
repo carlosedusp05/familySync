@@ -7,6 +7,8 @@ import ShowAlert from "./ShowAlert.jsx";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import LoadingOverlay from "../../ui/LoadingOverlay.jsx";
+import { useCalendar } from "../../../hooks/useCalendar.js";
 
 function CalendarView({
   dateEvent,
@@ -22,9 +24,12 @@ function CalendarView({
   handleDelete,
   handleOpenModal,
   eventCount,
+  isLoading,
 }) {
   return (
     <MainLayout>
+      {isLoading && <LoadingOverlay />}
+
       <div className="h-full flex w-full">
         <div className="w-[50%] h-full flex flex-col p-30 gap-7">
           <h2 className="text-5xl text-white font-bold">Calendário</h2>
@@ -52,6 +57,7 @@ function CalendarView({
                 onDelete={handleDelete}
                 isInitialEdit={isModeEdition}
                 data={selectedInfo}
+                isLoading={isLoading}
               />
             </div>
           </LargeCard>
