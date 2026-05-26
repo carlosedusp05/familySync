@@ -40,7 +40,9 @@ export function useCalendar() {
   const familiaAtivaSalva = sessionStorage.getItem("@FamilySync:family:id");
 
   useEffect(() => {
-    setIsLoading(true);
+    if (dateEvent == "") {
+      setIsLoading(true);
+    }
 
     async function loadEvents() {
       try {
@@ -83,16 +85,29 @@ export function useCalendar() {
   }, [dateEvent]);
 
   const handleDelete = async (id) => {
-    const response = await eventService.deleteEvent(id);
+    setIsLoading(true);
+    try {
+      const response = await eventService.deleteEvent(id);
 
+<<<<<<< HEAD
     if (response.StatusCode !== 200) {
       triggerAlert(
         "Não foi possível deletar o evento... Tente novamente mais tarde!"
       );
       return;
-    }
+=======
+      if (response.StatusCode !== 200) {
+        triggerAlert(
+          "Não foi possível deletar o evento... Tente novamente mais tarde!"
+        );
+        return;
+      }
 
-    setDateEvent((prev) => prev.filter((item) => item.id_eventos !== id));
+      setDateEvent((prev) => prev.filter((item) => item.id_eventos !== id));
+    } finally {
+      setIsLoading(false);
+>>>>>>> 990e8ea20bf3999c15cd890e31b663497f4895a2
+    }
   };
 
   const handleSave = async (newData) => {

@@ -58,7 +58,7 @@ function DefaultHeader({ disconnected }) {
     <div className="flex gap-12 max-md:gap-8 items-center justify-center">
       <IconPerfil
         is_white_backgroud={false}
-        another_size={"max-md:h-7 max-md:w-7"}
+        another_size={"h-10 max-md:h-7 max-md:w-7"}
       />
       <div
         className="bg-orange-dark flex items-center justify-center h-fit p-4 max-md:p-4 rounded-lg cursor-pointer duration-300 transition-all hover:scale-110"
@@ -66,7 +66,7 @@ function DefaultHeader({ disconnected }) {
         onClick={handleNotificationClick}
       >
         <img
-          className="w-12 h-12 max-md:w-6 max-md:h-6"
+          className="w-8 h-8 max-md:w-6 max-md:h-6"
           src={notificationsIcon}
           alt="Notificações"
           draggable={false}
@@ -77,7 +77,7 @@ function DefaultHeader({ disconnected }) {
 
   return (
     <header
-      className={`w-full flex justify-between py-10 items-center bg-white px-16`}
+      className={`w-full flex justify-between py-8 items-center bg-white px-16`}
     >
       {disconnected ? (
         <IconFamilySync />

@@ -64,13 +64,13 @@ function RootLayout() {
               <img
                 src={familySyncTextIcon}
                 alt="FamilySync Text"
-                className="h-70 w-auto max-w-none object-left"
+                className="h-70 w-auto max-w-none object-left max-lg:h-50 max-sm:h-30"
               />
             </div>
             <img
               src={familySyncSmallIcon}
               alt="FamilySync Icon"
-              className="h-70 w-auto z-10"
+              className="h-70 w-auto z-10 max-lg:h-50 max-sm:h-30"
             />
           </div>
         </div>
