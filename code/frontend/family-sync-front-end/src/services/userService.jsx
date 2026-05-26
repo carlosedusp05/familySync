@@ -143,7 +143,7 @@ const getFamiliesByUser = async function (id) {
     ]);
 
     const familiasDoUsuario = familias.dados.filter((familia) =>
-      familia.membros.some((membro) => membro.id_usuario === id),
+      familia.membros.some((membro) => membro.id_usuario === id)
     );
 
     const familiasFormatadas = familiasDoUsuario.map((f) => ({

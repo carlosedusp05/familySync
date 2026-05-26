@@ -35,7 +35,7 @@ function FinancierView({
   return (
     <MainLayout>
       <div className="flex flex-col items-center justify-center py-12 h-full">
-        <LargeCard size="h-[85%] w-[65%]" display="flex justify-center">
+        <LargeCard size="h-[90%] w-[57%]" display="flex justify-center">
           <div className="w-full h-full flex flex-col items-center bg-white p-10 rounded-3xl relative">
             <div className="flex flex-col items-center mb-6">
               <span className="text-orange font-bold uppercase tracking-wider text-[18px] mb-1">
@@ -49,7 +49,6 @@ function FinancierView({
               </h2>
             </div>
 
-            {/* Tabs */}
             <div className="w-full flex items-center justify-center gap-50 mt-4 px-10">
               {PERIODOS.map((item) => (
                 <div
@@ -58,7 +57,11 @@ function FinancierView({
                   onClick={() => setPeriodo(item)}
                 >
                   <span
-                    className={`text-2xl pb-2 transition-colors ${periodo === item ? "text-orange font-bold" : "text-orange font-medium"}`}
+                    className={`text-2xl pb-2 transition-colors ${
+                      periodo === item
+                        ? "text-orange font-bold"
+                        : "text-orange font-medium"
+                    }`}
                   >
                     {item}
                   </span>
@@ -98,7 +101,22 @@ function FinancierView({
                 {gastosAtuais.map((item, index) => {
                   const idFinanca = item.id_financas;
                   const valorItem = Number(item.total || item.valor || 0);
-                  const labelItem = item.ano || periodo;
+                  let labelItem = "";
+
+                  switch (periodo) {
+                    case "Dia":
+                    case "Semana":
+                      labelItem = `${item.dia}/${item.mes}/${item.ano}`;
+                      break;
+                    case "Mês":
+                      labelItem = `${item.semana_mes}`;
+                      break;
+                    case "Ano":
+                      labelItem = `${item.mes}`;
+                      break;
+                    default:
+                      labelItem = "";
+                  }
 
                   const alturaBarra =
                     valorMaximo > 0 ? (valorItem / valorMaximo) * 100 : 0;

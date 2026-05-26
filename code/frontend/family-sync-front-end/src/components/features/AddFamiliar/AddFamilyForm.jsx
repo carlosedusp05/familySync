@@ -41,7 +41,7 @@ function AddFamilyForm({
     <LargeCard
       color={"bg-yellow-light"}
       p={"px-50"}
-      size={"h-[85%] w-[75%]"}
+      size={"h-[85%] w-[65%]"}
       data-aos="fade-up"
     >
       <div className="h-full w-full flex items-center justify-between ajuste-desfoque">

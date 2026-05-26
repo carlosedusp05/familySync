@@ -19,7 +19,6 @@ function FamilyDetails({
   return (
     <div className="flex-1 bg-[#fdf8ed] rounded-[40px] shadow-sm p-10 flex flex-col gap-8 relative">
       <div className="flex items-center justify-between">
-        {/* ALTERAÇÃO: Nome da família vira input quando está em modo de edição */}
         {isEditing ? (
           <input
             type="text"
@@ -36,13 +35,6 @@ function FamilyDetails({
         )}
 
         <div className="flex gap-4 items-center">
-          {/* Lápis alterna o modo de edição */}
-          <img
-            src={pencilTerracotaIcon}
-            alt="Editar"
-            onClick={toggleEditMode}
-            className={`w-8 h-8 cursor-pointer transition-all ${isEditing ? "opacity-100 scale-110" : "opacity-70 hover:opacity-100"}`}
-          />
           <img
             src={trashIconRed}
             alt="Deletar Família"
@@ -50,10 +42,10 @@ function FamilyDetails({
           />
         </div>
       </div>
-
-      {/* Upload da Foto de Capa (Desabilitado se não estiver editando) */}
       <div
-        className={`relative w-full h-56 bg-gray-300 rounded-3xl overflow-hidden group ${isEditing ? "cursor-pointer" : "cursor-default opacity-80"}`}
+        className={`relative w-full h-56 bg-gray-300 rounded-3xl overflow-hidden group ${
+          isEditing ? "cursor-pointer" : "cursor-default opacity-80"
+        }`}
       >
         {preview ? (
           <img

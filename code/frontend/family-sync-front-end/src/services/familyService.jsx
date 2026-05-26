@@ -39,6 +39,19 @@ const createFamily = async function (data) {
   }
 };
 
+const updateFamily = async function (id, data) {
+  const url = `/familia/${id}`;
+
+  try {
+    const response = await api.put(url, data);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 const createFamilyEndereco = async function (data) {
   const url = "/familia/endereco/";
 
@@ -66,7 +79,7 @@ const getFamilyComplete = async function (id) {
 };
 
 const createMemberByEmailFamily = async function (data) {
-  const url = "/usuariio-familia/email/";
+  const url = "/usuario-familia/email/";
 
   try {
     const response = await api.post(url, data);
@@ -85,4 +98,5 @@ export const familyService = {
   createFamilyEndereco,
   getFamilyComplete,
   createMemberByEmailFamily,
+  updateFamily,
 };

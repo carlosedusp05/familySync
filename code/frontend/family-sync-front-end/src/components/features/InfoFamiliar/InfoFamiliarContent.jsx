@@ -34,7 +34,9 @@ function InfoFamiliarContent({
           ${isActive ? "bg-brown-dark" : "bg-yellow-cream"}`}
           />
           <span
-            className={`text-xs font-bold uppercase ${isActive ? "text-brown-dark" : "text-yellow-cream"} ...`}
+            className={`text-xs font-bold uppercase ${
+              isActive ? "text-brown-dark" : "text-yellow-cream"
+            } ...`}
           >
             {nome}
           </span>
@@ -99,7 +101,12 @@ function InfoFamiliarContent({
         </div>
 
         <div className="w-70 h-full bg-[#EED9CE]/40 backdrop-blur-lg border border-white/10 p-6 flex flex-col items-center gap-6 shadow-[-10px_0_30px_0_rgba(0,0,0,0.1)] rounded-[40px] transform-gpu">
-          <div className="flex flex-col items-center gap-6 w-full">
+          <div
+            className="flex flex-col items-center gap-6 w-full overflow-y-auto custom-scrollbar  [&::-webkit-scrollbar]:w-2.5
+            [&::-webkit-scrollbar-track]:bg-transparent
+          [&::-webkit-scrollbar-thumb]:bg-[#282828]
+            [&::-webkit-scrollbar-thumb]:rounded-md"
+          >
             {renderedMembers}
           </div>
         </div>

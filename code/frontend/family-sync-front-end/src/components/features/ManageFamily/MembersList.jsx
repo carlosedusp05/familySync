@@ -48,7 +48,12 @@ function MembersList({
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 overflow-y-auto pr-2 pb-24 custom-scrollbar">
+      <div
+        className="flex flex-col gap-4 overflow-y-auto pr-2 pb-24 custom-scrollbar  [&::-webkit-scrollbar]:w-2.5
+            [&::-webkit-scrollbar-track]:bg-transparent
+          [&::-webkit-scrollbar-thumb]:bg-[#282828]
+            [&::-webkit-scrollbar-thumb]:rounded-md"
+      >
         {familiars.map((member) => (
           <div
             key={member.id}

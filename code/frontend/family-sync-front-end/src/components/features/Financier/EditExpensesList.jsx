@@ -3,25 +3,34 @@ import { motion } from "framer-motion";
 import DefaultButton from "../../ui/DefaultButton";
 
 const ExpenseItem = memo(({ item, totalGasto, onEdit, onDelete }) => {
+  // Ajuste para garantir que pega o valor correto vindo da API
+  const valorItem = Number(item.valor || item.total || 0);
+
   const percent =
-    totalGasto > 0 ? ((item.valor / totalGasto) * 100).toFixed(0) : 0;
-  const formattedValue = item.valor.toLocaleString("pt-BR", {
+    totalGasto > 0 ? ((valorItem / totalGasto) * 100).toFixed(0) : 0;
+  const formattedValue = valorItem.toLocaleString("pt-BR", {
     minimumFractionDigits: 2,
   });
 
   const handleEdit = useCallback(() => onEdit(item), [item, onEdit]);
+
+  // CORREÇÃO: Alterado de item.id para item.id_financas
   const handleDelete = useCallback(
-    () => onDelete(item.id),
-    [item.id, onDelete],
+    () => onDelete(item.id_financas),
+    [item.id_financas, onDelete]
   );
 
   return (
     <div className="bg-white rounded-full px-6 py-3 flex items-center justify-between shadow-sm">
       <div className="flex items-center gap-4 w-1/3">
+        {/* CORREÇÃO: Alterado de item.emoji para item.icone */}
         <span className="bg-orange/20 p-2 rounded-lg text-xl">
-          {item.emoji}
+          {item.icone || "💰"}
         </span>
-        <span className="font-semibold text-brown-dark">{item.label}</span>
+        {/* CORREÇÃO: Alterado de item.label para item.tipo ou item.descricao */}
+        <span className="font-semibold text-brown-dark truncate">
+          {item.tipo || item.descricao || "Gasto"}
+        </span>
       </div>
 
       <span className="text-brown-dark font-medium w-1/6 text-center">
@@ -35,7 +44,7 @@ const ExpenseItem = memo(({ item, totalGasto, onEdit, onDelete }) => {
       <div className="flex gap-3 ml-4">
         <button
           onClick={handleEdit}
-          className="text-orange hover:scale-110 transition-transform"
+          className="text-orange hover:scale-110 transition-transform cursor-pointer"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -53,7 +62,7 @@ const ExpenseItem = memo(({ item, totalGasto, onEdit, onDelete }) => {
         </button>
         <button
           onClick={handleDelete}
-          className="text-orange hover:scale-110 transition-transform"
+          className="text-orange hover:scale-110 transition-transform cursor-pointer"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -109,7 +118,7 @@ const EditExpensesList = memo(
             ) : (
               expenses.map((item) => (
                 <ExpenseItem
-                  key={item.id}
+                  key={item.id_financas}
                   item={item}
                   totalGasto={totalGasto}
                   onEdit={onEdit}
@@ -135,7 +144,7 @@ const EditExpensesList = memo(
         </motion.div>
       </motion.div>
     );
-  },
+  }
 );
 
 EditExpensesList.displayName = "EditExpensesList";

@@ -22,17 +22,22 @@ const FINANCE_EMOJIS = [
 ];
 
 function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
-  const [valor, setValor] = useState(initialData ? initialData.valor : 0);
+  // CORREÇÃO: Alinhando os campos com o que vem do seu backend (valor, tipo, icone)
+  const [valor, setValor] = useState(
+    initialData ? initialData.valor || initialData.total || 0 : 0
+  );
   const [categoria, setCategoria] = useState(
-    initialData ? initialData.label : "",
+    initialData ? initialData.tipo || initialData.label || "" : ""
   );
   const [descricao, setDescricao] = useState(
-    initialData?.descricao ? initialData.descricao : "",
+    initialData?.descricao ? initialData.descricao : ""
   );
   const [emojiSelecionado, setEmojiSelecionado] = useState(
-    initialData ? initialData.emoji : "🛍️",
+    initialData ? initialData.icone || initialData.emoji || "🛍️" : "🛍️"
   );
+
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = useCallback((campo, val) => {
     let msg = "";
@@ -46,13 +51,28 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
     return !msg;
   }, []);
 
-  const handleConfirm = useCallback(() => {
+  const handleConfirm = useCallback(async () => {
+    if (isSubmitting) return;
     const isValorValid = validate("valor", valor);
     const isCatValid = validate("categoria", categoria);
     const isDescValid = validate("descricao", descricao);
 
     if (isValorValid && isCatValid && isDescValid) {
-      onSave(categoria, valor, emojiSelecionado, descricao, initialData?.id);
+      setIsSubmitting(true);
+      try {
+        // CORREÇÃO: Passando o id_financas correto em vez de .id
+        await onSave(
+          categoria,
+          valor,
+          emojiSelecionado,
+          descricao,
+          initialData?.id_financas
+        );
+      } catch (error) {
+        console.error("Erro ao processar requisição:", error);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   }, [
     validate,
@@ -62,6 +82,7 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
     descricao,
     onSave,
     initialData,
+    isSubmitting,
   ]);
 
   const handleValorChange = useCallback(
@@ -71,7 +92,7 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
       setValor(valorNumerico);
       if (errors.valor) setErrors((prev) => ({ ...prev, valor: "" }));
     },
-    [errors.valor],
+    [errors.valor]
   );
 
   const handleCategoriaChange = useCallback(
@@ -79,7 +100,7 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
       setCategoria(e.target.value);
       if (errors.categoria) setErrors((prev) => ({ ...prev, categoria: "" }));
     },
-    [errors.categoria],
+    [errors.categoria]
   );
 
   const handleDescricaoChange = useCallback(
@@ -87,12 +108,12 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
       setDescricao(e.target.value);
       if (errors.descricao) setErrors((prev) => ({ ...prev, descricao: "" }));
     },
-    [errors.descricao],
+    [errors.descricao]
   );
 
   const displayValor = useMemo(
     () => (valor > 0 ? formatToBRL(valor).replace("R$", "").trim() : ""),
-    [valor],
+    [valor]
   );
 
   const emojiGrid = useMemo(
@@ -102,6 +123,7 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
           {FINANCE_EMOJIS.map((item) => (
             <motion.button
               key={item.label}
+              type="button"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setEmojiSelecionado(item.icon)}
@@ -126,7 +148,7 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
         </div>
       </div>
     ),
-    [emojiSelecionado],
+    [emojiSelecionado]
   );
 
   return (
@@ -163,6 +185,7 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
               onBlur={() => validate("valor", valor)}
               className="w-48 outline-none text-orange text-[42px] font-black bg-transparent text-center placeholder:text-orange/20"
               placeholder="0,00"
+              disabled={isSubmitting}
             />
             <span className="text-orange text-xl font-bold mb-3">BRL</span>
           </div>
@@ -195,6 +218,7 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
                 value={categoria}
                 onChange={handleCategoriaChange}
                 onBlur={() => validate("categoria", categoria)}
+                disabled={isSubmitting}
               />
               <AnimatePresence>
                 {errors.categoria && (
@@ -223,6 +247,7 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
                 value={descricao}
                 onChange={handleDescricaoChange}
                 onBlur={() => validate("descricao", descricao)}
+                disabled={isSubmitting}
               />
               <AnimatePresence>
                 {errors.descricao && (
@@ -248,11 +273,19 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
             text="Cancelar"
             another_size={"h-14 w-40"}
             theme={false}
+            disabled={isSubmitting}
           />
           <DefaultButton
             onClick={handleConfirm}
             another_size={"h-14 w-40"}
-            text={is_edit_expenses ? "Salvar" : "Adicionar"}
+            text={
+              isSubmitting
+                ? "Salvando..."
+                : is_edit_expenses
+                ? "Salvar"
+                : "Adicionar"
+            }
+            disabled={isSubmitting}
           />
         </div>
       </motion.div>

@@ -1,12 +1,12 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { familyService } from "../services/familyService";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
-import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { validateEmail } from "../utils/validators";
+import { enderecoService } from "../services/enderecoService";
 
 const INITIAL_FAMILIARS = [
-  { id: 3, name: "Lucas Gabriel", degree_of_relatives: "Filho", isMe: true },
+  { id: 3, name: "Lucas Gabriel", degree_of_relatives: "Filho", isMe: false },
   { id: 1, name: "João Pedro Silva", degree_of_relatives: "Pai", isMe: false },
   { id: 2, name: "Maria Alice", degree_of_relatives: "Mãe", isMe: false },
   { id: 4, name: "Ana Beatriz", degree_of_relatives: "Filha", isMe: false },
@@ -50,13 +50,27 @@ export function useManageFamily() {
 
   const idFamilia = sessionStorage.getItem("@FamilySync:family:id");
 
+  const myUserId = useMemo(() => {
+    const token = Cookies.get("familysync_token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        return String(decoded.id_usuario || decoded.id);
+      } catch (error) {
+        console.error("Erro ao decodificar token:", error);
+      }
+    }
+    return null;
+  }, []);
+
   const fetchApiData = async () => {
+    if (!idFamilia) return;
     try {
       const response = await familyService.getFamilyComplete(idFamilia);
 
       const dadosDaAPI = {
         nome: response.Response.familia[0].nome,
-        telefone: response.Response.familia[0].telefone_residencial || "",
+        telefone: response.Response.telefone_residencial || "",
         cep: response.Response.endereco[0].cep,
         cidade: response.Response.endereco[0].cidade,
         estado: response.Response.endereco[0].estado,
@@ -71,19 +85,10 @@ export function useManageFamily() {
       setFormData(dadosDaAPI);
 
       if (response.Response.usuarios) {
-        const token = Cookies.get("familysync_token");
-        let myUserId = "";
-
-        if (token) {
-          const decoded = jwtDecode(token);
-          myUserId = String(decoded.id_usuario || decoded.id);
-        }
-
         const membrosFormatados = response.Response.usuarios.map((user) => ({
-          id: user.id,
+          id: user.id_usuario,
           name: user.nome,
           degree_of_relatives: user.parentesco || "Membro",
-          isMe: myUserId ? String(user.id) === myUserId : false,
         }));
 
         setFamiliars(membrosFormatados);
@@ -94,56 +99,6 @@ export function useManageFamily() {
   };
 
   useEffect(() => {
-    if (idFamilia) {
-      fetchApiData();
-    }
-  }, [idFamilia]);
-
-  useEffect(() => {
-    fetchApiData();
-  }, [idFamilia]);
-
-  useEffect(() => {
-    const fetchApiData = async () => {
-      try {
-        const response = await familyService.getFamilyComplete(idFamilia);
-
-        const dadosDaAPI = {
-          nome: response.Response.familia[0].nome,
-          telefone: response.Response.familia[0].telefone_residencial || "",
-          cep: response.Response.endereco[0].cep,
-          cidade: response.Response.endereco[0].cidade,
-          estado: response.Response.endereco[0].estado,
-          bairro: response.Response.endereco[0].bairro,
-          logradouro: response.Response.endereco[0].logradouro,
-          numero: response.Response.endereco[0].numero,
-          complemento: response.Response.endereco[0].complemento,
-        };
-
-        setFamilyData(dadosDaAPI);
-        setFormData(dadosDaAPI);
-
-        if (response.Response.usuarios) {
-          const token = Cookies.get("familysync_token");
-
-          if (token) {
-            const decoded = jwtDecode(token);
-            myUserId = String(decoded.id_usuario || decoded.id);
-          }
-
-          const membrosFormatados = response.Response.usuarios.map((user) => ({
-            id: user.id,
-            name: user.nome,
-            degree_of_relatives: user.parentesco || "Membro",
-            isMe: myUserId ? String(user.id) === myUserId : false,
-          }));
-
-          setFamiliars(membrosFormatados);
-        }
-      } catch (error) {
-        console.error("Erro ao buscar dados da família:", error);
-      }
-    };
     fetchApiData();
   }, [idFamilia]);
 
@@ -228,7 +183,13 @@ export function useManageFamily() {
 
   const saveFamilyData = async () => {
     try {
-      console.log("Enviando para API:", formData);
+      const familyDataPayload = {
+        nome: formData.nome,
+        telefone_residencial: formData.telefone,
+      };
+
+      await familyService.updateFamily(idFamilia, familyDataPayload);
+
       setFamilyData(formData);
       setIsEditing(false);
       alert("Informações salvas com sucesso!");
@@ -240,7 +201,7 @@ export function useManageFamily() {
 
   const leaveFamily = async () => {
     const confirm = window.confirm(
-      "Tem certeza que deseja sair desta família? Você perderá acesso a todos os dados.",
+      "Tem certeza que deseja sair desta família? Você perderá acesso a todos os dados."
     );
     if (confirm) {
       try {
@@ -262,8 +223,6 @@ export function useManageFamily() {
 
     setIsLoading(true);
     try {
-      const idFamilia = sessionStorage.getItem("@FamilySync:family:id");
-
       await familyService.createMemberByEmailFamily({
         id_familia: idFamilia,
         email: [currentEmail],
@@ -292,6 +251,19 @@ export function useManageFamily() {
     }));
   };
 
+  const sortedFamiliars = useMemo(() => {
+    const familiarsWithIsMe = familiars.map((member) => ({
+      ...member,
+      isMe: myUserId ? String(member.id) === myUserId : false,
+    }));
+
+    return familiarsWithIsMe.sort((a, b) => {
+      if (a.isMe) return -1;
+      if (b.isMe) return 1;
+      return 0;
+    });
+  }, [familiars, myUserId]);
+
   return {
     fileInputRef,
     preview,
@@ -301,7 +273,7 @@ export function useManageFamily() {
     setIsHoveredSettings,
     isHoveredView,
     setIsHoveredView,
-    familiars,
+    familiars: sortedFamiliars,
     isPermissionsOpen,
     isDeleteOpen,
     selectedMember,
@@ -321,10 +293,12 @@ export function useManageFamily() {
     handleInputChange,
     saveFamilyData,
     leaveFamily,
+    isLoading,
+    currentEmail,
+    setCurrentEmail,
     handleAddMember,
     handleRemoveMember,
     errosCampos,
     setErrosCampos,
-    handleRemoveMember,
   };
 }

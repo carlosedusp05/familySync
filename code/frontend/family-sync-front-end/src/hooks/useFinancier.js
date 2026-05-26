@@ -45,7 +45,6 @@ export function useFinancier() {
         dados = await financeService.getFinancasYearlyByIdFamily(idFamilia);
 
       console.log(dados);
-
       if (dados && Array.isArray(dados)) {
         setGastosAtuais(dados);
       } else if (dados && Array.isArray(dados.Response)) {
@@ -70,13 +69,13 @@ export function useFinancier() {
 
     const total = listaValida.reduce(
       (acc, curr) => acc + Number(curr.total || curr.valor || 0),
-      0,
+      0
     );
 
     const maiorGastoAtual =
       listaValida.length > 0
         ? Math.max(
-            ...listaValida.map((item) => Number(item.total || item.valor || 0)),
+            ...listaValida.map((item) => Number(item.total || item.valor || 0))
           )
         : 0;
 
@@ -88,7 +87,7 @@ export function useFinancier() {
   const yAxisValues = useMemo(() => {
     const passos = 5;
     return Array.from({ length: passos + 1 }, (_, i) =>
-      Math.round((valorMaximo / passos) * (passos - i)),
+      Math.round((valorMaximo / passos) * (passos - i))
     );
   }, [valorMaximo]);
 
@@ -109,7 +108,7 @@ export function useFinancier() {
 
     return {
       Dia: capitalize(
-        hoje.toLocaleDateString("pt-BR", { day: "2-digit", month: "long" }),
+        hoje.toLocaleDateString("pt-BR", { day: "2-digit", month: "long" })
       ),
       Semana: `${fmt(dom)} - ${fmt(sab)}`,
       Mês: `${fmt(pMes)} - ${fmt(uMes)}`,
@@ -121,7 +120,9 @@ export function useFinancier() {
     try {
       await financeService.deleteFinancas(id);
       setGastosAtuais((prev) =>
-        Array.isArray(prev) ? prev.filter((item) => item.id !== id) : [],
+        Array.isArray(prev)
+          ? prev.filter((item) => item.id_financas !== id)
+          : []
       );
     } catch (error) {
       console.error("Erro ao deletar gasto:", error);
@@ -139,13 +140,10 @@ export function useFinancier() {
           descricao: descricao,
         };
 
-        console.log(payload);
-
         if (idToEdit) {
           await financeService.updateFinancas(idToEdit, payload);
         } else {
-          const financas_retorno = await financeService.createFinancas(payload);
-          console.log(financas_retorno);
+          await financeService.createFinancas(payload);
         }
 
         await fetchGastos();
@@ -156,7 +154,7 @@ export function useFinancier() {
         console.error("Erro ao salvar gasto:", error);
       }
     },
-    [fetchGastos, idFamilia],
+    [fetchGastos, idFamilia]
   );
 
   const handleOpenEditForm = (item) => {

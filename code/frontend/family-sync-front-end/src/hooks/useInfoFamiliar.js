@@ -58,10 +58,22 @@ export function useInfoFamiliar() {
         const response = await userService.listUsersByFamily(idFamilia);
         const fetchedMembers = response.dados.membros || [];
 
-        setMembers(fetchedMembers);
+        const myUserId = String(decodedUser.id_usuario);
+        const mappedMembers = fetchedMembers.map((member) => ({
+          ...member,
+          isMe: String(member.id_usuario) === myUserId,
+        }));
 
-        if (fetchedMembers.length > 0) {
-          setActiveMemberId(fetchedMembers[0].id_usuario);
+        const sortedMembers = mappedMembers.sort((a, b) => {
+          if (a.isMe) return -1;
+          if (b.isMe) return 1;
+          return 0;
+        });
+
+        setMembers(sortedMembers);
+
+        if (sortedMembers.length > 0) {
+          setActiveMemberId(sortedMembers[0].id_usuario);
         }
       } catch (error) {
         console.error("Erro ao buscar membros:", error);
@@ -71,7 +83,7 @@ export function useInfoFamiliar() {
     };
 
     fetchMembers();
-  }, []);
+  }, [decodedUser.id_usuario]);
 
   useEffect(() => {
     if (!activeMemberId) return;
@@ -118,12 +130,12 @@ export function useInfoFamiliar() {
         return {
           ...prevDict,
           [activeMemberId]: currentMemberInfos.filter(
-            (info) => info.id_info !== id_info,
+            (info) => info.id_info !== id_info
           ),
         };
       });
     },
-    [activeMemberId],
+    [activeMemberId]
   );
 
   const handleSave = useCallback(
@@ -143,8 +155,8 @@ export function useInfoFamiliar() {
             prev.map((info) =>
               info.id_info === selectedInfo.id_info
                 ? { ...info, titulo: title, descricao: description }
-                : info,
-            ),
+                : info
+            )
           );
         } else {
           const newInfoPayload = {
@@ -179,7 +191,7 @@ export function useInfoFamiliar() {
         setIsLoading(false);
       }
     },
-    [selectedInfo, handleCloseModal, decodedUser.id_usuario],
+    [selectedInfo, handleCloseModal, decodedUser.id_usuario]
   );
   return {
     members,
