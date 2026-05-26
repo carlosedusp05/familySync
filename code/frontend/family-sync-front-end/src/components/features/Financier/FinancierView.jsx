@@ -32,6 +32,30 @@ function FinancierView({
   handleOpenEditForm,
   handleOpenAddForm,
 }) {
+  const traduzirDia = {
+    Monday: "Segunda",
+    Tuesday: "Terça",
+    Wednesday: "Quarta",
+    Thursday: "Quinta",
+    Friday: "Sexta",
+    Saturday: "Sábado",
+    Sunday: "Domingo",
+  };
+
+  const traduzirMes = {
+    January: "Janeiro",
+    February: "Fevereiro",
+    March: "Março",
+    April: "Abril",
+    May: "Maio",
+    June: "Junho",
+    July: "Julho",
+    August: "Agosto",
+    September: "Setembro",
+    October: "Outubro",
+    November: "Novembro",
+    December: "Dezembro",
+  };
   return (
     <MainLayout>
       <div className="flex flex-col items-center justify-center py-12 h-full">
@@ -106,18 +130,18 @@ function FinancierView({
                   switch (periodo) {
                     case "Dia":
                     case "Semana":
-                      labelItem = `${item.dia}/${item.mes}/${item.ano}`;
+                      labelItem =
+                        traduzirDia[item.dia_semana] || item.dia_semana;
                       break;
                     case "Mês":
                       labelItem = `${item.semana_mes}`;
                       break;
                     case "Ano":
-                      labelItem = `${item.mes}`;
+                      labelItem = traduzirMes[item.mes] || `${item.mes}`;
                       break;
                     default:
                       labelItem = "";
                   }
-
                   const alturaBarra =
                     valorMaximo > 0 ? (valorItem / valorMaximo) * 100 : 0;
                   const percent =
@@ -183,7 +207,7 @@ function FinancierView({
                           bounce: 0.3,
                         }}
                       />
-                      <span className="absolute top-full mt-1 text-base font-bold text-[#5B3E31] w-24 text-center break-words">
+                      <span className="absolute top-full mt-1 text-[18px] font-bold text-[#5B3E31] w-24 text-center break-words">
                         {labelItem}
                       </span>
                     </div>

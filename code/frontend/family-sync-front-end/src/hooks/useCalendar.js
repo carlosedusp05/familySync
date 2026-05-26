@@ -44,8 +44,9 @@ export function useCalendar() {
 
     async function loadEvents() {
       try {
-        const response =
-          await eventService.listEventsByFamily(familiaAtivaSalva);
+        const response = await eventService.listEventsByFamily(
+          familiaAtivaSalva
+        );
 
         const formattedEvents = response.map((event) => ({
           ...event,
@@ -86,7 +87,7 @@ export function useCalendar() {
 
     if (response.StatusCode !== 200) {
       triggerAlert(
-        "Não foi possível deletar o evento... Tente novamente mais tarde!",
+        "Não foi possível deletar o evento... Tente novamente mais tarde!"
       );
       return;
     }
@@ -107,12 +108,12 @@ export function useCalendar() {
 
         const updateEvent = await eventService.updateEvent(
           selectedInfo.id_eventos,
-          updateItem,
+          updateItem
         );
 
         if (updateEvent.StatusCode !== 200) {
           triggerAlert(
-            "Não foi possível atualizar o evento... Tente novamente mais tarde",
+            "Não foi possível atualizar o evento... Tente novamente mais tarde"
           );
           handleCloseModal();
           return;
@@ -120,8 +121,8 @@ export function useCalendar() {
 
         setDateEvent((prev) =>
           prev.map((item) =>
-            item.id_eventos === selectedInfo.id_eventos ? updateItem : item,
-          ),
+            item.id_eventos === selectedInfo.id_eventos ? updateItem : item
+          )
         );
       } else {
         const newItem = {
@@ -137,7 +138,7 @@ export function useCalendar() {
 
         if (createEvent.StatusCode !== 201) {
           triggerAlert(
-            "Não foi possível criar o evento... Tente novamente mais tarde",
+            "Não foi possível criar o evento... Tente novamente mais tarde"
           );
           handleCloseModal();
           return;
