@@ -40,12 +40,15 @@ export function useCalendar() {
   const familiaAtivaSalva = sessionStorage.getItem("@FamilySync:family:id");
 
   useEffect(() => {
-    setIsLoading(true);
+    if (dateEvent == "") {
+      setIsLoading(true);
+    }
 
     async function loadEvents() {
       try {
-        const response =
-          await eventService.listEventsByFamily(familiaAtivaSalva);
+        const response = await eventService.listEventsByFamily(
+          familiaAtivaSalva
+        );
 
         const formattedEvents = response.map((event) => ({
           ...event,
@@ -82,16 +85,21 @@ export function useCalendar() {
   }, [dateEvent]);
 
   const handleDelete = async (id) => {
-    const response = await eventService.deleteEvent(id);
+    setIsLoading(true);
+    try {
+      const response = await eventService.deleteEvent(id);
 
-    if (response.StatusCode !== 200) {
-      triggerAlert(
-        "Não foi possível deletar o evento... Tente novamente mais tarde!",
-      );
-      return;
+      if (response.StatusCode !== 200) {
+        triggerAlert(
+          "Não foi possível deletar o evento... Tente novamente mais tarde!"
+        );
+        return;
+      }
+
+      setDateEvent((prev) => prev.filter((item) => item.id_eventos !== id));
+    } finally {
+      setIsLoading(false);
     }
-
-    setDateEvent((prev) => prev.filter((item) => item.id_eventos !== id));
   };
 
   const handleSave = async (newData) => {
@@ -107,12 +115,12 @@ export function useCalendar() {
 
         const updateEvent = await eventService.updateEvent(
           selectedInfo.id_eventos,
-          updateItem,
+          updateItem
         );
 
         if (updateEvent.StatusCode !== 200) {
           triggerAlert(
-            "Não foi possível atualizar o evento... Tente novamente mais tarde",
+            "Não foi possível atualizar o evento... Tente novamente mais tarde"
           );
           handleCloseModal();
           return;
@@ -120,8 +128,8 @@ export function useCalendar() {
 
         setDateEvent((prev) =>
           prev.map((item) =>
-            item.id_eventos === selectedInfo.id_eventos ? updateItem : item,
-          ),
+            item.id_eventos === selectedInfo.id_eventos ? updateItem : item
+          )
         );
       } else {
         const newItem = {
@@ -137,7 +145,7 @@ export function useCalendar() {
 
         if (createEvent.StatusCode !== 201) {
           triggerAlert(
-            "Não foi possível criar o evento... Tente novamente mais tarde",
+            "Não foi possível criar o evento... Tente novamente mais tarde"
           );
           handleCloseModal();
           return;

@@ -108,3 +108,7 @@
 .fc-scroller {
   overflow: hidden !important;
 }
+
+.fc-toolbar-title {
+  text-transform: capitalize;
+}

@@ -15,7 +15,7 @@ function ShowAlert({ warning, showWarning }) {
           py-3
           rounded-xl
           shadow-lg
-          z-[9999]
+          z-9999
           transition-all
           duration-500
   

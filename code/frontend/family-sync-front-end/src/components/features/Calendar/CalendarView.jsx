@@ -3,12 +3,12 @@ import MainLayout from "../../../layouts/MainLayout.jsx";
 import LargeCard from "../../ui/LargeCard.jsx";
 import MultEventsField from "./MultEventsFIeld.jsx";
 import ModalEvents from "./ModalEvent.jsx";
-import ShowAlert from "./ShowAlert.jsx";
+import ShowAlert from "../../ui/ShowAlert.jsx";
 import FullCalendar from "@fullcalendar/react";
+import ptBrLocale from "@fullcalendar/core/locales/pt-br";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import LoadingOverlay from "../../ui/LoadingOverlay.jsx";
-import { useCalendar } from "../../../hooks/useCalendar.js";
 
 function CalendarView({
   dateEvent,
@@ -45,6 +45,7 @@ function CalendarView({
                 height="100%"
                 dateClick={handleDateClick}
                 events={eventCount}
+                locale={ptBrLocale}
               />
 
               <ShowAlert warning={warning} showWarning={showWarning} />
