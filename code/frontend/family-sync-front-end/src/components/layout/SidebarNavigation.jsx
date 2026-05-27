@@ -45,7 +45,11 @@ function SideBarNavegation() {
   };
 
   return (
-    <div className="p-4 gap-10 bg-orange flex flex-col items-center justify-center relative transform-gpu">
+    <div
+      className="p-4 gap-10 bg-orange flex flex-col items-center justify-center relative transform-gpu
+    max-md:gap-8 max-md:py-0 max-md:px-4
+    "
+    >
       <LayoutGroup>
         {navLinks.map((link) => {
           const isActive = checkIsPage(link);
@@ -60,7 +64,7 @@ function SideBarNavegation() {
                 <motion.div
                   layoutId="activeBackground"
                   initial={false}
-                  className="absolute inset-0 bg-black/20 rounded-2xl"
+                  className="absolute inset-0 bg-black/20   rounded-2xl"
                   style={{ willChange: "transform" }}
                   transition={{
                     type: "spring",
