@@ -2,7 +2,9 @@ import IconFamilySync from "../icons/IconFamilySync";
 import IconPerfil from "../icons/IconPerfil";
 import DefaultButton from "../ui/DefaultButton";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { notificationsIcon } from "../../assets/index";
+import { useNotifications } from "../../hooks/useNotifications";
 
 function DefaultHeader({ disconnected }) {
   const navigate = useNavigate();
