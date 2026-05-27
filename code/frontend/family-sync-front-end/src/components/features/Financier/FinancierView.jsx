@@ -5,6 +5,7 @@ import DefaultButton from "../../ui/DefaultButton.jsx";
 import AddExpenses from "./AddExpenses.jsx";
 import FinancialSelect from "./FinancialSelect.jsx";
 import EditExpensesList from "./EditExpensesList.jsx";
+import LoadingOverlay from "../../ui/LoadingOverlay.jsx";
 
 function FinancierView({
   PERIODOS,
@@ -31,6 +32,7 @@ function FinancierView({
   handleSaveExpense,
   handleOpenEditForm,
   handleOpenAddForm,
+  isLoading,
 }) {
   const traduzirDia = {
     Monday: "Segunda",
@@ -58,6 +60,7 @@ function FinancierView({
   };
   return (
     <MainLayout>
+      {isLoading && <LoadingOverlay />}
       <div className="flex flex-col items-center justify-center py-12 h-full">
         <LargeCard size="h-[90%] w-[57%]" display="flex justify-center">
           <div className="w-full h-full flex flex-col items-center bg-white p-10 rounded-3xl relative">

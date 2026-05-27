@@ -66,6 +66,7 @@ export function useManageFamily() {
   const fetchApiData = async () => {
     if (!idFamilia) return;
     try {
+      setIsLoading(true);
       const response = await familyService.getFamilyComplete(idFamilia);
 
       const dadosDaAPI = {
@@ -95,6 +96,8 @@ export function useManageFamily() {
       }
     } catch (error) {
       console.error("Erro ao buscar dados da família:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -201,7 +204,7 @@ export function useManageFamily() {
 
   const leaveFamily = async () => {
     const confirm = window.confirm(
-      "Tem certeza que deseja sair desta família? Você perderá acesso a todos os dados."
+      "Tem certeza que deseja sair desta família? Você perderá acesso a todos os dados.",
     );
     if (confirm) {
       try {

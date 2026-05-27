@@ -143,7 +143,7 @@ const getFamiliesByUser = async function (id) {
     ]);
 
     const familiasDoUsuario = familias.dados.filter((familia) =>
-      familia.membros.some((membro) => membro.id_usuario === id)
+      familia.membros.some((membro) => membro.id_usuario === id),
     );
 
     const familiasFormatadas = familiasDoUsuario.map((f) => ({
@@ -162,6 +162,19 @@ const getFamiliesByUser = async function (id) {
   }
 };
 
+const getNotificationsByUser = async function (id) {
+  const url = `/usuario-notificacao/${id}`;
+
+  try {
+    const response = await api.get(url);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 export const userService = {
   getUsers,
   getUserById,
@@ -174,4 +187,5 @@ export const userService = {
   addUserFamilyByEmail,
   getUsersFamily,
   getFamiliesByUser,
+  getNotificationsByUser,
 };

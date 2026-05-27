@@ -89,7 +89,6 @@ export function useInfoFamiliar() {
     if (!activeMemberId) return;
 
     const fetchInformacoes = async () => {
-      setIsLoading(true);
       try {
         const targetId =
           activeMemberId === "me" ? decodedUser.id_usuario : activeMemberId;
@@ -100,8 +99,6 @@ export function useInfoFamiliar() {
       } catch (error) {
         console.error("Erro ao buscar informações:", error);
         setInfos(allInfosDict[activeMemberId] || []);
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -130,12 +127,12 @@ export function useInfoFamiliar() {
         return {
           ...prevDict,
           [activeMemberId]: currentMemberInfos.filter(
-            (info) => info.id_info !== id_info
+            (info) => info.id_info !== id_info,
           ),
         };
       });
     },
-    [activeMemberId]
+    [activeMemberId],
   );
 
   const handleSave = useCallback(
@@ -155,8 +152,8 @@ export function useInfoFamiliar() {
             prev.map((info) =>
               info.id_info === selectedInfo.id_info
                 ? { ...info, titulo: title, descricao: description }
-                : info
-            )
+                : info,
+            ),
           );
         } else {
           const newInfoPayload = {
@@ -191,7 +188,7 @@ export function useInfoFamiliar() {
         setIsLoading(false);
       }
     },
-    [selectedInfo, handleCloseModal, decodedUser.id_usuario]
+    [selectedInfo, handleCloseModal, decodedUser.id_usuario],
   );
   return {
     members,

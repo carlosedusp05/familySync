@@ -4,6 +4,7 @@ import SearchBar from "../../ui/SearchBar";
 import MultLists from "./MultLists";
 import MultItemsList from "./MultItemsList";
 import { editIcon } from "../../../assets";
+import LoadingOverlay from "../../ui/LoadingOverlay";
 
 function ListContent({
   lists,
@@ -18,6 +19,7 @@ function ListContent({
   handleDeleteList,
   handleAddItem,
   handleDeleteItem,
+  isLoading,
 }) {
   const allItemsSelected =
     activeList?.items?.length > 0 &&
@@ -25,6 +27,7 @@ function ListContent({
 
   return (
     <div className="flex items-center justify-center py-12 h-full">
+      {isLoading && <LoadingOverlay />}
       <LargeCard
         color="bg-black/20 backdrop-blur-md"
         not_pop_up={true}

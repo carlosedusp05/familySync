@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import DefaultButton from "../../ui/DefaultButton.jsx";
 import MultInfos from "./MultInfos.jsx";
 import ModalInfo from "./ModalInfo.jsx";
+import LoadingOverlay from "../../ui/LoadingOverlay.jsx";
 
 function InfoFamiliarContent({
   members,
@@ -15,6 +16,7 @@ function InfoFamiliarContent({
   handleOpenModal,
   handleDelete,
   handleSave,
+  isLoading,
 }) {
   const renderedMembers = useMemo(() => {
     return members.map((member) => {
@@ -47,6 +49,7 @@ function InfoFamiliarContent({
 
   return (
     <>
+      {isLoading && <LoadingOverlay />}
       <div className="flex flex-row gap-4 items-center justify-center py-12 h-full">
         <div className="h-full w-[60%] bg-black/20 backdrop-blur-md border border-white/10 shadow-lg rounded-3xl p-8 overflow-hidden flex flex-col relative transform-gpu">
           <div className="w-full p-5 flex justify-end absolute top-3 right-3 z-10">

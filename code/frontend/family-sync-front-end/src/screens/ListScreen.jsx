@@ -4,50 +4,13 @@ import { useList } from "../hooks/useList";
 import ModalList from "../components/features/List/ModalList";
 
 function ListScreen() {
-  const {
-    lists,
-    activeList,
-    setActiveListId,
-    searchQuery,
-    setSearchQuery,
-    toggleItem,
-    handleSelectAllItems,
-    toggleFavorite,
-    handleOpenModal,
-    handleCloseModal,
-    handleDeleteList,
-    handleSaveList,
-    isModalOpen,
-    isModeEdition,
-    selectedListToEdit,
-    handleAddItem,
-    handleDeleteItem,
-  } = useList();
+  const listProps = useList();
 
   return (
     <MainLayout>
-      <ListContent
-        lists={lists}
-        activeList={activeList}
-        setActiveListId={setActiveListId}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        toggleItem={toggleItem}
-        handleSelectAllItems={handleSelectAllItems}
-        toggleFavorite={toggleFavorite}
-        handleOpenModal={handleOpenModal}
-        handleDeleteList={handleDeleteList}
-        handleAddItem={handleAddItem}
-        handleDeleteItem={handleDeleteItem}
-      />
+      <ListContent {...listProps} />
 
-      <ModalList
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSave={handleSaveList}
-        data={selectedListToEdit}
-        isEdit={isModeEdition}
-      />
+      <ModalList {...listProps} />
     </MainLayout>
   );
 }

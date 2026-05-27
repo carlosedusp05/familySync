@@ -1,37 +1,14 @@
 import MainLayout from "../layouts/MainLayout";
 import InfoFamiliarContent from "../components/features/InfoFamiliar/InfoFamiliarContent";
 import { useInfoFamiliar } from "../hooks/useInfoFamiliar";
+import LoadingOverlay from "../components/ui/LoadingOverlay";
 
 function InfoFamiliarScreen() {
-  const {
-    members,
-    activeMemberId,
-    setActiveMemberId,
-    infos,
-    isModalOpen,
-    selectedInfo,
-    isModeEdition,
-    handleCloseModal,
-    handleOpenModal,
-    handleDelete,
-    handleSave,
-  } = useInfoFamiliar();
+  const infoFamiliarProps = useInfoFamiliar();
 
   return (
     <MainLayout>
-      <InfoFamiliarContent
-        members={members}
-        activeMemberId={activeMemberId}
-        setActiveMemberId={setActiveMemberId}
-        infos={infos}
-        isModalOpen={isModalOpen}
-        selectedInfo={selectedInfo}
-        isModeEdition={isModeEdition}
-        handleCloseModal={handleCloseModal}
-        handleOpenModal={handleOpenModal}
-        handleDelete={handleDelete}
-        handleSave={handleSave}
-      />
+      <InfoFamiliarContent {...infoFamiliarProps} />
     </MainLayout>
   );
 }

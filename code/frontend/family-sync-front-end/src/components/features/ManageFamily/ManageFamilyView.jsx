@@ -3,6 +3,7 @@ import MembersList from "./MembersList";
 import FamilyDetails from "./FamilyDetails";
 import PermissionsModal from "./PermissionsModal";
 import DeleteMemberModal from "./DeleteMemberModal";
+import LoadingOverlay from "../../ui/LoadingOverlay";
 
 function ManageFamilyView(props) {
   const {
@@ -18,6 +19,7 @@ function ManageFamilyView(props) {
 
   return (
     <MainLayout>
+      {props.isLoading && <LoadingOverlay />}
       <div className="flex flex-col items-center justify-center py-10 h-full relative">
         <div className="w-[95%] max-w-350 h-full flex gap-8">
           <MembersList {...props} />
