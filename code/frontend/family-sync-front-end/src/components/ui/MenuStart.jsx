@@ -38,15 +38,19 @@ function MenuStart(props) {
     <LargeCard
       key={props.userData.nome}
       color={"bg-yellow-light"}
-      p={"py-8 px-28"}
-      size={"h-[88%] w-[82%]"}
+      p={"py-8 px-28 md:pt-20 md:pb-20 md:px-26"}
+      size={"h-[88%] w-[82%] md:h-[78%] md:w-[73%]"}
       data-aos="fade-up"
     >
-      <div className="flex flex-col gap-2 h-full">
-        <div className="flex justify-between items-center gap-4 pb-1">
+      <div className="flex flex-col gap-3 h-full ">
+        <div
+          className="flex justify-between items-center gap-4 pb-1
+        md:gap-5"
+        >
           <div className="flex flex-col">
             <h2
-              className="text-2xl font-bold text-orange"
+              className="text-2xl font-bold text-orange
+              md:text-4xl"
               data-aos="fade-down"
               data-aos-delay="400"
             >
@@ -56,7 +60,8 @@ function MenuStart(props) {
             </h2>
 
             <p
-              className="text-xl font-bold text-default"
+              className="text-xl font-bold text-default
+              md:text-2xl"
               data-aos="fade-down"
               data-aos-delay="450"
             >
@@ -65,7 +70,8 @@ function MenuStart(props) {
           </div>
 
           <h2
-            className="text-3xl font-bold text-orange"
+            className="text-3xl font-bold text-orange 
+            md:text-4xl"
             data-aos="fade-down"
             data-aos-delay="450"
           >
@@ -76,7 +82,7 @@ function MenuStart(props) {
         </div>
 
         {/* Grid Div 1*/}
-        <div className="grid grid-cols-10 gap-3 flex-[0.85] ">
+        <div className="grid grid-cols-10 gap-3 flex-[0.85] md:gap-4 md:flex-[0.5]">
           {/* Div Lista Compartilhada - WRAPPER */}
           <div
             className="col-span-4"
@@ -84,13 +90,25 @@ function MenuStart(props) {
             data-aos-delay="400"
           >
             <div
-              className={`w-full h-full flex items-center justify-center gap-3 bg-orange py-8 rounded-2xl ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
+              className={`w-full h-full flex items-center justify-center gap-3 bg-orange py-8 md:py-10 rounded-2xl ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer
+              md:py-10 
+              `}
               onMouseEnter={prefetchRoutes.list}
               onClick={() => navigate("/dashboard/lists")}
             >
-              <img className="h-18" src={listIcon} alt="Icon List" />
+              <img
+                className="h-18
+              md:h-27
+              "
+                src={listIcon}
+                alt="Icon List"
+              />
 
-              <p className="font-bold text-4xl text-white flex-wrap">
+              <p
+                className="font-bold text-4xl text-white flex-wrap
+              md:text-6xl
+              "
+              >
                 Lista <br /> Compartilhada
               </p>
             </div>
@@ -99,19 +117,25 @@ function MenuStart(props) {
           {/* Div Calendário - WRAPPER */}
           <div className="col-span-4" data-aos="fade-down" data-aos-delay="500">
             <div
-              className={`w-full h-full flex flex-col rounded-2xl pt-4 px-7 bg-default gap-3 ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
+              className={`w-full h-full flex flex-col rounded-2xl pt-4 px-7 bg-default gap-3 ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer
+              md:pt-5 md:px-9 md:gap-4
+              `}
               onMouseEnter={prefetchRoutes.calendar}
               onClick={() => navigate("/dashboard/calendar")}
             >
               <div className="flex w-full rounded-2xl overflow-hidden bg-white">
                 {[1, 2, 3, 4].map((i) => (
                   <div key={i} className="flex flex-col w-full">
-                    <div className="bg-brown-dark text-white font-bold text-[16px] text-center py-2">
+                    <div
+                      className="bg-brown-dark text-white font-bold text-[16px] text-center py-2
+                    md:text-[19px]
+                    "
+                    >
                       Título
                     </div>
 
                     <div
-                      className={`flex justify-between p-3 text-terracota text-[13px] font-medium ${
+                      className={`flex justify-between p-3 text-terracota text-[13px] font-medium md:text-[15px] md:p-4 ${
                         i !== 4 ? "border-r-2 border-brown-dark" : ""
                       }`}
                     >
@@ -122,8 +146,12 @@ function MenuStart(props) {
                 ))}
               </div>
 
-              <div className="flex items-center gap-2 text-orange-dark text-3xl font-bold">
-                <img className="h-20" src={calendarIcon} alt="Calendar Icon" />
+              <div className="flex items-center gap-2 text-orange-dark text-3xl md:text-4xl font-bold">
+                <img
+                  className="h-20 md:h-25"
+                  src={calendarIcon}
+                  alt="Calendar Icon"
+                />
                 <h2>Calendário</h2>
               </div>
             </div>
@@ -132,17 +160,23 @@ function MenuStart(props) {
           {/* Div Adicionar Familia - WRAPPER */}
           <div className="col-span-2" data-aos="fade-left" data-aos-delay="600">
             <div
-              className={`w-full h-full flex items-center justify-center p-9 rounded-2xl bg-orange-dark ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
+              className={`w-full h-full flex items-center justify-center p-9 rounded-2xl bg-orange-dark ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer
+              md:p-12
+              `}
               onMouseEnter={prefetchRoutes.newFamily}
               onClick={() => navigate("/dashboard/family/add")}
             >
-              <img className="w-[82%] h-[82%]" src={plusIcon} alt="Plus Icon" />
+              <img
+                className="w-[82%] h-[82%] md:w-[86%] md:h-[86%]"
+                src={plusIcon}
+                alt="Plus Icon"
+              />
             </div>
           </div>
         </div>
 
         {/* Grid Div 2 */}
-        <div className="grid grid-cols-11 gap-3 flex-[1.15]">
+        <div className="grid grid-cols-11 gap-3 flex-[1.15] md:flex-1">
           {/* Div Gerenciamento Financeiro - WRAPPER */}
           <div
             className="col-span-4"
@@ -150,7 +184,9 @@ function MenuStart(props) {
             data-aos-delay="700"
           >
             <div
-              className={`w-full h-full flex flex-col gap-4 items-center rounded-2xl bg-terracota p-4 ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
+              className={`w-full h-full flex flex-col gap-4 items-center rounded-2xl bg-terracota p-4 ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer
+              md:p-5
+              `}
               onMouseEnter={prefetchRoutes.financier}
               onClick={() => navigate("/dashboard/finance")}
             >
@@ -169,10 +205,18 @@ function MenuStart(props) {
                 ))}
               </div>
 
-              <div className="flex gap-2 items-center text-2xl text-white font-semibold">
-                <img className="h-18" src={piggyBank} alt="Piggy Icon" />
+              <div
+                className="flex gap-2 items-center text-2xl text-white font-semibold
+              md:text-3xl
+              "
+              >
+                <img
+                  className="h-18 md:h-22"
+                  src={piggyBank}
+                  alt="Piggy Icon"
+                />
 
-                <h2 className="text-4xl">
+                <h2 className="text-4xl md:text-5xl">
                   Gerenciamento <br /> Financeiro
                 </h2>
               </div>
@@ -186,12 +230,20 @@ function MenuStart(props) {
               onMouseEnter={prefetchRoutes.manageFamily}
               onClick={() => navigate("/dashboard/family")}
             >
-              <div className="h-full flex p-4 rounded-l-2xl items-center justify-center bg-orange">
-                <img className="h-20" src={settingsIcon} alt="Settings Icon" />
+              <div
+                className="h-full flex p-4 rounded-l-2xl items-center justify-center bg-orange
+              md:p-5
+              "
+              >
+                <img
+                  className="h-20 md:h-25"
+                  src={settingsIcon}
+                  alt="Settings Icon"
+                />
               </div>
 
               <div className="h-full flex items-center justify-center px-9">
-                <h2 className="text-orange text-[3rem] leading-none font-bold">
+                <h2 className="text-orange text-[3rem] md:text-[4rem] leading-none font-bold">
                   Gerenciar <br /> Familia
                 </h2>
               </div>
@@ -201,24 +253,26 @@ function MenuStart(props) {
           {/* Div Informações Familiares - WRAPPER */}
           <div className="col-span-3" data-aos="fade-left" data-aos-delay="900">
             <div
-              className={`w-full h-full flex flex-col items-center justify-center bg-brown-dark rounded-2xl gap-2 ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
+              className={`w-full h-full flex flex-col items-center justify-center bg-brown-dark rounded-2xl gap-2 ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer
+              md:gap-3
+              `}
               onMouseEnter={prefetchRoutes.infoFamiliar}
               onClick={() => navigate("/dashboard/family/info")}
             >
               <div className="flex items-center justify-center gap-2">
-                <img className="h-20" src={infoIcon} alt="Info Icon" />
+                <img className="h-20 md:h-25" src={infoIcon} alt="Info Icon" />
 
-                <h2 className="text-white text-3xl font-bold">
+                <h2 className="text-white text-3xl md:text-4xl font-bold">
                   Informações <br /> Familiar
                 </h2>
               </div>
 
               <div className="w-[78%] h-[50%] bg-terracota rounded-2xl flex flex-col px-3 py-2">
-                <h3 className="font-bold text-brown-dark text-[21px]">
+                <h3 className="font-bold text-brown-dark text-[21px] md:text-[25px]">
                   Principais informações:
                 </h3>
 
-                <ul className="font-bold text-white text-[15px]">
+                <ul className="font-bold text-white text-[15px] md:text-[18px]">
                   {Array.isArray(props.infos) && props.infos.length > 0 ? (
                     props.infos.map((info, index) => (
                       <li key={index}>{info.descricao || info}</li>
