@@ -22,7 +22,9 @@ export function useList() {
 
       const response = await listService.getListsByFamily(idFamilia);
 
-      if (response?.StatusCode === 200 && response?.Status) {
+      console.log(response);
+
+      if (response?.StatusCode === 200) {
         const { usuarios, listas, items } = response.Response;
 
         const mappedLists = listas.map((lista) => {
