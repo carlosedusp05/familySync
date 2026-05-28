@@ -25,7 +25,7 @@ export function useList() {
       console.log(response);
 
       if (response?.StatusCode === 200) {
-        const { usuarios, listas, items } = response.Response;
+        const { usuarios = [], listas = [], items = [] } = response.Response;
 
         const mappedLists = listas.map((lista) => {
           const authorUser = usuarios.find(
