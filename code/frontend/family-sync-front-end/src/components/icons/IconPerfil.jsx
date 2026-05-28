@@ -30,7 +30,7 @@ function IconPerfil({
 
   return (
     <div
-      className={`rounded-full p-4 flex items-center justify-center transition-all duration-300  ${style} cursor-pointer hover:scale-110`}
+      className={`rounded-full p-4 flex items-center justify-center transition-all duration-300  ${style} cursor-pointer`}
       onMouseEnter={prefetchPerfil}
       onClick={onClickNew ? onClickNew : () => navigate("/dashboard/profile")}
     >

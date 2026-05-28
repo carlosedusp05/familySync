@@ -14,6 +14,19 @@ const getInfos = async function () {
   }
 };
 
+const getInfosByFamily = async function (idFamily) {
+  const url = "/usuario-informacao/familia";
+
+  try {
+    const response = await api.get(url, idFamily);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 const getInfosUser = async function () {
   const url = "/usuarios-informacoes";
 
@@ -104,4 +117,5 @@ export const infoService = {
   updateInfo,
   deleteInfo,
   createInfoWithUser,
+  getInfosByFamily,
 };

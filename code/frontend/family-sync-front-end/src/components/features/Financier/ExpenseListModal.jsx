@@ -1,12 +1,25 @@
 import React, { useMemo } from "react";
 import DefaultButton from "../../ui/DefaultButton.jsx";
 
-export default function EditExpensesList({
+const DIAS_DA_SEMANA = [
+  "Segunda",
+  "Terça",
+  "Quarta",
+  "Quinta",
+  "Sexta",
+  "Sábado",
+  "Domingo",
+];
+
+export function ExpenseListModal({
+  isOpen,
   expenses,
+  title = "Detalhes dos Gastos",
   onClose,
   onEdit,
   onDelete,
   onAdd,
+  onDayClick,
 }) {
   const localTotal = useMemo(() => {
     return expenses.reduce(
@@ -15,15 +28,11 @@ export default function EditExpensesList({
     );
   }, [expenses]);
 
+  if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.2 }}
-        className="bg-white rounded-[2rem] shadow-2xl w-11/12 max-w-lg p-8 relative flex flex-col max-h-[85vh]"
-      >
+      <div className="bg-white rounded-[2rem] shadow-2xl w-11/12 max-w-lg p-8 relative flex flex-col max-h-[85vh]">
         <button
           onClick={onClose}
           className="absolute top-6 right-6 text-gray-400 hover:text-orange transition-colors"
@@ -45,7 +54,7 @@ export default function EditExpensesList({
 
         <div className="text-center mb-6">
           <h2 className="text-orange font-bold uppercase tracking-wider text-[16px]">
-            Detalhes dos Gastos
+            {title}
           </h2>
           <p className="text-brown-dark font-extrabold text-[36px] leading-none mt-2">
             R${" "}
@@ -61,14 +70,32 @@ export default function EditExpensesList({
           ) : (
             <ul className="space-y-3">
               {expenses.map((item, index) => {
+                const nomeOriginal = item.descricao || item.tipo || "Gasto";
                 const valorExibicao = Number(item.valor || item.total || 0);
 
-                const canEditDelete = !!item.id_financas;
+                const isDiaDaSemana = DIAS_DA_SEMANA.includes(nomeOriginal);
+
+                let nomeExibicao = nomeOriginal;
+                if (nomeExibicao.length > 20) {
+                  nomeExibicao = nomeExibicao.substring(0, 20) + "...";
+                }
+
+                const canEditDelete = !!item.id_financas && !isDiaDaSemana;
 
                 return (
                   <li
                     key={item.id_financas || index}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-orange-200 transition-colors group"
+                    title={nomeOriginal}
+                    onClick={() => {
+                      if (isDiaDaSemana && onDayClick) {
+                        onDayClick(item);
+                      }
+                    }}
+                    className={`flex items-center justify-between p-4 rounded-2xl border transition-colors group ${
+                      isDiaDaSemana
+                        ? "bg-orange-50/50 border-orange-100 cursor-pointer hover:bg-orange-100/70 hover:border-orange-300"
+                        : "bg-gray-50 border-gray-100 hover:border-orange-200"
+                    }`}
                   >
                     <div className="flex items-center gap-4">
                       <span className="text-3xl bg-white p-2 rounded-xl shadow-sm">
@@ -76,8 +103,13 @@ export default function EditExpensesList({
                       </span>
                       <div className="flex flex-col">
                         <span className="font-bold text-gray-800 capitalize text-lg leading-tight">
-                          {item.descricao || item.tipo || "Gasto"}
+                          {nomeExibicao}
                         </span>
+                        {isDiaDaSemana && (
+                          <span className="text-xs text-orange font-semibold mt-0.5">
+                            Clique para ver o dia ➔
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -92,15 +124,21 @@ export default function EditExpensesList({
                       {canEditDelete && (
                         <div className="flex opacity-0 group-hover:opacity-100 transition-opacity gap-2">
                           <button
-                            onClick={() => onEdit(item)}
-                            className="text-blue-500 hover:text-blue-700 bg-blue-50 p-2 rounded-lg"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEdit(item);
+                            }}
+                            className="text-blue-500 hover:text-blue-700 bg-blue-50 p-2 rounded-lg transition-colors"
                             title="Editar"
                           >
                             ✏️
                           </button>
                           <button
-                            onClick={() => onDelete(item.id_financas)}
-                            className="text-red-500 hover:text-red-700 bg-red-50 p-2 rounded-lg"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDelete(item.id_financas);
+                            }}
+                            className="text-red-500 hover:text-red-700 bg-red-50 p-2 rounded-lg transition-colors"
                             title="Excluir"
                           >
                             🗑️

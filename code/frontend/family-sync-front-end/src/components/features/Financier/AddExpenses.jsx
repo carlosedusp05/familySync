@@ -24,16 +24,16 @@ const FINANCE_EMOJIS = [
 function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
   // CORREÇÃO: Alinhando os campos com o que vem do seu backend (valor, tipo, icone)
   const [valor, setValor] = useState(
-    initialData ? initialData.valor || initialData.total || 0 : 0
+    initialData ? initialData.valor || initialData.total || 0 : 0,
   );
   const [categoria, setCategoria] = useState(
-    initialData ? initialData.tipo || initialData.label || "" : ""
+    initialData ? initialData.tipo || initialData.label || "" : "",
   );
   const [descricao, setDescricao] = useState(
-    initialData?.descricao ? initialData.descricao : ""
+    initialData?.descricao ? initialData.descricao : "",
   );
   const [emojiSelecionado, setEmojiSelecionado] = useState(
-    initialData ? initialData.icone || initialData.emoji || "🛍️" : "🛍️"
+    initialData ? initialData.icone || initialData.emoji || "🛍️" : "🛍️",
   );
 
   const [errors, setErrors] = useState({});
@@ -66,7 +66,7 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
           valor,
           emojiSelecionado,
           descricao,
-          initialData?.id_financas
+          initialData?.id_financas,
         );
       } catch (error) {
         console.error("Erro ao processar requisição:", error);
@@ -92,7 +92,7 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
       setValor(valorNumerico);
       if (errors.valor) setErrors((prev) => ({ ...prev, valor: "" }));
     },
-    [errors.valor]
+    [errors.valor],
   );
 
   const handleCategoriaChange = useCallback(
@@ -100,7 +100,7 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
       setCategoria(e.target.value);
       if (errors.categoria) setErrors((prev) => ({ ...prev, categoria: "" }));
     },
-    [errors.categoria]
+    [errors.categoria],
   );
 
   const handleDescricaoChange = useCallback(
@@ -108,12 +108,12 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
       setDescricao(e.target.value);
       if (errors.descricao) setErrors((prev) => ({ ...prev, descricao: "" }));
     },
-    [errors.descricao]
+    [errors.descricao],
   );
 
   const displayValor = useMemo(
     () => (valor > 0 ? formatToBRL(valor).replace("R$", "").trim() : ""),
-    [valor]
+    [valor],
   );
 
   const emojiGrid = useMemo(
@@ -148,7 +148,7 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
         </div>
       </div>
     ),
-    [emojiSelecionado]
+    [emojiSelecionado],
   );
 
   return (
@@ -216,6 +216,7 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
                     : "border-transparent focus:border-orange"
                 }`}
                 value={categoria}
+                maxLength={50}
                 onChange={handleCategoriaChange}
                 onBlur={() => validate("categoria", categoria)}
                 disabled={isSubmitting}
@@ -282,8 +283,8 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
               isSubmitting
                 ? "Salvando..."
                 : is_edit_expenses
-                ? "Salvar"
-                : "Adicionar"
+                  ? "Salvar"
+                  : "Adicionar"
             }
             disabled={isSubmitting}
           />

@@ -2,10 +2,11 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { infoService } from "../services/infoService";
-import { userService } from "../services/userService";
+import { familyService } from "../services/familyService";
 
 const INITIAL_MOCK_INFOS = {};
 const STORAGE_KEY = "@FamilySync:infos";
+const idFamilia = sessionStorage.get("@FamilySync:family:id");
 
 const getInitialInfosFromStorage = () => {
   try {
@@ -55,8 +56,9 @@ export function useInfoFamiliar() {
           return;
         }
 
-        const response = await userService.listUsersByFamily(idFamilia);
-        const fetchedMembers = response.dados.membros || [];
+        const response = await familyService.getFamilyComplete(idFamilia);
+
+        const fetchedMembers = response.Response?.usuarios || [];
 
         const myUserId = String(decodedUser.id_usuario);
         const mappedMembers = fetchedMembers.map((member) => ({
@@ -148,6 +150,7 @@ export function useInfoFamiliar() {
             descricao: description,
           };
           await infoService.updateInfo(infoAtualizada);
+
           setInfos((prev) =>
             prev.map((info) =>
               info.id_info === selectedInfo.id_info
@@ -163,7 +166,9 @@ export function useInfoFamiliar() {
 
           await infoService.createInfo(newInfoPayload);
 
-          const responseAll = await infoService.getInfos();
+          const responseAll = await infoService.getInfosByFamily(idFamilia);
+
+          console.log(responseAll);
 
           const listaInfos = responseAll.data?.dados || responseAll.dados || [];
           const ultimaInfo = listaInfos[listaInfos.length - 1];
@@ -190,6 +195,7 @@ export function useInfoFamiliar() {
     },
     [selectedInfo, handleCloseModal, decodedUser.id_usuario],
   );
+
   return {
     members,
     activeMemberId,

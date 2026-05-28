@@ -22,22 +22,15 @@ export function useList() {
 
       const response = await listService.getListsByFamily(idFamilia);
 
-      console.log(response);
-
       if (response?.StatusCode === 200) {
-        const { usuarios = [], listas = [], items = [] } = response.Response;
+        const { usuarios = [], id_familia } = response.Response || {};
 
-        const mappedLists = listas.map((lista) => {
-          const authorUser = usuarios.find(
-            (u) => u.id_usuario === lista.id_usuario,
-          );
-          const authorName = authorUser
-            ? authorUser.nome_usuario
-            : "Desconhecido";
+        const allMappedLists = [];
 
-          const listItems = items
-            .filter((item) => item.id_lista === lista.id_lista)
-            .map((item) => ({
+        usuarios.forEach((usuario) => {
+          const userLists = usuario.listas || [];
+          userLists.forEach((lista) => {
+            const listItems = (lista.itens || []).map((item) => ({
               id: item.id_item,
               name: item.nome_item,
               price: parseFloat(item.valor_unitario) || 0,
@@ -45,22 +38,23 @@ export function useList() {
               isSelected: item.comprado === 1,
             }));
 
-          return {
-            id: lista.id_lista,
-            name: lista.nome,
-            author: authorName,
-            isFavorite: false,
-            items: listItems,
-            id_familia: lista.id_familia,
-            id_usuario: lista.id_usuario,
-          };
+            allMappedLists.push({
+              id: lista.id_lista,
+              name: lista.nome_lista,
+              author: usuario.nome_usuario,
+              isFavorite: false,
+              items: listItems,
+              id_familia: id_familia,
+              id_usuario: usuario.id_usuario,
+            });
+          });
         });
 
-        setLists(mappedLists);
+        setLists(allMappedLists);
 
         setActiveListId((currentId) => {
           if (currentId) return currentId;
-          return mappedLists.length > 0 ? mappedLists[0].id : null;
+          return allMappedLists.length > 0 ? allMappedLists[0].id : null;
         });
       }
     } catch (err) {
@@ -110,14 +104,8 @@ export function useList() {
     return computedLists.find((list) => list.id === activeListId) || null;
   }, [computedLists, activeListId]);
 
-  // --- FUNÇÕES DE MUTAÇÃO (C.R.U.D) ---
-  // Nota: Estas funções atualizam o estado local para resposta instantânea (Optimistic UI),
-  // mas você precisará adicionar as chamadas de API (PUT, POST, DELETE) dentro delas.
-
   const toggleItem = useCallback(
     (itemId) => {
-      // TODO: Adicionar chamada API para atualizar status `comprado` (0 ou 1) do item
-
       setLists((prevLists) =>
         prevLists.map((list) => {
           if (list.id !== activeListId) return list;
@@ -139,8 +127,6 @@ export function useList() {
     if (!activeList) return;
     const allSelected = activeList.items.every((item) => item.isSelected);
 
-    // TODO: Adicionar chamada API para atualizar status de todos os itens da lista
-
     setLists((prevLists) =>
       prevLists.map((list) => {
         if (list.id !== activeListId) return list;
@@ -158,9 +144,6 @@ export function useList() {
   const handleAddItem = useCallback(
     (itemData) => {
       if (!activeListId) return;
-
-      // TODO: Adicionar chamada API POST para criar o item no back-end
-      // E usar o `id_item` retornado pelo back-end ao invés do Date.now()
 
       const newItem = {
         id: Date.now() + Math.random(),
@@ -184,7 +167,6 @@ export function useList() {
   );
 
   const toggleFavorite = useCallback((listId) => {
-    // TODO: Se for salvar favoritos no banco, adicionar chamada API PUT aqui
     setLists((prev) =>
       prev.map((list) =>
         list.id === listId ? { ...list, isFavorite: !list.isFavorite } : list,
@@ -194,7 +176,6 @@ export function useList() {
 
   const handleDeleteList = useCallback(
     (listId) => {
-      // TODO: Adicionar chamada API DELETE para a lista
       setLists((prev) => prev.filter((list) => list.id !== listId));
       if (activeListId === listId) setActiveListId(null);
     },
@@ -205,7 +186,6 @@ export function useList() {
     (itemId) => {
       if (!activeListId) return;
 
-      // TODO: Adicionar chamada API DELETE para o item específico
       setLists((prevLists) =>
         prevLists.map((list) => {
           if (list.id !== activeListId) return list;
@@ -221,7 +201,6 @@ export function useList() {
 
   const handleSaveList = useCallback(
     (data) => {
-      // TODO: Adicionar chamada API POST (se nova lista) ou PUT (se edição)
       setLists((prev) => {
         if (selectedListToEdit) {
           return prev.map((list) =>
@@ -231,7 +210,7 @@ export function useList() {
           );
         } else {
           const newList = {
-            id: Date.now(), // Substituir pelo ID que retornar do POST
+            id: Date.now(),
             name: data.name,
             author: "Você",
             isFavorite: false,
@@ -277,8 +256,8 @@ export function useList() {
     selectedListToEdit,
     handleAddItem,
     handleDeleteItem,
-    isLoading, // Exportado para exibir skeletons/spinners na UI
+    isLoading,
     error,
-    refreshLists: fetchLists, // Exportado caso precise recarregar manualmente
+    refreshLists: fetchLists,
   };
 }

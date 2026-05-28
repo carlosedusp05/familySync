@@ -1,10 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { useRef } from "react";
 import LargeCard from "../../ui/LargeCard.jsx";
 import MainLayout from "../../../layouts/MainLayout.jsx";
 import DefaultButton from "../../ui/DefaultButton.jsx";
 import AddExpenses from "./AddExpenses.jsx";
-import FinancialSelect from "./FinancialSelect.jsx";
-import EditExpensesList from "./EditExpensesList.jsx";
+import { ExpenseListModal } from "./ExpenseListModal.jsx"; // <-- Trocado para o seu novo Modal
 import LoadingOverlay from "../../ui/LoadingOverlay.jsx";
 
 function FinancierView({
@@ -23,41 +23,32 @@ function FinancierView({
   expenseToEdit,
   setExpenseToEdit,
   authorName,
-  gastosAtuais,
+  chartData,
+  selectedExpenses,
   totalGasto,
   valorMaximo,
   yAxisValues,
   labelsData,
   handleDeleteExpense,
   handleSaveExpense,
-  handleOpenEditForm,
   handleOpenAddForm,
+  handleBarClick,
+  handleOpenFullList,
   isLoading,
+  handleDayClick,
 }) {
-  const traduzirDia = {
-    Monday: "Segunda",
-    Tuesday: "Terça",
-    Wednesday: "Quarta",
-    Thursday: "Quinta",
-    Friday: "Sexta",
-    Saturday: "Sábado",
-    Sunday: "Domingo",
+  const isScrollable = chartData.length > 8;
+
+  const topScrollRef = useRef(null);
+  const chartScrollRef = useRef(null);
+
+  const obterTituloModal = () => {
+    if (periodo === "Semana") return "Gastos por Dia";
+    if (periodo === "Mês") return "Gastos por Semana";
+    if (periodo === "Ano") return "Gastos por Mês";
+    return "Detalhes dos Gastos";
   };
 
-  const traduzirMes = {
-    January: "Janeiro",
-    February: "Fevereiro",
-    March: "Março",
-    April: "Abril",
-    May: "Maio",
-    June: "Junho",
-    July: "Julho",
-    August: "Agosto",
-    September: "Setembro",
-    October: "Outubro",
-    November: "Novembro",
-    December: "Dezembro",
-  };
   return (
     <MainLayout>
       {isLoading && <LoadingOverlay />}
@@ -107,11 +98,34 @@ function FinancierView({
               ))}
             </div>
 
-            <div className="text-orange font-semibold mt-6 mb-8 text-xl">
+            <div className="text-orange font-semibold mt-6 mb-5 text-xl">
               {labelsData[periodo]}
             </div>
 
-            <div className="relative w-full max-w-300 h-150 mt-2 mb-10">
+            {isScrollable && (
+              <div
+                ref={topScrollRef}
+                onScroll={() => {
+                  if (chartScrollRef.current && topScrollRef.current) {
+                    chartScrollRef.current.scrollLeft =
+                      topScrollRef.current.scrollLeft;
+                  }
+                }}
+                className="w-full overflow-x-auto custom-scrollbar mb-2 h-6"
+                style={{ paddingLeft: "48px" }}
+              >
+                <div
+                  className="flex gap-20 px-4"
+                  style={{ width: `${chartData.length * 136}px` }}
+                >
+                  {chartData.map((item) => (
+                    <div key={item.id_financas} className="w-14 shrink-0" />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="relative w-full max-w-300 h-150 mt-2 mb-18 group">
               <div className="absolute inset-0 flex flex-col justify-between z-0">
                 {yAxisValues.map((val, i) => (
                   <div key={i} className="flex items-center w-full h-0">
@@ -124,27 +138,29 @@ function FinancierView({
                 <div className="absolute top-0 bottom-0 left-12 border-l border-gray-300"></div>
               </div>
 
-              <div className="relative z-10 w-full h-full flex items-end justify-around pl-15 pr-4">
-                {gastosAtuais.map((item, index) => {
-                  const idFinanca = item.id_financas;
-                  const valorItem = Number(item.total || item.valor || 0);
-                  let labelItem = "";
-
-                  switch (periodo) {
-                    case "Dia":
-                    case "Semana":
-                      labelItem =
-                        traduzirDia[item.dia_semana] || item.dia_semana;
-                      break;
-                    case "Mês":
-                      labelItem = `${item.semana_mes}`;
-                      break;
-                    case "Ano":
-                      labelItem = traduzirMes[item.mes] || `${item.mes}`;
-                      break;
-                    default:
-                      labelItem = "";
+              <div
+                ref={chartScrollRef}
+                onScroll={() => {
+                  if (topScrollRef.current && chartScrollRef.current) {
+                    topScrollRef.current.scrollLeft =
+                      chartScrollRef.current.scrollLeft;
                   }
+                }}
+                className={`absolute top-0 -bottom-16 left-12 scroll-smooth right-0 z-10 flex items-end pb-16 overflow-x-auto px-4 ${
+                  isScrollable
+                    ? "justify-start gap-20 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                    : "justify-evenly w-full"
+                }`}
+              >
+                {chartData.map((item, index) => {
+                  const idFinanca = item.id_financas;
+                  const valorItem = item.valorItem;
+                  let labelItem = item.labelItem;
+
+                  if (labelItem && labelItem.length > 22) {
+                    labelItem = labelItem.substring(0, 22) + "...";
+                  }
+
                   const alturaBarra =
                     valorMaximo > 0 ? (valorItem / valorMaximo) * 100 : 0;
                   const percent =
@@ -155,10 +171,10 @@ function FinancierView({
                   return (
                     <div
                       key={idFinanca}
-                      className="relative w-14 h-full flex flex-col justify-end items-center group"
+                      className="relative w-14 h-full flex flex-col justify-end items-center group shrink-0"
                       onMouseEnter={() => setHoveredIndex(index)}
                       onMouseLeave={() => setHoveredIndex(null)}
-                      onClick={() => handleOpenEditForm(item)}
+                      onClick={() => handleBarClick(item)}
                     >
                       <AnimatePresence>
                         {hoveredIndex === index && (
@@ -166,7 +182,7 @@ function FinancierView({
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
-                            className="absolute top-full -mt-60 z-30 w-52 bg-white border border-orange-200 shadow-2xl rounded-2xl p-4 flex flex-col items-center"
+                            className="absolute top-full -mt-60 z-50 w-52 bg-white border border-orange-200 shadow-2xl rounded-2xl p-4 flex flex-col items-center"
                           >
                             <span className="text-4xl mb-2">
                               {item.icone || "💰"}
@@ -187,21 +203,23 @@ function FinancierView({
                             <p className="text-orange font-black text-lg">
                               {percent}%
                             </p>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteExpense(idFinanca);
-                              }}
-                              className="mt-2 text-[12px] text-red-500 hover:underline font-bold uppercase"
-                            >
-                              Excluir
-                            </button>
+                            {!item.isGroup && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteExpense(idFinanca);
+                                }}
+                                className="mt-2 text-[12px] text-red-500 hover:underline font-bold uppercase"
+                              >
+                                Excluir
+                              </button>
+                            )}
                           </motion.div>
                         )}
                       </AnimatePresence>
 
                       <motion.div
-                        className="w-full bg-linear-to-b from-[#FFB382] via-[#FF8C42] to-[#DFB3CD] cursor-pointer hover:brightness-110 rounded-t-sm"
+                        className="w-full bg-gradient-to-b from-[#FFB382] via-[#FF8C42] to-[#DFB3CD] cursor-pointer hover:brightness-110 rounded-t-sm"
                         initial={{ height: 0 }}
                         animate={{ height: `${alturaBarra}%` }}
                         transition={{
@@ -210,7 +228,8 @@ function FinancierView({
                           bounce: 0.3,
                         }}
                       />
-                      <span className="absolute top-full mt-1 text-[18px] font-bold text-[#5B3E31] w-24 text-center break-words">
+
+                      <span className="absolute top-full mt-3 left-1/2 -translate-x-1/2 text-[16px] font-bold text-[#5B3E31] text-center w-28 break-words leading-tight">
                         {labelItem}
                       </span>
                     </div>
@@ -219,11 +238,11 @@ function FinancierView({
               </div>
             </div>
 
-            <div className="flex gap-10 mt-4">
+            <div className="flex gap-10 mt-4 z-10">
               <DefaultButton
                 text="Editar"
                 another_size="h-14 w-40"
-                onClick={() => setIsListModalOpen(true)}
+                onClick={handleOpenFullList}
                 theme={false}
               />
               <DefaultButton
@@ -237,13 +256,12 @@ function FinancierView({
 
         <AnimatePresence>
           {isListModalOpen && (
-            <EditExpensesList
-              expenses={gastosAtuais}
-              totalGasto={totalGasto}
+            <ExpenseListModal
+              isOpen={isListModalOpen}
+              expenses={selectedExpenses}
+              title={obterTituloModal()}
               onClose={() => setIsListModalOpen(false)}
-              onEdit={handleOpenEditForm}
-              onDelete={handleDeleteExpense}
-              onAdd={handleOpenAddForm}
+              onDayClick={handleDayClick}
             />
           )}
 

@@ -5,6 +5,7 @@ import DefaultTextField from "../ui/DefaultTextField";
 import { calendarIconForms } from "../../assets";
 import { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { formatCPF } from "../../utils/formatters";
 
 function AccountRegister({
   nome,
@@ -54,15 +55,6 @@ function AccountRegister({
 
   const todayDate = new Date().toISOString().split("T")[0];
   const minDate = "1900-01-01";
-
-  const formatCPF = (value) => {
-    return value
-      .replace(/\D/g, "")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
-      .slice(0, 14);
-  };
 
   const handleButtonClick = () => {
     setTimeout(() => {
@@ -154,7 +146,7 @@ function AccountRegister({
 
   return (
     <DefaultCard h={"pb-20 max-sm:pb-10 max-sm:px-5 max-sm:py-5"}>
-      <div className="w-30 max-sm:w-25 relative rounded-full border-2 border-orange flex items-center justify-center bg-white">
+      <div className="w-30 h-30 max-sm:w-25 relative rounded-full border-2 border-orange flex items-center justify-center bg-white">
         {preview ? (
           <img
             src={preview}

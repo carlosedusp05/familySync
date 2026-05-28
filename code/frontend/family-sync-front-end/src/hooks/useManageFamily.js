@@ -71,7 +71,7 @@ export function useManageFamily() {
 
       const dadosDaAPI = {
         nome: response.Response.familia[0].nome,
-        telefone: response.Response.telefone_residencial || "",
+        telefone: response.Response.familia[0].telefone_residencial || "",
         cep: response.Response.endereco[0].cep,
         cidade: response.Response.endereco[0].cidade,
         estado: response.Response.endereco[0].estado,

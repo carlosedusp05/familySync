@@ -5,8 +5,36 @@ import { financeService } from "../services/financeService";
 
 const PERIODOS = ["Dia", "Semana", "Mês", "Ano"];
 
+const traduzirDia = {
+  Monday: "Segunda",
+  Tuesday: "Terça",
+  Wednesday: "Quarta",
+  Thursday: "Quinta",
+  Friday: "Sexta",
+  Saturday: "Sábado",
+  Sunday: "Domingo",
+};
+
+const traduzirMes = {
+  January: "Janeiro",
+  February: "Fevereiro",
+  March: "Março",
+  April: "Abril",
+  May: "Maio",
+  June: "Junho",
+  July: "Julho",
+  August: "Agosto",
+  September: "Setembro",
+  October: "Outubro",
+  November: "Novembro",
+  December: "Dezembro",
+};
+
 export function useFinancier() {
-  const [periodo, setPeriodo] = useState("Mês");
+  const [periodo, setPeriodoState] = useState("Mês");
+  // NOVO: Estado para saber qual data o gráfico de "Dia" deve renderizar
+  const [dataFiltroDia, setDataFiltroDia] = useState(new Date());
+
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -14,6 +42,7 @@ export function useFinancier() {
   const [expenseToEdit, setExpenseToEdit] = useState(null);
 
   const [gastosAtuais, setGastosAtuais] = useState([]);
+  const [selectedExpenses, setSelectedExpenses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const authorName = useMemo(() => {
@@ -30,6 +59,14 @@ export function useFinancier() {
 
   const idFamilia = sessionStorage.getItem("@FamilySync:family:id");
 
+  // NOVO: Sobrescrevemos o setPeriodo. Se o usuário clicar manualmente na aba "Dia", volta para a data de hoje.
+  const setPeriodo = useCallback((novoPeriodo) => {
+    if (novoPeriodo === "Dia") {
+      setDataFiltroDia(new Date());
+    }
+    setPeriodoState(novoPeriodo);
+  }, []);
+
   const fetchGastos = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -44,11 +81,17 @@ export function useFinancier() {
       if (periodo === "Ano")
         dados = await financeService.getFinancasYearlyByIdFamily(idFamilia);
 
-      console.log(dados);
       if (dados && Array.isArray(dados)) {
         setGastosAtuais(dados);
-      } else if (dados && Array.isArray(dados.Response)) {
+      } else if (
+        dados?.Response?.financas &&
+        Array.isArray(dados.Response.financas)
+      ) {
+        setGastosAtuais(dados.Response.financas);
+      } else if (dados?.Response && Array.isArray(dados.Response)) {
         setGastosAtuais(dados.Response);
+      } else if (dados?.data?.Response?.financas) {
+        setGastosAtuais(dados.data.Response.financas);
       } else {
         setGastosAtuais([]);
       }
@@ -64,30 +107,101 @@ export function useFinancier() {
     fetchGastos();
   }, [fetchGastos]);
 
+  const processedData = useMemo(() => {
+    const rawList = Array.isArray(gastosAtuais) ? gastosAtuais : [];
+    let chartData = [];
+    let listData = [];
+
+    const d = dataFiltroDia;
+    const filtroStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+    if (periodo === "Dia") {
+      const filtered = rawList.filter(
+        (item) => (item.data_movimentacao || "").substring(0, 10) === filtroStr,
+      );
+      listData = filtered;
+      chartData = filtered.map((item) => ({
+        id_financas: item.id_financas,
+        labelItem: item.tipo || item.descricao,
+        valorItem: Number(item.valor || item.total || 0),
+        icone: item.icone || "💰",
+        rawItem: item,
+        isGroup: false,
+      }));
+    } else if (periodo === "Semana") {
+      listData = rawList;
+      chartData = rawList.map((item, index) => {
+        const diaBr = traduzirDia[item.dia_semana] || item.dia_semana;
+        return {
+          id_financas: `week-${index}`,
+          labelItem: diaBr,
+          valorItem: Number(item.total || item.valor || 0),
+          icone: "📅",
+          rawItem: {
+            ...item,
+            descricao: diaBr,
+            icone: "📅",
+            valor: item.total,
+          },
+          isGroup: true,
+        };
+      });
+    } else if (periodo === "Mês") {
+      listData = rawList;
+      chartData = rawList.map((item, index) => ({
+        id_financas: `month-${index}`,
+        labelItem: item.semana_mes,
+        valorItem: Number(item.total || item.valor || 0),
+        icone: "📅",
+        rawItem: {
+          ...item,
+          descricao: item.semana_mes,
+          icone: "📅",
+          valor: item.total,
+        },
+        isGroup: true,
+      }));
+    } else if (periodo === "Ano") {
+      listData = rawList;
+      chartData = rawList.map((item, index) => {
+        const mesBr = traduzirMes[item.mes] || item.mes;
+        return {
+          id_financas: `year-${index}`,
+          labelItem: mesBr,
+          valorItem: Number(item.total || item.valor || 0),
+          icone: "📅",
+          rawItem: {
+            ...item,
+            descricao: mesBr,
+            icone: "📅",
+            valor: item.total,
+          },
+          isGroup: true,
+        };
+      });
+    }
+
+    return { listData, chartData };
+  }, [gastosAtuais, periodo, dataFiltroDia]);
+
   const { totalGasto, valorMaximo } = useMemo(() => {
-    const listaValida = Array.isArray(gastosAtuais) ? gastosAtuais : [];
-
-    const total = listaValida.reduce(
-      (acc, curr) => acc + Number(curr.total || curr.valor || 0),
-      0
+    const total = processedData.chartData.reduce(
+      (acc, curr) => acc + curr.valorItem,
+      0,
     );
-
     const maiorGastoAtual =
-      listaValida.length > 0
-        ? Math.max(
-            ...listaValida.map((item) => Number(item.total || item.valor || 0))
-          )
+      processedData.chartData.length > 0
+        ? Math.max(...processedData.chartData.map((item) => item.valorItem))
         : 0;
-
     const maxFinal = maiorGastoAtual > 0 ? maiorGastoAtual : 1000;
 
     return { totalGasto: total, valorMaximo: maxFinal };
-  }, [gastosAtuais]);
+  }, [processedData.chartData]);
 
   const yAxisValues = useMemo(() => {
     const passos = 5;
     return Array.from({ length: passos + 1 }, (_, i) =>
-      Math.round((valorMaximo / passos) * (passos - i))
+      Math.round((valorMaximo / passos) * (passos - i)),
     );
   }, [valorMaximo]);
 
@@ -108,13 +222,16 @@ export function useFinancier() {
 
     return {
       Dia: capitalize(
-        hoje.toLocaleDateString("pt-BR", { day: "2-digit", month: "long" })
+        dataFiltroDia.toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "long",
+        }),
       ),
       Semana: `${fmt(dom)} - ${fmt(sab)}`,
       Mês: `${fmt(pMes)} - ${fmt(uMes)}`,
       Ano: `Janeiro - Dezembro ${hoje.getFullYear()}`,
     };
-  }, []);
+  }, [dataFiltroDia]);
 
   const handleDeleteExpense = useCallback(async (id) => {
     try {
@@ -122,7 +239,12 @@ export function useFinancier() {
       setGastosAtuais((prev) =>
         Array.isArray(prev)
           ? prev.filter((item) => item.id_financas !== id)
-          : []
+          : [],
+      );
+      setSelectedExpenses((prev) =>
+        Array.isArray(prev)
+          ? prev.filter((item) => item.id_financas !== id)
+          : [],
       );
     } catch (error) {
       console.error("Erro ao deletar gasto:", error);
@@ -139,29 +261,76 @@ export function useFinancier() {
           icone: emoji,
           descricao: descricao,
         };
-
         if (idToEdit) {
           await financeService.updateFinancas(idToEdit, payload);
         } else {
           await financeService.createFinancas(payload);
         }
-
         await fetchGastos();
-
         setIsFormModalOpen(false);
         setExpenseToEdit(null);
       } catch (error) {
         console.error("Erro ao salvar gasto:", error);
       }
     },
-    [fetchGastos, idFamilia]
+    [fetchGastos, idFamilia],
   );
 
-  const handleOpenEditForm = (item) => {
-    setExpenseToEdit(item);
-    setIsFormModalOpen(true);
-    setIsListModalOpen(false);
-  };
+  const handleBarClick = useCallback((item) => {
+    if (item.isGroup) {
+      setSelectedExpenses([item.rawItem]);
+      setIsListModalOpen(true);
+    } else {
+      setExpenseToEdit(item.rawItem);
+      setIsFormModalOpen(true);
+      setIsListModalOpen(false);
+    }
+  }, []);
+
+  const handleDayClick = useCallback((item) => {
+    const nomeDiaBr = item.descricao || item.tipo;
+    const mapaDias = {
+      Domingo: 0,
+      Segunda: 1,
+      Terça: 2,
+      Quarta: 3,
+      Quinta: 4,
+      Sexta: 5,
+      Sábado: 6,
+    };
+
+    const diaAlvo = mapaDias[nomeDiaBr];
+
+    if (diaAlvo !== undefined) {
+      const hoje = new Date();
+      const diaAtual = hoje.getDay();
+      const diferenca = diaAlvo - diaAtual;
+
+      const dataClicada = new Date(hoje);
+      dataClicada.setDate(hoje.getDate() + diferenca);
+
+      setDataFiltroDia(dataClicada);
+      setPeriodoState("Dia");
+      setIsListModalOpen(false);
+    }
+  }, []);
+
+  const handleOpenFullList = useCallback(() => {
+    const listFormatted = processedData.listData.map((item) => {
+      let desc = item.descricao;
+      if (periodo === "Semana") desc = traduzirDia[item.dia_semana];
+      if (periodo === "Mês") desc = item.semana_mes;
+      if (periodo === "Ano") desc = traduzirMes[item.mes];
+      return {
+        ...item,
+        descricao: desc,
+        icone: item.icone || "📅",
+        valor: item.total || item.valor,
+      };
+    });
+    setSelectedExpenses(listFormatted);
+    setIsListModalOpen(true);
+  }, [processedData.listData, periodo]);
 
   const handleOpenAddForm = () => {
     setExpenseToEdit(null);
@@ -182,7 +351,8 @@ export function useFinancier() {
     expenseToEdit,
     setExpenseToEdit,
     authorName,
-    gastosAtuais: Array.isArray(gastosAtuais) ? gastosAtuais : [],
+    chartData: processedData.chartData,
+    selectedExpenses,
     totalGasto,
     valorMaximo,
     yAxisValues,
@@ -190,7 +360,9 @@ export function useFinancier() {
     isLoading,
     handleDeleteExpense,
     handleSaveExpense,
-    handleOpenEditForm,
     handleOpenAddForm,
+    handleBarClick,
+    handleOpenFullList,
+    handleDayClick,
   };
 }

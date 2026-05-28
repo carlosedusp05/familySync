@@ -1,7 +1,7 @@
 import api from "./api";
 
 const getListsByFamily = async function (idFamily) {
-  const url = `/lista/${idFamily}`;
+  const url = `/lista/completa/familia/${idFamily}`;
 
   try {
     const response = await api.get(url);

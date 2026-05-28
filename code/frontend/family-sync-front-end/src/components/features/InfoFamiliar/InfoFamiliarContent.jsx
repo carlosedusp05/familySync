@@ -21,7 +21,7 @@ function InfoFamiliarContent({
   const renderedMembers = useMemo(() => {
     return members.map((member) => {
       const id = member.id_usuario;
-      const nome = member.nome_usuario;
+      const nome = member.nome || member.nome_usuario;
 
       const isActive = activeMemberId === id;
 
