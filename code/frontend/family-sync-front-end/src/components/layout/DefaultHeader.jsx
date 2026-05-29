@@ -107,7 +107,7 @@ function DefaultHeader({ disconnected }) {
 
   return (
     <>
-      <header className="w-full flex justify-between py-8 items-center bg-white px-16 relative z-50">
+      <header className="w-full flex justify-between py-5 items-center bg-white px-16 relative z-50">
         {disconnected ? (
           <IconFamilySync />
         ) : (

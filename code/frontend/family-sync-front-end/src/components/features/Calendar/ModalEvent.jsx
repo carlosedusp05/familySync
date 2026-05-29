@@ -216,7 +216,7 @@ function ModalEvents({
                         ref={titleRef}
                         type="text"
                         value={title}
-                        maxLength={100}
+                        maxLength={50}
                         readOnly={!editableFields.title}
                         onChange={(e) => {
                           setTitle(e.target.value);
