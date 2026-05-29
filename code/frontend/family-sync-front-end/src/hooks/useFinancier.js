@@ -30,6 +30,16 @@ const traduzirMes = {
   December: "Dezembro",
 };
 
+const ordemDias = {
+  Segunda: 1,
+  Terça: 2,
+  Quarta: 3,
+  Quinta: 4,
+  Sexta: 5,
+  Sábado: 6,
+  Domingo: 7,
+};
+
 export function useFinancier() {
   const [periodo, setPeriodoState] = useState("Mês");
   const [dataFiltroDia, setDataFiltroDia] = useState(new Date());
@@ -58,7 +68,6 @@ export function useFinancier() {
 
   const idFamilia = sessionStorage.getItem("@FamilySync:family:id");
 
-  // NOVO: Sobrescrevemos o setPeriodo. Se o usuário clicar manualmente na aba "Dia", volta para a data de hoje.
   const setPeriodo = useCallback((novoPeriodo) => {
     if (novoPeriodo === "Dia") {
       setDataFiltroDia(new Date());
@@ -128,8 +137,14 @@ export function useFinancier() {
         isGroup: false,
       }));
     } else if (periodo === "Semana") {
-      listData = rawList;
-      chartData = rawList.map((item, index) => {
+      const sortedList = [...rawList].sort((a, b) => {
+        const diaA = traduzirDia[a.dia_semana] || a.dia_semana;
+        const diaB = traduzirDia[b.dia_semana] || b.dia_semana;
+        return (ordemDias[diaA] || 99) - (ordemDias[diaB] || 99);
+      });
+
+      listData = sortedList;
+      chartData = sortedList.map((item, index) => {
         const diaBr = traduzirDia[item.dia_semana] || item.dia_semana;
         return {
           id_financas: `week-${index}`,
@@ -149,14 +164,14 @@ export function useFinancier() {
       listData = rawList;
       chartData = rawList.map((item, index) => ({
         id_financas: `month-${index}`,
-        labelItem: item.semana_mes,
+        labelItem: item.semana_mes || item.data_movimentacao || `Dia ${index}`,
         valorItem: Number(item.total || item.valor || 0),
         icone: "📅",
         rawItem: {
           ...item,
-          descricao: item.semana_mes,
+          descricao: item.semana_mes || "Detalhe do Mês",
           icone: "📅",
-          valor: item.total,
+          valor: item.total || item.valor,
         },
         isGroup: true,
       }));
@@ -216,8 +231,6 @@ export function useFinancier() {
     dom.setDate(hoje.getDate() - hoje.getDay());
     const sab = new Date(hoje);
     sab.setDate(hoje.getDate() + (6 - hoje.getDay()));
-    const pMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-    const uMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
 
     return {
       Dia: capitalize(
@@ -227,7 +240,12 @@ export function useFinancier() {
         }),
       ),
       Semana: `${fmt(dom)} - ${fmt(sab)}`,
-      Mês: `${fmt(pMes)} - ${fmt(uMes)}`,
+      Mês: capitalize(
+        dataFiltroDia.toLocaleDateString("pt-BR", {
+          month: "long",
+          year: "numeric",
+        }),
+      ),
       Ano: `Janeiro - Dezembro ${hoje.getFullYear()}`,
     };
   }, [dataFiltroDia]);
@@ -287,6 +305,13 @@ export function useFinancier() {
   }, []);
 
   const handleDayClick = useCallback((item) => {
+    if (item.exactDate) {
+      setDataFiltroDia(item.exactDate);
+      setPeriodoState("Dia");
+      setIsListModalOpen(false);
+      return;
+    }
+
     const nomeDiaBr = item.descricao || item.tipo;
     const mapaDias = {
       Domingo: 0,
@@ -318,7 +343,7 @@ export function useFinancier() {
     const listFormatted = processedData.listData.map((item) => {
       let desc = item.descricao;
       if (periodo === "Semana") desc = traduzirDia[item.dia_semana];
-      if (periodo === "Mês") desc = item.semana_mes;
+      if (periodo === "Mês") desc = item.semana_mes || item.data_movimentacao;
       if (periodo === "Ano") desc = traduzirMes[item.mes];
       return {
         ...item,
@@ -341,6 +366,8 @@ export function useFinancier() {
     PERIODOS,
     periodo,
     setPeriodo,
+    dataFiltroDia,
+    listData: processedData.listData,
     hoveredIndex,
     setHoveredIndex,
     isFormModalOpen,

@@ -30,7 +30,6 @@ export function useNotifications() {
         if (isInitialLoad) setIsLoading(true);
 
         const response = await userService.getNotificationsByUser(userId);
-
         if (response.status_code === 200) {
           const fetchedNotifs = response.dados.notificacoes || [];
 

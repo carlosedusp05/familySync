@@ -4,7 +4,7 @@ import LargeCard from "../../ui/LargeCard.jsx";
 import MainLayout from "../../../layouts/MainLayout.jsx";
 import DefaultButton from "../../ui/DefaultButton.jsx";
 import AddExpenses from "./AddExpenses.jsx";
-import { ExpenseListModal } from "./ExpenseListModal.jsx"; // <-- Trocado para o seu novo Modal
+import { ExpenseListModal } from "./ExpenseListModal.jsx";
 import LoadingOverlay from "../../ui/LoadingOverlay.jsx";
 
 function FinancierView({
@@ -36,6 +36,7 @@ function FinancierView({
   handleOpenFullList,
   isLoading,
   handleDayClick,
+  dataFiltroDia,
 }) {
   const isScrollable = chartData.length > 8;
 
@@ -262,6 +263,14 @@ function FinancierView({
               title={obterTituloModal()}
               onClose={() => setIsListModalOpen(false)}
               onDayClick={handleDayClick}
+              dataFiltroDia={dataFiltroDia}
+              onDelete={handleDeleteExpense}
+              onEdit={(item) => {
+                setExpenseToEdit(item);
+                setIsListModalOpen(false);
+                setIsFormModalOpen(true);
+              }}
+              onAdd={handleOpenAddForm}
             />
           )}
 
