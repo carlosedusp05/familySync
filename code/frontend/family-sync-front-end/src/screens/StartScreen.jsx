@@ -54,7 +54,7 @@ function StartScreen(props) {
         blur_or_glass={"blur"}
       />
       <DefaultHeader />
-      <div className="w-full flex justify-center items-center h-full ">
+      <div className="w-full flex justify-center items-center h-full">
         {estaCarregando ? null : isFamily && isFamily.length > 0 ? (
           <MenuStart
             props={props}
