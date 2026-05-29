@@ -32,7 +32,6 @@ const traduzirMes = {
 
 export function useFinancier() {
   const [periodo, setPeriodoState] = useState("Mês");
-  // NOVO: Estado para saber qual data o gráfico de "Dia" deve renderizar
   const [dataFiltroDia, setDataFiltroDia] = useState(new Date());
 
   const [hoveredIndex, setHoveredIndex] = useState(null);

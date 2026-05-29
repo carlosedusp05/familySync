@@ -4,31 +4,13 @@ import { jwtDecode } from "jwt-decode";
 import { infoService } from "../services/infoService";
 import { familyService } from "../services/familyService";
 
-const INITIAL_MOCK_INFOS = {};
-const STORAGE_KEY = "@FamilySync:infos";
-const idFamilia = sessionStorage.get("@FamilySync:family:id");
-
-const getInitialInfosFromStorage = () => {
-  try {
-    const storedData = localStorage.getItem(STORAGE_KEY);
-    if (storedData) {
-      return JSON.parse(storedData);
-    }
-  } catch (error) {
-    console.error("Erro ao ler do localStorage", error);
-  }
-  return INITIAL_MOCK_INFOS;
-};
-
 export function useInfoFamiliar() {
   const [members, setMembers] = useState([]);
   const [activeMemberId, setActiveMemberId] = useState(null);
-
-  const [allInfosDict, setAllInfosDict] = useState(getInitialInfosFromStorage);
+  const [allFamilyInfos, setAllFamilyInfos] = useState([]);
   const [infos, setInfos] = useState([]);
 
   const [isLoading, setIsLoading] = useState(false);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedInfo, setSelectedInfo] = useState(null);
   const [isModeEdition, setIsModeEdition] = useState(false);
@@ -47,7 +29,7 @@ export function useInfoFamiliar() {
   }, []);
 
   useEffect(() => {
-    const fetchMembers = async () => {
+    const fetchInitialData = async () => {
       setIsLoading(true);
       try {
         const idFamilia = sessionStorage.getItem("@FamilySync:family:id");
@@ -56,11 +38,11 @@ export function useInfoFamiliar() {
           return;
         }
 
-        const response = await familyService.getFamilyComplete(idFamilia);
-
-        const fetchedMembers = response.Response?.usuarios || [];
-
+        const responseMembers =
+          await familyService.getFamilyComplete(idFamilia);
+        const fetchedMembers = responseMembers.Response?.usuarios || [];
         const myUserId = String(decodedUser.id_usuario);
+
         const mappedMembers = fetchedMembers.map((member) => ({
           ...member,
           isMe: String(member.id_usuario) === myUserId,
@@ -73,39 +55,54 @@ export function useInfoFamiliar() {
         });
 
         setMembers(sortedMembers);
-
         if (sortedMembers.length > 0) {
           setActiveMemberId(sortedMembers[0].id_usuario);
         }
+
+        const responseInfos = await infoService.getInfosByFamily(idFamilia);
+
+        const payload = responseInfos.data?.dados || responseInfos.dados || {};
+        const usuariosComInfos = payload.usuarios || [];
+
+        let allInfosFlattened = [];
+
+        usuariosComInfos.forEach((usuario) => {
+          const infosDoUsuario = usuario.informacoes || [];
+
+          infosDoUsuario.forEach((info) => {
+            allInfosFlattened.push({
+              ...info,
+              id_usuario: usuario.id_usuario,
+              descricao: info.descricao_informacao || info.descricao,
+            });
+          });
+        });
+
+        setAllFamilyInfos(allInfosFlattened);
       } catch (error) {
-        console.error("Erro ao buscar membros:", error);
+        console.error("Erro ao buscar dados iniciais:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchMembers();
+    fetchInitialData();
   }, [decodedUser.id_usuario]);
 
   useEffect(() => {
     if (!activeMemberId) return;
 
-    const fetchInformacoes = async () => {
-      try {
-        const targetId =
-          activeMemberId === "me" ? decodedUser.id_usuario : activeMemberId;
-        const response = await infoService.getInfosById(targetId);
+    const targetId =
+      activeMemberId === "me" ? decodedUser.id_usuario : activeMemberId;
 
-        const dados = response.data?.dados || response.data || [];
-        setInfos(dados);
-      } catch (error) {
-        console.error("Erro ao buscar informações:", error);
-        setInfos(allInfosDict[activeMemberId] || []);
-      }
-    };
+    const filteredInfos = allFamilyInfos.filter(
+      (info) =>
+        String(info.id_usuario) === String(targetId) ||
+        String(info.id_usuario_informacao) === String(targetId),
+    );
 
-    fetchInformacoes();
-  }, [activeMemberId, decodedUser.id_usuario]);
+    setInfos(filteredInfos);
+  }, [activeMemberId, allFamilyInfos, decodedUser.id_usuario]);
 
   const handleOpenModal = useCallback((item = null, isEditMode = true) => {
     setSelectedInfo(item);
@@ -121,21 +118,17 @@ export function useInfoFamiliar() {
     }, 200);
   }, []);
 
-  const handleDelete = useCallback(
-    async (id_info) => {
+  const handleDelete = useCallback(async (id_info) => {
+    try {
       await infoService.deleteInfo(id_info);
-      setAllInfosDict((prevDict) => {
-        const currentMemberInfos = prevDict[activeMemberId] || [];
-        return {
-          ...prevDict,
-          [activeMemberId]: currentMemberInfos.filter(
-            (info) => info.id_info !== id_info,
-          ),
-        };
-      });
-    },
-    [activeMemberId],
-  );
+
+      setAllFamilyInfos((prevInfos) =>
+        prevInfos.filter((info) => info.id_info !== id_info),
+      );
+    } catch (error) {
+      console.error("Erro ao deletar:", error);
+    }
+  }, []);
 
   const handleSave = useCallback(
     async (data) => {
@@ -145,13 +138,12 @@ export function useInfoFamiliar() {
       try {
         if (selectedInfo) {
           const infoAtualizada = {
-            id_info: selectedInfo.id_info,
             titulo: title,
             descricao: description,
           };
-          await infoService.updateInfo(infoAtualizada);
+          await infoService.updateInfo(selectedInfo.id_info, infoAtualizada);
 
-          setInfos((prev) =>
+          setAllFamilyInfos((prev) =>
             prev.map((info) =>
               info.id_info === selectedInfo.id_info
                 ? { ...info, titulo: title, descricao: description }
@@ -164,27 +156,37 @@ export function useInfoFamiliar() {
             descricao: description,
           };
 
-          await infoService.createInfo(newInfoPayload);
+          const responseCreate = await infoService.createInfo(newInfoPayload);
 
-          const responseAll = await infoService.getInfosByFamily(idFamilia);
+          const infoCriada =
+            responseCreate.dados || responseCreate.data || responseCreate;
+          const idGerado = infoCriada.id_info || infoCriada.id;
 
-          console.log(responseAll);
-
-          const listaInfos = responseAll.data?.dados || responseAll.dados || [];
-          const ultimaInfo = listaInfos[listaInfos.length - 1];
-
-          if (ultimaInfo) {
-            const idGerado = ultimaInfo.id || ultimaInfo.id_info;
-
-            await infoService.createInfoWithUser({
-              id_info: idGerado,
-              id_usuario: decodedUser.id_usuario,
-            });
-
-            setInfos((prev) => [ultimaInfo, ...prev]);
+          if (!idGerado) {
+            console.error("Dados retornados da criação:", responseCreate);
+            throw new Error(
+              "Não foi possível recuperar o ID da informação recém-criada.",
+            );
           }
-        }
 
+          const targetId =
+            activeMemberId === "me" ? decodedUser.id_usuario : activeMemberId;
+
+          await infoService.createInfoWithUser({
+            id_info: idGerado,
+            id_usuario: targetId,
+          });
+
+          const novaInfoNormalizada = {
+            ...infoCriada,
+            titulo: title,
+            descricao: description,
+            id_usuario: targetId,
+            id_usuario_informacao: targetId,
+          };
+
+          setAllFamilyInfos((prev) => [novaInfoNormalizada, ...prev]);
+        }
         handleCloseModal();
       } catch (error) {
         console.error("Erro ao salvar:", error);
@@ -193,7 +195,7 @@ export function useInfoFamiliar() {
         setIsLoading(false);
       }
     },
-    [selectedInfo, handleCloseModal, decodedUser.id_usuario],
+    [selectedInfo, handleCloseModal, activeMemberId, decodedUser.id_usuario],
   );
 
   return {

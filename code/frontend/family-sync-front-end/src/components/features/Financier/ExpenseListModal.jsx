@@ -13,7 +13,7 @@ const DIAS_DA_SEMANA = [
 
 export function ExpenseListModal({
   isOpen,
-  expenses,
+  expenses = [],
   title = "Detalhes dos Gastos",
   onClose,
   onEdit,
@@ -29,6 +29,8 @@ export function ExpenseListModal({
   }, [expenses]);
 
   if (!isOpen) return null;
+
+  const isGastosPorSemana = title === "Gastos por Semana";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -67,6 +69,70 @@ export function ExpenseListModal({
             <div className="flex items-center justify-center h-full text-gray-400 font-medium">
               Nenhum gasto registrado neste período.
             </div>
+          ) : isGastosPorSemana ? (
+            <div className="flex flex-col gap-4">
+              {expenses.map((semana, index) => {
+                const nomeSemana =
+                  semana.descricao ||
+                  semana.semana_mes ||
+                  `Semana ${index + 1}`;
+                const totalSemana = Number(semana.valor || semana.total || 0);
+                const diasComGasto = semana.dias_com_gasto || [];
+
+                return (
+                  <div
+                    key={semana.id_financas || index}
+                    className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex flex-col gap-3 shadow-sm"
+                  >
+                    <div className="flex justify-between items-center border-b border-gray-200 pb-2">
+                      <span className="text-brown-dark font-black text-lg">
+                        {nomeSemana}
+                      </span>
+                      <span className="text-orange font-bold text-sm bg-orange/10 px-3 py-1 rounded-full">
+                        Gastos: R${" "}
+                        {totalSemana.toLocaleString("pt-BR", {
+                          minimumFractionDigits: 2,
+                        })}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 pt-1 justify-between">
+                      {[
+                        { nome: "Domingo", sigla: "DOM" },
+                        { nome: "Segunda", sigla: "SEG" },
+                        { nome: "Terça", sigla: "TER" },
+                        { nome: "Quarta", sigla: "QUA" },
+                        { nome: "Quinta", sigla: "QUI" },
+                        { nome: "Sexta", sigla: "SEX" },
+                        { nome: "Sábado", sigla: "SAB" },
+                      ].map((dia) => {
+                        const temGastoNesteDia =
+                          diasComGasto.length === 0 ||
+                          diasComGasto.includes(dia.nome);
+
+                        return (
+                          <button
+                            key={dia.nome}
+                            onClick={() => {
+                              if (onDayClick) {
+                                onDayClick({ descricao: dia.nome });
+                              }
+                            }}
+                            className={`flex-1 min-w-[45px] py-2 rounded-xl font-extrabold text-[11px] text-center shadow-sm transition-all ${
+                              temGastoNesteDia
+                                ? "bg-orange text-white hover:brightness-110 active:scale-95 cursor-pointer"
+                                : "bg-gray-200 text-gray-400 opacity-60 cursor-pointer"
+                            }`}
+                          >
+                            {dia.sigla}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           ) : (
             <ul className="space-y-3">
               {expenses.map((item, index) => {
@@ -91,22 +157,23 @@ export function ExpenseListModal({
                         onDayClick(item);
                       }
                     }}
-                    className={`flex items-center justify-between p-4 rounded-2xl border transition-colors group ${
+                    // ⏪ Listagem comum retornada ao padrão original (sempre clicável)
+                    className={`flex items-center justify-between p-4 rounded-2xl border transition-colors group cursor-pointer ${
                       isDiaDaSemana
-                        ? "bg-orange-50/50 border-orange-100 cursor-pointer hover:bg-orange-100/70 hover:border-orange-300"
+                        ? "bg-orange-50/50 border-orange-100 hover:bg-orange-100/70 hover:border-orange-300"
                         : "bg-gray-50 border-gray-100 hover:border-orange-200"
                     }`}
                   >
                     <div className="flex items-center gap-4">
-                      <span className="text-3xl bg-white p-2 rounded-xl shadow-sm">
+                      <span className="text-3xl p-2 rounded-xl shadow-sm bg-white">
                         {item.icone || "💰"}
                       </span>
                       <div className="flex flex-col">
-                        <span className="font-bold text-gray-800 capitalize text-lg leading-tight">
+                        <span className="font-bold capitalize text-lg leading-tight text-gray-800">
                           {nomeExibicao}
                         </span>
                         {isDiaDaSemana && (
-                          <span className="text-xs text-orange font-semibold mt-0.5">
+                          <span className="text-xs font-semibold mt-0.5 text-orange">
                             Clique para ver o dia ➔
                           </span>
                         )}
@@ -114,7 +181,7 @@ export function ExpenseListModal({
                     </div>
 
                     <div className="flex items-center gap-4">
-                      <span className="font-extrabold text-brown-dark text-lg">
+                      <span className="font-extrabold text-lg text-brown-dark">
                         R${" "}
                         {valorExibicao.toLocaleString("pt-BR", {
                           minimumFractionDigits: 2,
@@ -126,7 +193,7 @@ export function ExpenseListModal({
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              onEdit(item);
+                              if (onEdit) onEdit(item);
                             }}
                             className="text-blue-500 hover:text-blue-700 bg-blue-50 p-2 rounded-lg transition-colors"
                             title="Editar"
@@ -136,7 +203,7 @@ export function ExpenseListModal({
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              onDelete(item.id_financas);
+                              if (onDelete) onDelete(item.id_financas);
                             }}
                             className="text-red-500 hover:text-red-700 bg-red-50 p-2 rounded-lg transition-colors"
                             title="Excluir"
@@ -153,13 +220,15 @@ export function ExpenseListModal({
           )}
         </div>
 
-        <div className="mt-8 flex justify-center border-t border-gray-100 pt-6 z-10">
-          <DefaultButton
-            text="Novo Gasto"
-            another_size="h-14 w-full max-w-[200px]"
-            onClick={onAdd}
-          />
-        </div>
+        {!isGastosPorSemana && (
+          <div className="mt-8 flex justify-center border-t border-gray-100 pt-6 z-10">
+            <DefaultButton
+              text="Novo Gasto"
+              another_size="h-14 w-full max-w-[200px]"
+              onClick={onAdd}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

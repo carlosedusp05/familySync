@@ -15,10 +15,10 @@ const getInfos = async function () {
 };
 
 const getInfosByFamily = async function (idFamily) {
-  const url = "/usuario-informacao/familia";
+  const url = `/usuario-informacao/familia/${idFamily}`;
 
   try {
-    const response = await api.get(url, idFamily);
+    const response = await api.get(url);
     const dados = response.data;
 
     return dados;
@@ -43,9 +43,12 @@ const getInfosUser = async function () {
 const getInfosById = async function (id) {
   const url = `/usuario-informacao/${id}`;
 
+  console.log(`Usado o id: ${id}`);
   try {
     const response = await api.get(url);
     const dados = response.data;
+
+    console.log(dados);
 
     return dados;
   } catch (error) {
