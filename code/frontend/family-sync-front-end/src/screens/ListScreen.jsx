@@ -10,7 +10,13 @@ function ListScreen() {
     <MainLayout>
       <ListContent {...listProps} />
 
-      <ModalList {...listProps} />
+      <ModalList
+        isOpen={listProps.isModalOpen}
+        onClose={listProps.handleCloseModal}
+        onSave={listProps.handleSaveList}
+        data={listProps.selectedListToEdit}
+        isEdit={listProps.isModeEdition}
+      />
     </MainLayout>
   );
 }

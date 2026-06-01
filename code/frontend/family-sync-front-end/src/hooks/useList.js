@@ -1,4 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 import { formatToBRL } from "../utils/formatters";
 import { listService } from "../services/listService";
 
@@ -12,6 +14,19 @@ export function useList() {
   const [selectedListToEdit, setSelectedListToEdit] = useState(null);
   const [isModeEdition, setIsModeEdition] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const token = Cookies.get("familysync_token");
+
+  const user = token
+    ? (() => {
+        const decoded = jwtDecode(token);
+        return {
+          nome: decoded.nome,
+          id: decoded.id_usuario,
+          idFamily: decoded.is_familia,
+        };
+      })()
+    : {};
 
   const idFamilia = sessionStorage.getItem("@FamilySync:family:id");
 
@@ -32,7 +47,7 @@ export function useList() {
           userLists.forEach((lista) => {
             const listItems = (lista.itens || []).map((item) => ({
               id: item.id_item,
-              name: item.nome_item,
+              nome: item.nome_item,
               price: parseFloat(item.valor_unitario) || 0,
               units: item.quantidade || 1,
               isSelected: item.comprado === 1,
@@ -40,7 +55,7 @@ export function useList() {
 
             allMappedLists.push({
               id: lista.id_lista,
-              name: lista.nome_lista,
+              nome: lista.nome_lista,
               author: usuario.nome_usuario,
               isFavorite: false,
               items: listItems,
@@ -95,7 +110,7 @@ export function useList() {
         };
       })
       .filter((list) =>
-        list.name.toLowerCase().includes(searchQuery.toLowerCase()),
+        list.nome.toLowerCase().includes(searchQuery.toLowerCase()),
       )
       .sort((a, b) => (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0));
   }, [lists, searchQuery]);
@@ -142,7 +157,7 @@ export function useList() {
   }, [activeList, activeListId]);
 
   const handleAddItem = useCallback(
-    (itemData) => {
+    async (itemData) => {
       if (!activeListId) return;
 
       const newItem = {
@@ -200,25 +215,33 @@ export function useList() {
   );
 
   const handleSaveList = useCallback(
-    (data) => {
-      setLists((prev) => {
-        if (selectedListToEdit) {
-          return prev.map((list) =>
+    async (data) => {
+      if (selectedListToEdit) {
+        setLists((prev) =>
+          prev.map((list) =>
             list.id === selectedListToEdit.id
               ? { ...list, name: data.name, items: data.items }
               : list,
-          );
-        } else {
-          const newList = {
-            id: Date.now(),
-            name: data.name,
-            author: "Você",
-            isFavorite: false,
-            items: data.items || [],
-          };
-          return [newList, ...prev];
-        }
-      });
+          ),
+        );
+      } else {
+        const newList = {
+          id: Date.now(),
+          id_usuario: user.id,
+          nome: data.name,
+          isFavorite: false,
+          items: data.items || [],
+        };
+
+        console.log(newList);
+
+        const response = await listService.createList(newList);
+
+        console.log(response);
+
+        setLists((prev) => [newList, ...prev]);
+      }
+
       handleCloseModal();
     },
     [selectedListToEdit],

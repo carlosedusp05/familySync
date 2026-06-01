@@ -112,7 +112,9 @@ function ListContent({
               another_padding="pb-2 px-6"
               another_text_weight="font-medium"
               most_radius={true}
-              onClick={() => handleOpenModal(null, false)}
+              onClick={() => {
+                handleOpenModal(null, false);
+              }}
             />
           </div>
           <div className="h-[93%] w-full flex flex-col">

@@ -1,6 +1,9 @@
 function ShowAlert({ warning, showWarning }) {
   if (!warning) return null;
 
+  console.log(warning);
+  console.log(showWarning);
+
   return (
     <div
       className={`
@@ -26,7 +29,7 @@ function ShowAlert({ warning, showWarning }) {
           }
         `}
     >
-      {warning}
+      <p>{warning}</p>
     </div>
   );
 }
