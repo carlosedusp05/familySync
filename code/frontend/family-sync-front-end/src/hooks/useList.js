@@ -47,7 +47,7 @@ export function useList() {
           userLists.forEach((lista) => {
             const listItems = (lista.itens || []).map((item) => ({
               id: item.id_item,
-              nome: item.nome_item,
+              name: item.nome || item.nome_item || item.name || "Item sem nome",
               price: parseFloat(item.valor_unitario) || 0,
               units: item.quantidade || 1,
               isSelected: item.comprado === 1,
@@ -55,7 +55,8 @@ export function useList() {
 
             allMappedLists.push({
               id: lista.id_lista,
-              nome: lista.nome_lista,
+              nome: lista.nome_lista || lista.nome || "Lista sem nome",
+              name: lista.nome_lista || lista.nome || "Lista sem nome",
               author: usuario.nome_usuario,
               isFavorite: false,
               items: listItems,

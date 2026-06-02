@@ -78,16 +78,8 @@ export function useFinancier() {
   const fetchGastos = useCallback(async () => {
     setIsLoading(true);
     try {
-      let dados = null;
-
-      if (periodo === "Dia")
-        dados = await financeService.getFinancasDailyByIdFamily(idFamilia);
-      if (periodo === "Semana")
-        dados = await financeService.getFinancasWeekByIdFamily(idFamilia);
-      if (periodo === "Mês")
-        dados = await financeService.getFinancasMonthlyByIdFamily(idFamilia);
-      if (periodo === "Ano")
-        dados = await financeService.getFinancasYearlyByIdFamily(idFamilia);
+      // Trazemos SEMPRE a lista crua e completa do backend
+      const dados = await financeService.getFinancasDailyByIdFamily(idFamilia);
 
       if (dados && Array.isArray(dados)) {
         setGastosAtuais(dados);
@@ -104,12 +96,12 @@ export function useFinancier() {
         setGastosAtuais([]);
       }
     } catch (error) {
-      console.error(`Erro ao buscar os gastos do tipo: ${periodo}`, error);
+      console.error("Erro ao buscar os gastos completos", error);
       setGastosAtuais([]);
     } finally {
       setIsLoading(false);
     }
-  }, [periodo, idFamilia]);
+  }, [idFamilia]);
 
   useEffect(() => {
     fetchGastos();
@@ -120,12 +112,34 @@ export function useFinancier() {
     let chartData = [];
     let listData = [];
 
-    const d = dataFiltroDia;
-    const filtroStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const d = new Date(dataFiltroDia);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const date = String(d.getDate()).padStart(2, "0");
+
+    const filtroDiaStr = `${year}-${month}-${date}`;
+    const filtroMesStr = `${year}-${month}`;
+    const filtroAnoStr = `${year}`;
+
+    // 🔥 Função salva-vidas para evitar o bug de fuso horário (UTC vs Local)
+    const getLocalDate = (dateStr) => {
+      const [y, m, dStr] = dateStr.substring(0, 10).split("-");
+      return new Date(Number(y), Number(m) - 1, Number(dStr));
+    };
+
+    // Limites exatos da Semana (Domingo a Sábado) baseados no dataFiltroDia
+    const dom = new Date(d);
+    dom.setDate(d.getDate() - d.getDay());
+    dom.setHours(0, 0, 0, 0);
+
+    const sab = new Date(d);
+    sab.setDate(d.getDate() + (6 - d.getDay()));
+    sab.setHours(23, 59, 59, 999);
 
     if (periodo === "Dia") {
       const filtered = rawList.filter(
-        (item) => (item.data_movimentacao || "").substring(0, 10) === filtroStr,
+        (item) =>
+          (item.data_movimentacao || "").substring(0, 10) === filtroDiaStr,
       );
       listData = filtered;
       chartData = filtered.map((item) => ({
@@ -137,62 +151,127 @@ export function useFinancier() {
         isGroup: false,
       }));
     } else if (periodo === "Semana") {
-      const sortedList = [...rawList].sort((a, b) => {
-        const diaA = traduzirDia[a.dia_semana] || a.dia_semana;
-        const diaB = traduzirDia[b.dia_semana] || b.dia_semana;
-        return (ordemDias[diaA] || 99) - (ordemDias[diaB] || 99);
+      const filtered = rawList.filter((item) => {
+        if (!item.data_movimentacao) return false;
+        // Usamos a função blindada contra fuso horário aqui
+        const itemDate = getLocalDate(item.data_movimentacao);
+        return itemDate >= dom && itemDate <= sab;
       });
 
-      listData = sortedList;
-      chartData = sortedList.map((item, index) => {
-        const diaBr = traduzirDia[item.dia_semana] || item.dia_semana;
-        return {
+      // Agrupando e somando os valores por Dia da Semana
+      const agrupado = {};
+      const diasSemana = [
+        "Domingo",
+        "Segunda",
+        "Terça",
+        "Quarta",
+        "Quinta",
+        "Sexta",
+        "Sábado",
+      ];
+
+      filtered.forEach((item) => {
+        const itemDate = getLocalDate(item.data_movimentacao);
+        const nomeDia = diasSemana[itemDate.getDay()];
+        if (!agrupado[nomeDia]) agrupado[nomeDia] = 0;
+        agrupado[nomeDia] += Number(item.valor || item.total || 0);
+      });
+
+      listData = filtered;
+      chartData = Object.keys(agrupado)
+        .sort((a, b) => (ordemDias[a] || 99) - (ordemDias[b] || 99))
+        .map((diaBr, index) => ({
           id_financas: `week-${index}`,
           labelItem: diaBr,
-          valorItem: Number(item.total || item.valor || 0),
+          valorItem: agrupado[diaBr],
           icone: "📅",
           rawItem: {
-            ...item,
             descricao: diaBr,
             icone: "📅",
-            valor: item.total,
+            valor: agrupado[diaBr],
+            isVirtual: true,
           },
           isGroup: true,
-        };
-      });
+        }));
     } else if (periodo === "Mês") {
-      listData = rawList;
-      chartData = rawList.map((item, index) => ({
-        id_financas: `month-${index}`,
-        labelItem: item.semana_mes || item.data_movimentacao || `Dia ${index}`,
-        valorItem: Number(item.total || item.valor || 0),
-        icone: "📅",
-        rawItem: {
-          ...item,
-          descricao: item.semana_mes || "Detalhe do Mês",
-          icone: "📅",
-          valor: item.total || item.valor,
-        },
-        isGroup: true,
-      }));
-    } else if (periodo === "Ano") {
-      listData = rawList;
-      chartData = rawList.map((item, index) => {
-        const mesBr = traduzirMes[item.mes] || item.mes;
-        return {
-          id_financas: `year-${index}`,
-          labelItem: mesBr,
-          valorItem: Number(item.total || item.valor || 0),
+      const filtered = rawList.filter((item) => {
+        if (!item.data_movimentacao) return false;
+        return (item.data_movimentacao || "").substring(0, 7) === filtroMesStr;
+      });
+
+      // Agrupando e somando os valores por Semana do Mês
+      const agrupado = {};
+      filtered.forEach((item) => {
+        // Pega o dia direto da string: "2026-06-15" -> 15
+        const diaMes = parseInt(item.data_movimentacao.substring(8, 10), 10);
+        const semana = `Semana ${Math.ceil(diaMes / 7)}`;
+        if (!agrupado[semana]) agrupado[semana] = 0;
+        agrupado[semana] += Number(item.valor || item.total || 0);
+      });
+
+      listData = filtered;
+      chartData = Object.keys(agrupado)
+        .sort()
+        .map((semana, index) => ({
+          id_financas: `month-${index}`,
+          labelItem: semana,
+          valorItem: agrupado[semana],
           icone: "📅",
           rawItem: {
-            ...item,
-            descricao: mesBr,
+            descricao: semana,
             icone: "📅",
-            valor: item.total,
+            valor: agrupado[semana],
+            isVirtual: true,
           },
           isGroup: true,
-        };
+        }));
+    } else if (periodo === "Ano") {
+      const filtered = rawList.filter((item) => {
+        if (!item.data_movimentacao) return false;
+        return (item.data_movimentacao || "").substring(0, 4) === filtroAnoStr;
       });
+
+      // Agrupando e somando os valores por Mês
+      const agrupado = {};
+      const mesesStr = [
+        "Janeiro",
+        "Fevereiro",
+        "Março",
+        "Abril",
+        "Maio",
+        "Junho",
+        "Julho",
+        "Agosto",
+        "Setembro",
+        "Outubro",
+        "Novembro",
+        "Dezembro",
+      ];
+
+      filtered.forEach((item) => {
+        const mesIndex =
+          parseInt(item.data_movimentacao.substring(5, 7), 10) - 1;
+        const nomeMes = mesesStr[mesIndex];
+        if (!agrupado[nomeMes]) agrupado[nomeMes] = 0;
+        agrupado[nomeMes] += Number(item.valor || item.total || 0);
+      });
+
+      listData = filtered;
+      chartData = Object.keys(agrupado)
+        .sort((a, b) => mesesStr.indexOf(a) - mesesStr.indexOf(b))
+        .map((mesBr, index) => ({
+          id_financas: `year-${index}`,
+          labelItem: mesBr,
+          valorItem: agrupado[mesBr],
+          icone: "📅",
+          rawItem: {
+            descricao: mesBr,
+            icone: "📅",
+            valor: agrupado[mesBr],
+            isVirtual: true,
+          },
+          isGroup: true,
+        }));
     }
 
     return { listData, chartData };
@@ -220,33 +299,33 @@ export function useFinancier() {
   }, [valorMaximo]);
 
   const labelsData = useMemo(() => {
-    const hoje = new Date();
+    const d = new Date(dataFiltroDia);
     const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
-    const fmt = (d) =>
-      d
+    const fmt = (dateObj) =>
+      dateObj
         .toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })
         .replace(".", "");
 
-    const dom = new Date(hoje);
-    dom.setDate(hoje.getDate() - hoje.getDay());
-    const sab = new Date(hoje);
-    sab.setDate(hoje.getDate() + (6 - hoje.getDay()));
+    const dom = new Date(d);
+    dom.setDate(d.getDate() - d.getDay());
+    const sab = new Date(d);
+    sab.setDate(d.getDate() + (6 - d.getDay()));
 
     return {
       Dia: capitalize(
-        dataFiltroDia.toLocaleDateString("pt-BR", {
+        d.toLocaleDateString("pt-BR", {
           day: "2-digit",
           month: "long",
         }),
       ),
       Semana: `${fmt(dom)} - ${fmt(sab)}`,
       Mês: capitalize(
-        dataFiltroDia.toLocaleDateString("pt-BR", {
+        d.toLocaleDateString("pt-BR", {
           month: "long",
           year: "numeric",
         }),
       ),
-      Ano: `Janeiro - Dezembro ${hoje.getFullYear()}`,
+      Ano: `Janeiro - Dezembro ${d.getFullYear()}`,
     };
   }, [dataFiltroDia]);
 

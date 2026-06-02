@@ -30,6 +30,13 @@ function PerfilScreen() {
     handleDeleteAccount,
     handleLogout,
     handleSelectFamily,
+    // Destruturando as propriedades novas do fluxo de senha
+    isPasswordModalOpen,
+    setIsPasswordModalOpen,
+    passwordData,
+    setPasswordData,
+    errosSenhaModal,
+    handleUpdatePassword,
   } = usePerfil();
 
   return (
@@ -64,6 +71,13 @@ function PerfilScreen() {
         handleDeleteAccount={handleDeleteAccount}
         handleLogout={handleLogout}
         handleSelectFamily={handleSelectFamily}
+        // Novas propriedades injetadas no Formulario
+        isPasswordModalOpen={isPasswordModalOpen}
+        setIsPasswordModalOpen={setIsPasswordModalOpen}
+        passwordData={passwordData}
+        setPasswordData={setPasswordData}
+        errosSenhaModal={errosSenhaModal}
+        handleUpdatePassword={handleUpdatePassword}
       />
     </div>
   );

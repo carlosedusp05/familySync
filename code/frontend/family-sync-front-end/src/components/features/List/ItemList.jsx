@@ -2,7 +2,7 @@ import { checkIcon } from "../../../assets";
 import { formatToBRL } from "../../../utils/formatters";
 
 function ItemList({
-  name,
+  name = "",
   price = 0,
   units = 0,
   isSelected,

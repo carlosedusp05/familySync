@@ -5,6 +5,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { notificationsIcon } from "../../assets/index";
 import { useNotifications } from "../../hooks/useNotifications";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
+import { userService } from "../../services/userService";
 
 function DefaultHeader({ disconnected }) {
   const navigate = useNavigate();
@@ -15,6 +18,31 @@ function DefaultHeader({ disconnected }) {
 
   const { notifications, newAlert, clearAlert } = useNotifications();
   const [showRedDot, setShowRedDot] = useState(false);
+  const [fotoUsuario, setFotoUsuario] = useState(null);
+
+  useEffect(() => {
+    const buscarDadosUsuario = async () => {
+      if (!disconnected) {
+        const token = Cookies.get("familysync_token");
+        if (token) {
+          try {
+            const decoded = jwtDecode(token);
+            const userData = await userService.getUserById(decoded.id_usuario);
+
+            const urlFoto = userData?.Response?.[0]?.foto;
+
+            if (urlFoto) {
+              setFotoUsuario(urlFoto);
+            }
+          } catch (error) {
+            console.error("Erro ao buscar foto do usuário:", error);
+          }
+        }
+      }
+    };
+
+    buscarDadosUsuario();
+  }, [disconnected]);
 
   const STORAGE_KEY = "@FamilySync:notifications:lastReadId";
 
@@ -81,7 +109,8 @@ function DefaultHeader({ disconnected }) {
     <div className="flex gap-12 max-md:gap-8 items-center justify-center">
       <IconPerfil
         is_white_backgroud={false}
-        another_size={"h-10 max-md:h-7 max-md:w-7"}
+        another_size={"w-25 h-25 max-md:h-8 max-md:w-8"}
+        fotoUrl={fotoUsuario}
       />
       <div
         className="relative bg-orange-dark flex items-center justify-center h-fit p-4 max-md:p-4 rounded-lg cursor-pointer duration-300 transition-all hover:scale-110"

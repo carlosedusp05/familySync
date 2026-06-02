@@ -28,8 +28,17 @@ export function usePerfil() {
     email: "",
     cpf: "",
     dataNascimento: "",
-    senha: "",
   });
+  const [userId, setUserId] = useState(null);
+
+  // --- NOVOS ESTADOS PARA O MODAL DE ALTERAÇÃO DE SENHA ---
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    senhaAnterior: "",
+    novaSenha: "",
+    confirmarNovaSenha: "",
+  });
+  const [errosSenhaModal, setErrosSenhaModal] = useState({});
 
   const [familiasDisponiveis, setFamiliasDisponiveis] = useState([]);
   const [familiasSelecionadas, setFamiliasSelecionadas] = useState([]);
@@ -138,9 +147,6 @@ export function usePerfil() {
           setFormData((prev) => ({ ...prev, dataNascimento: hoje }));
         }
         break;
-      case "senha":
-        if (valor) erroMensagem = validatePassword(valor);
-        break;
       default:
         break;
     }
@@ -153,11 +159,47 @@ export function usePerfil() {
     if (editableFields[fieldId]) {
       setErrosCampos((prev) => ({ ...prev, [fieldId]: "" }));
     }
-    if (fieldId === "senha" && !editableFields["senha"]) {
-      setMostrarSenha(true);
-    }
   };
 
+  const handleUpdatePassword = async () => {
+    const erros = {};
+    if (!passwordData.senhaAnterior)
+      erros.senhaAnterior = "A senha atual é obrigatória.";
+    if (validatePassword(passwordData.novaSenha))
+      erros.novaSenha = validatePassword(passwordData.novaSenha);
+    if (passwordData.novaSenha !== passwordData.confirmarNovaSenha)
+      erros.confirmarNovaSenha = "As senhas não coincidem.";
+
+    if (Object.keys(erros).length > 0) {
+      setErrosSenhaModal(erros);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await userService.updateUser(userId, {
+        ...formData,
+        cpf: cleanCPF(formData.cpf),
+        familias: familiasSelecionadas,
+        senhaAnterior: passwordData.senhaAnterior,
+        senha: passwordData.novaSenha,
+      });
+
+      setIsPasswordModalOpen(false);
+      setPasswordData({
+        senhaAnterior: "",
+        novaSenha: "",
+        confirmarNovaSenha: "",
+      });
+    } catch (error) {
+      setErrosSenhaModal({
+        geral:
+          "Falha ao alterar senha. Verifique se a senha atual está correta.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const handleUpdate = async () => {
     const erros = {
       nome: validateName(formData.nome),
@@ -165,8 +207,6 @@ export function usePerfil() {
       cpf: validarCpf(formData.cpf),
       dataNascimento: validarDataNascimento(formData.dataNascimento),
     };
-
-    if (formData.senha) erros.senha = validatePassword(formData.senha);
 
     Object.keys(erros).forEach((key) => !erros[key] && delete erros[key]);
 
@@ -184,13 +224,7 @@ export function usePerfil() {
         familias: familiasSelecionadas,
       };
 
-      if (formData.senha) {
-        dadosUpdate.senha = CryptoJS.SHA256(formData.senha).toString(
-          CryptoJS.enc.Hex,
-        );
-      } else {
-        delete dadosUpdate.senha;
-      }
+      delete dadosUpdate.senha;
 
       await userService.updateUser(dadosUpdate);
       navigate("/dashboard");
@@ -265,5 +299,11 @@ export function usePerfil() {
     handleButtonClick,
     handleDeleteAccount,
     handleLogout,
+    isPasswordModalOpen,
+    setIsPasswordModalOpen,
+    passwordData,
+    setPasswordData,
+    errosSenhaModal,
+    handleUpdatePassword,
   };
 }

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import CryptoJS from "crypto-js";
 import { userService } from "../services/userService";
 import {
   validateName,
@@ -100,18 +99,18 @@ export function useRegister() {
 
     setIsLoading(true);
     try {
-      const senhaHasheada = CryptoJS.SHA256(senha).toString(CryptoJS.enc.Hex);
+      const formData = new FormData();
+      formData.append("nome", formatUserName(nome));
+      formData.append("email", email);
+      formData.append("cpf", cleanCPF(cpf));
+      formData.append("data_nascimento", dataNascimento);
+      formData.append("senha", senha);
 
-      const dadosBackend = {
-        nome: formatUserName(nome),
-        email,
-        cpf: cleanCPF(cpf),
-        data_nascimento: dataNascimento,
-        senha: senhaHasheada,
-      };
+      if (fileSelecionado) {
+        formData.append("foto", fileSelecionado);
+      }
 
-      const response = await userService.createUser(dadosBackend);
-      console.log(response);
+      const response = await userService.createUser(formData);
 
       if (response.StatusCode == 201) navigate("/auth/login");
       else

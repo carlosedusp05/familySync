@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import CryptoJS from "crypto-js";
 import Cookies from "js-cookie";
 import { userService } from "../services/userService";
 import {
@@ -38,10 +37,9 @@ export function useLogin() {
           return;
         }
 
-        const senhaHasheada = CryptoJS.SHA256(senha).toString(CryptoJS.enc.Hex);
         const response = await userService.loginUser({
           email,
-          senha: senhaHasheada,
+          senha,
         });
 
         if (
