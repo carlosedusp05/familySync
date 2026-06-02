@@ -34,16 +34,16 @@ function ListContainer({
           </button>
 
           <h1
-            title={list.name}
+            title={list.nome}
             className={`${
               (list.name?.length || 0) <= 20
                 ? "text-3xl"
-                : (list.name?.length || 0) <= 40
+                : (list.nome?.length || 0) <= 40
                   ? "text-2xl"
                   : "text-xl"
             } font-semibold text-[#3A2414] leading-tight truncate`}
           >
-            {list.name}
+            {list.nome}
           </h1>
         </div>
 

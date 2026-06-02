@@ -47,16 +47,17 @@ export function useList() {
           userLists.forEach((lista) => {
             const listItems = (lista.itens || []).map((item) => ({
               id: item.id_item,
-              name: item.nome || item.nome_item || item.name || "Item sem nome",
-              price: parseFloat(item.valor_unitario) || 0,
-              units: item.quantidade || 1,
+              nome_item:
+                item.nome || item.nome_item || item.nome || "Item sem nome",
+              valor_unitario: parseFloat(item.valor_unitario) || 0,
+              quantidade: item.quantidade || 1,
               isSelected: item.comprado === 1,
+              id_lista: item.id_lista,
             }));
 
             allMappedLists.push({
               id: lista.id_lista,
               nome: lista.nome_lista || lista.nome || "Lista sem nome",
-              name: lista.nome_lista || lista.nome || "Lista sem nome",
               author: usuario.nome_usuario,
               isFavorite: false,
               items: listItems,
@@ -121,7 +122,7 @@ export function useList() {
   }, [computedLists, activeListId]);
 
   const toggleItem = useCallback(
-    (itemId) => {
+    async (itemId) => {
       setLists((prevLists) =>
         prevLists.map((list) => {
           if (list.id !== activeListId) return list;
@@ -157,17 +158,28 @@ export function useList() {
     );
   }, [activeList, activeListId]);
 
+  // Funcionando
   const handleAddItem = useCallback(
-    async (itemData) => {
-      if (!activeListId) return;
+    async (itemData, listId) => {
+      const idLista = listId || activeListId;
+
+      console.log(idLista);
+
+      if (!idLista) return;
 
       const newItem = {
-        id: Date.now() + Math.random(),
-        name: itemData.name || "Sem nome",
-        price: parseFloat(itemData.price) || 0,
-        units: parseInt(itemData.units) || 1,
-        isSelected: false,
+        nome_item: itemData.name || "Sem nome",
+        valor_unitario: parseFloat(itemData.price) || 0,
+        quantidade: parseInt(itemData.units) || 1,
+        comprado: false,
+        id_lista: activeListId,
       };
+
+      const responseItem = await listService.createItems(newItem);
+
+      if (responseItem.StatusCode !== 201) {
+        return;
+      }
 
       setLists((prevLists) =>
         prevLists.map((list) => {
@@ -190,8 +202,18 @@ export function useList() {
     );
   }, []);
 
+  //Funcionando
   const handleDeleteList = useCallback(
-    (listId) => {
+    async (listId) => {
+      console.log(listId);
+      const response = await listService.deleteList(listId);
+
+      console.log(response);
+
+      if (response.StatusCode !== 200) {
+        return;
+      }
+
       setLists((prev) => prev.filter((list) => list.id !== listId));
       if (activeListId === listId) setActiveListId(null);
     },
@@ -199,7 +221,7 @@ export function useList() {
   );
 
   const handleDeleteItem = useCallback(
-    (itemId) => {
+    async (itemId) => {
       if (!activeListId) return;
 
       setLists((prevLists) =>
@@ -215,32 +237,46 @@ export function useList() {
     [activeListId],
   );
 
+  //Funcionando
   const handleSaveList = useCallback(
     async (data) => {
       if (selectedListToEdit) {
         setLists((prev) =>
           prev.map((list) =>
             list.id === selectedListToEdit.id
-              ? { ...list, name: data.name, items: data.items }
+              ? { ...list, nome: data.nome, items: data.items }
               : list,
           ),
         );
       } else {
         const newList = {
-          id: Date.now(),
           id_usuario: user.id,
-          nome: data.name,
+          id_familia: idFamilia,
+          nome: data.nome,
           isFavorite: false,
           items: data.items || [],
         };
 
-        console.log(newList);
+        const responseList = await listService.createList(newList);
 
-        const response = await listService.createList(newList);
+        await Promise.all(
+          newList.items.map((item) =>
+            handleAddItem(item, responseList.Response.id_list),
+          ),
+        );
 
-        console.log(response);
+        if (responseList.StatusCode !== 201) {
+          handleCloseModal();
+          return;
+        }
 
-        setLists((prev) => [newList, ...prev]);
+        const newItemToState = {
+          ...newList,
+          id_list: responseList.Response.id_list,
+          author: user.nome,
+        };
+
+        setLists((prev) => [newItemToState, ...prev]);
       }
 
       handleCloseModal();

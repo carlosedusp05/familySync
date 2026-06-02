@@ -35,9 +35,9 @@ function MultItemsList({
       {items_list.map((item) => (
         <ItemList
           key={item.id}
-          name={item.name}
-          price={item.price}
-          units={item.units}
+          nome_item={item.nome_item}
+          price={item.valor_unitario}
+          units={item.quantidade}
           isSelected={item.isSelected}
           onToggle={() => toggleItem(item.id)}
           onDelete={() => onDeleteItem(item.id)}

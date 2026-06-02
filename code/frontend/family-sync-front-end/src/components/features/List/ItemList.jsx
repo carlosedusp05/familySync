@@ -2,7 +2,7 @@ import { checkIcon } from "../../../assets";
 import { formatToBRL } from "../../../utils/formatters";
 
 function ItemList({
-  name = "",
+  nome_item = "",
   price = 0,
   units = 0,
   isSelected,
@@ -13,7 +13,7 @@ function ItemList({
   const formattedPrice = formatToBRL(price);
   const formattedResult = formatToBRL(units * price);
 
-  const nameSizeClass = name.length > 20 ? "text-xl" : "text-3xl";
+  const nameSizeClass = nome_item.length > 20 ? "text-xl" : "text-3xl";
 
   return (
     <div className="relative w-full bg-[#FFF8E7] flex items-center justify-between px-6 py-5 rounded-[25px] shadow-sm min-h-35 scale-95 hover:scale-98 active:scale-95 transition-all duration-300 ease-out hover:brightness-95 group">
@@ -34,9 +34,9 @@ function ItemList({
           <div className="flex flex-col gap-3">
             <p
               className={`text-brown-dark ${nameSizeClass} font-semibold leading-tight truncate`}
-              title={name}
+              title={nome_item}
             >
-              {name}
+              {nome_item}
             </p>
 
             <div className="flex flex-col gap-1.5 items-start">
@@ -58,9 +58,9 @@ function ItemList({
         ) : (
           <p
             className={`text-brown-dark ${nameSizeClass} font-semibold leading-tight truncate`}
-            title={name}
+            title={nome_item}
           >
-            {name}
+            {nome_item}
           </p>
         )}
       </div>

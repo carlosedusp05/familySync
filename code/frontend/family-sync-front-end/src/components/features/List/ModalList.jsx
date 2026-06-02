@@ -17,7 +17,7 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
 
   useEffect(() => {
     if (data && isEdit) {
-      setListName(data.name || "");
+      setListName(data.nome || "");
       setItems(data.items || []);
     } else {
       setListName("");
@@ -50,7 +50,7 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
 
     const newItem = {
       id: Date.now(),
-      name: newItemName,
+      nome: newItemName,
       price: priceParsed,
       units: unitsParsed,
       isSelected: false,
@@ -74,7 +74,7 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
       return;
     }
 
-    onSave({ name: listName, items: items });
+    onSave({ nome: listName, items: items });
   };
 
   const totalPurchase = items.reduce(
@@ -265,7 +265,7 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
                     className="bg-[#FF8B40] text-white rounded-xl flex items-center justify-between px-8 py-2.5 shadow-sm transition-all hover:-translate-y-px"
                   >
                     <span className="flex-1 font-semibold truncate pr-3 text-xl">
-                      {item.name}
+                      {item.nome}
                     </span>
                     <div className="flex items-center gap-3 shrink-0">
                       <span className="text-white/80 font-medium text-xl">

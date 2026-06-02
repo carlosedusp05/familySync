@@ -43,12 +43,9 @@ const getInfosUser = async function () {
 const getInfosById = async function (id) {
   const url = `/usuario-informacao/${id}`;
 
-  console.log(`Usado o id: ${id}`);
   try {
     const response = await api.get(url);
     const dados = response.data;
-
-    console.log(dados);
 
     return dados;
   } catch (error) {

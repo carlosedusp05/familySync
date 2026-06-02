@@ -39,17 +39,17 @@ function ListContent({
           <div className="py-10 px-3 shrink-0 h-37.5 flex flex-col justify-center w-full min-w-0 overflow-hidden">
             <h1
               className={`text-orange-dark truncate block w-full h-10 ${
-                activeList?.name
-                  ? activeList.name.length <= 20
+                activeList?.nome
+                  ? activeList.nome.length <= 20
                     ? "text-4xl"
-                    : activeList.name.length <= 40
+                    : activeList.nome.length <= 40
                       ? "text-3xl"
                       : "text-2xl"
                   : "text-4xl"
               } font-semibold`}
-              title={activeList?.name}
+              title={activeList?.nome}
             >
-              {activeList ? activeList.name : "Selecione uma Lista"}
+              {activeList ? activeList.nome : "Selecione uma Lista"}
             </h1>
 
             <h1

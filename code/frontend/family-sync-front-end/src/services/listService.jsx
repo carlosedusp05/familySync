@@ -52,9 +52,38 @@ const deleteList = async function (id) {
   }
 };
 
+// ItemService
+const getItems = async function () {
+  const url = `/lista/completa/familia`;
+
+  try {
+    const response = await api.get(url);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
+const createItems = async function (data) {
+  console.log(data);
+  const url = `/item`;
+
+  try {
+    const response = await api.post(url, data);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
 export const listService = {
   getListsByFamily,
   createList,
   updateList,
   deleteList,
+  getItems,
+  createItems,
 };
