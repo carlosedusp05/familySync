@@ -62,9 +62,7 @@ function StartScreen(props) {
       <DefaultHeader />
       <div className="w-full flex justify-center items-center h-full">
         <div className="w-full flex justify-center items-center h-full">
-          {estaCarregando ? (
-            <MenuStartSkeleton />
-          ) : isFamily && isFamily.length > 0 ? (
+          {estaCarregando ? null : isFamily && isFamily.length > 0 ? (
             <MenuStart
               props={props}
               userData={userDataSincronizado}

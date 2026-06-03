@@ -9,6 +9,7 @@ export function useInfoFamiliar() {
   const [activeMemberId, setActiveMemberId] = useState(null);
   const [allFamilyInfos, setAllFamilyInfos] = useState([]);
   const [infos, setInfos] = useState([]);
+  const [userinfo, setUserInfo] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -60,6 +61,8 @@ export function useInfoFamiliar() {
         }
 
         const responseInfos = await infoService.getInfosByFamily(idFamilia);
+
+        console.log(responseInfos);
 
         const payload = responseInfos.data?.dados || responseInfos.dados || {};
         const usuariosComInfos = payload.usuarios || [];
@@ -119,26 +122,25 @@ export function useInfoFamiliar() {
   }, []);
 
   const handleDelete = useCallback(async () => {
-    if (!selectedInfo || !selectedInfo.id_info) {
+    if (!selectedInfo || !selectedInfo.id_usuario_informacao) {
       console.warn("Nenhuma informação selecionada para deletar.");
       return;
     }
 
-    const id_info = selectedInfo.id_info;
-
     try {
-      console.log("Deletando a info:", id_info);
-      await infoService.deleteInfo(id_info);
+      await infoService.deleteInfo(selectedInfo.id_usuario_informacao);
 
       setAllFamilyInfos((prevInfos) =>
-        prevInfos.filter((info) => info.id_info !== id_info),
+        prevInfos.filter(
+          (info) => info.id_usuario_informacao !== id_usuario_informacao,
+        ),
       );
 
       handleCloseModal();
     } catch (error) {
       console.error("Erro ao deletar:", error);
     }
-  }, [selectedInfo, handleCloseModal]);
+  }, [selectedInfo, handleCloseModal, activeMemberId]);
 
   const handleSave = useCallback(
     async (data) => {
@@ -151,6 +153,8 @@ export function useInfoFamiliar() {
             titulo: title,
             descricao: description,
           };
+          console.log(selectedInfo.id_info);
+          console.log(infoAtualizada);
 
           await infoService.updateInfo(selectedInfo.id_info, infoAtualizada);
 

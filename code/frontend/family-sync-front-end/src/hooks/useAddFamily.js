@@ -18,6 +18,7 @@ export const useAddFamily = () => {
   const fileInputRef = useRef(null);
 
   const [preview, setPreview] = useState(null);
+  const [fotoUpload, setFotoUpload] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentEmail, setCurrentEmail] = useState("");
   const [errosCampos, setErrosCampos] = useState({});
@@ -79,11 +80,13 @@ export const useAddFamily = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setFotoUpload(file);
       setPreview(URL.createObjectURL(file));
     }
   };
 
   const removeImagem = () => {
+    setFotoUpload(null);
     setPreview(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -224,21 +227,25 @@ export const useAddFamily = () => {
       const decoded = jwtDecode(token);
       const user = decoded;
 
-      const dadosFamilyEndereco = {
-        nome: formData.nomeFamilia.trim(),
-        telefone: formatPhone(formData.telefone),
-        cep: formData.cep,
-        logradouro: formData.logradouro,
-        bairro: formData.bairro,
-        complemento: formData.complemento || "",
-        cidade: formData.cidade,
-        estado: formData.uf,
-        numero: formData.numero,
-      };
+      const formDataEnvio = new FormData();
+      formDataEnvio.append("nome", formData.nomeFamilia.trim());
+      formDataEnvio.append("telefone", formatPhone(formData.telefone));
+      formDataEnvio.append("cep", formData.cep);
+      formDataEnvio.append("logradouro", formData.logradouro);
+      formDataEnvio.append("bairro", formData.bairro);
+      formDataEnvio.append("complemento", formData.complemento || "");
+      formDataEnvio.append("cidade", formData.cidade);
+      formDataEnvio.append("estado", formData.uf);
+      formDataEnvio.append("numero", formData.numero);
+
+      if (fotoUpload) {
+        formDataEnvio.append("foto", fotoUpload);
+      }
 
       const responseFamilyCreation =
-        await familyService.createFamilyEndereco(dadosFamilyEndereco);
+        await familyService.createFamilyEndereco(formDataEnvio);
 
+      console.log(responseFamilyCreation);
       if (
         responseFamilyCreation.StatusCode == 201 ||
         responseFamilyCreation.StatusCode == 200

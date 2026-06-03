@@ -55,20 +55,6 @@ const updateUser = async function (id, data) {
   }
 };
 
-// PUT - Trocar Senha (Esqueci minha senha)
-const changePassword = async function (data, token) {
-  const url = `/usuario/trocar-senha?token=${token}`;
-
-  try {
-    const response = await api.put(url, data);
-    const dados = response.data;
-
-    return dados;
-  } catch (error) {
-    throw error.response?.data;
-  }
-};
-
 // DELETE - Deletar Usuário
 const deleteUser = async function (id) {
   const url = `/usuario/${id}`;
@@ -202,6 +188,33 @@ const getNotificationsByUser = async function (id) {
   }
 };
 
+const sendEmailForRememberPass = async function (email) {
+  const url = `/senha-nova/code?email=${email}`;
+
+  try {
+    const response = await api.get(url);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
+// PUT - Trocar Senha (Esqueci minha senha)
+const changePassword = async function (data, token) {
+  const url = `/usuario/trocar-senha?token=${token}`;
+
+  try {
+    const response = await api.put(url, data);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 export const userService = {
   getUsers,
   getUserById,
@@ -215,4 +228,6 @@ export const userService = {
   getUsersFamily,
   getFamiliesByUser,
   getNotificationsByUser,
+  sendEmailForRememberPass,
+  changePassword,
 };

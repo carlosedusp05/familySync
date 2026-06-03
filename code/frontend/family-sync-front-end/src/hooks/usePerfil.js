@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import CryptoJS from "crypto-js";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 
@@ -29,7 +28,6 @@ export function usePerfil() {
     cpf: "",
     dataNascimento: "",
   });
-  const [userId, setUserId] = useState(null);
 
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [passwordData, setPasswordData] = useState({
@@ -37,19 +35,21 @@ export function usePerfil() {
     novaSenha: "",
     confirmarNovaSenha: "",
   });
+  const [passwordErros, setPasswordErros] = useState({});
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
+  const [userId, setUserId] = useState(null);
   const [fotoArquivo, setFotoArquivo] = useState(null);
-  const [errosSenhaModal, setErrosSenhaModal] = useState({});
 
   const [familiasDisponiveis, setFamiliasDisponiveis] = useState([]);
   const [familiasSelecionadas, setFamiliasSelecionadas] = useState([]);
   const [isFamiliesOpen, setIsFamiliesOpen] = useState(false);
 
+  const [isEditing, setIsEditing] = useState(false);
   const [editableFields, setEditableFields] = useState({});
   const [errosCampos, setErrosCampos] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [preview, setPreview] = useState(null);
-  const [mostrarSenha, setMostrarSenha] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const hoje = new Date().toISOString().split("T")[0];
@@ -64,12 +64,6 @@ export function usePerfil() {
 
       try {
         const decodedUser = jwtDecode(token);
-
-        setFormData((prev) => ({
-          ...prev,
-          nome: decodedUser.nome || "",
-          email: decodedUser.email || "",
-        }));
         setIsLoading(true);
 
         const id_usuario = parseInt(decodedUser.id_usuario);
@@ -77,21 +71,18 @@ export function usePerfil() {
 
         const response = await userService.getFamiliesByUser(id_usuario);
 
-        setFormData({
-          nome: response.user.nome || "",
-          email: response.user.email || "",
+        setFormData((prev) => ({
+          ...prev,
+          nome: response.user.nome || decodedUser.nome || "",
+          email: response.user.email || decodedUser.email || "",
           cpf: formatCPF(response.user.cpf || ""),
           dataNascimento: formatDateForInput(response.user.data_nascimento),
-          senha: "",
-        });
+        }));
 
-        // --- ALTERAÇÃO AQUI ---
-        // Verifica se a imagem vem no atributo 'foto' ou 'foto_perfil'
         const fotoUsuario = response.user.foto || response.user.foto_perfil;
         if (fotoUsuario) {
           setPreview(fotoUsuario);
         }
-        // ----------------------
 
         setFamiliasDisponiveis(response.family);
 
@@ -99,7 +90,6 @@ export function usePerfil() {
           const familiaAtivaSalva = sessionStorage.getItem(
             "@FamilySync:family:id",
           );
-
           const familiaIdParaAtivar =
             familiaAtivaSalva &&
             response.family.some((f) => f.id === parseInt(familiaAtivaSalva))
@@ -163,52 +153,87 @@ export function usePerfil() {
     setErrosCampos((prev) => ({ ...prev, [id]: erroMensagem }));
   };
 
-  const toggleEdit = (fieldId) => {
-    setEditableFields((prev) => ({ ...prev, [fieldId]: !prev[fieldId] }));
-    if (editableFields[fieldId]) {
-      setErrosCampos((prev) => ({ ...prev, [fieldId]: "" }));
+  const toggleEditingMode = () => {
+    if (isEditing) {
+      setIsEditing(false);
+      setEditableFields({});
+      setErrosCampos({});
+    } else {
+      setIsEditing(true);
+      setEditableFields({
+        nome: true,
+        email: true,
+        cpf: true,
+        dataNascimento: true,
+      });
     }
   };
 
+  const validatePasswordOnBlur = (id, valor) => {
+    let erroMensagem = "";
+    if (id === "senhaAnterior" && !valor) {
+      erroMensagem = "A senha atual é obrigatória.";
+    }
+    if (id === "novaSenha") {
+      erroMensagem = validatePassword(valor);
+    }
+    if (id === "confirmarNovaSenha" && valor !== passwordData.novaSenha) {
+      erroMensagem = "As senhas não coincidem.";
+    }
+    setPasswordErros((prev) => ({ ...prev, [id]: erroMensagem }));
+  };
+
   const handleUpdatePassword = async () => {
-    const erros = {};
-    if (!passwordData.senhaAnterior)
-      erros.senhaAnterior = "A senha atual é obrigatória.";
-    if (validatePassword(passwordData.novaSenha))
-      erros.novaSenha = validatePassword(passwordData.novaSenha);
-    if (passwordData.novaSenha !== passwordData.confirmarNovaSenha)
-      erros.confirmarNovaSenha = "As senhas não coincidem.";
+    const erros = {
+      senhaAnterior: !passwordData.senhaAnterior
+        ? "A senha atual é obrigatória."
+        : "",
+      novaSenha: validatePassword(passwordData.novaSenha),
+      confirmarNovaSenha:
+        passwordData.novaSenha !== passwordData.confirmarNovaSenha
+          ? "As senhas não coincidem."
+          : "",
+    };
+
+    Object.keys(erros).forEach((key) => !erros[key] && delete erros[key]);
 
     if (Object.keys(erros).length > 0) {
-      setErrosSenhaModal(erros);
+      setPasswordErros(erros);
       return;
     }
 
-    setIsLoading(true);
+    setIsChangingPassword(true);
     try {
-      await userService.updateUser(userId, {
-        ...formData,
-        cpf: cleanCPF(formData.cpf),
-        familias: familiasSelecionadas,
-        senhaAnterior: passwordData.senhaAnterior,
-        senha: passwordData.novaSenha,
-      });
+      const formDataEnvio = new FormData();
+      formDataEnvio.append("senhaAnterior", passwordData.senhaAnterior);
+      formDataEnvio.append("senha", passwordData.novaSenha);
+      formDataEnvio.append("nome", formatUserName(formData.nome));
+      formDataEnvio.append("email", formData.email);
+      formDataEnvio.append("cpf", cleanCPF(formData.cpf));
+      formDataEnvio.append("dataNascimento", formData.dataNascimento);
 
-      setIsPasswordModalOpen(false);
+      await userService.updateUser(userId, formDataEnvio);
+
+      // Limpa e fecha o modal se der certo
       setPasswordData({
         senhaAnterior: "",
         novaSenha: "",
         confirmarNovaSenha: "",
       });
+      setPasswordErros({});
+      setIsPasswordModalOpen(false);
+      alert("Senha atualizada com sucesso!");
     } catch (error) {
-      setErrosSenhaModal({
-        geral:
-          "Falha ao alterar senha. Verifique se a senha atual está correta.",
-      });
+      console.error(error);
+      setPasswordErros((prev) => ({
+        ...prev,
+        senhaAnterior: "Senha atual incorreta ou erro no servidor.",
+      }));
     } finally {
-      setIsLoading(false);
+      setIsChangingPassword(false);
     }
   };
+
   const removeImagem = () => {
     setPreview(null);
     setFotoArquivo(null);
@@ -232,22 +257,20 @@ export function usePerfil() {
     setIsLoading(true);
     try {
       const formDataEnvio = new FormData();
-
       formDataEnvio.append("nome", formatUserName(formData.nome));
       formDataEnvio.append("email", formData.email);
       formDataEnvio.append("cpf", cleanCPF(formData.cpf));
-      formDataEnvio.append("dataNascimento", formData.dataNascimento);
-
-      formDataEnvio.append("familias", JSON.stringify(familiasSelecionadas));
+      formDataEnvio.append("data_nascimento", formData.dataNascimento);
 
       if (fotoArquivo) {
         formDataEnvio.append("foto_perfil", fotoArquivo);
       } else if (preview === null) {
         formDataEnvio.append("remover_foto", "true");
       }
-
       await userService.updateUser(userId, formDataEnvio);
 
+      setEditableFields({});
+      setIsEditing(false);
       navigate("/dashboard");
     } catch (error) {
       console.error(error);
@@ -270,7 +293,6 @@ export function usePerfil() {
 
       const decoded = jwtDecode(token);
       const id_usuario = parseInt(decoded.id_usuario);
-
       const response = await userService.deleteUser(id_usuario);
 
       const isSuccess =
@@ -301,28 +323,31 @@ export function usePerfil() {
     isFamiliesOpen,
     setIsFamiliesOpen,
     editableFields,
+    isEditing,
+    toggleEditingMode,
     errosCampos,
     isLoading,
     preview,
     setPreview,
-    mostrarSenha,
     isDeleteModalOpen,
     setIsDeleteModalOpen,
     hoje,
     validateFieldOnBlur,
-    toggleEdit,
     handleUpdate,
     removeImagem,
     handleButtonClick,
     handleDeleteAccount,
     handleLogout,
+    fotoArquivo,
+    setFotoArquivo,
     isPasswordModalOpen,
     setIsPasswordModalOpen,
     passwordData,
     setPasswordData,
-    errosSenhaModal,
+    passwordErros,
+    setPasswordErros,
+    isChangingPassword,
+    validatePasswordOnBlur,
     handleUpdatePassword,
-    fotoArquivo,
-    setFotoArquivo,
   };
 }

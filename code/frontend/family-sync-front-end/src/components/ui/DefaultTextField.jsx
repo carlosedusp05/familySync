@@ -58,18 +58,22 @@ function DefaultTextField(props) {
     : "border-orange";
   const defaultTextColor = props.hasError ? "text-red-500" : "text-orange";
 
-  const wrapperBaseClasses =
-    "flex flex-row w-full justify-between items-center bg-white";
+  const backgroundColor = props.readOnly ? "bg-gray-100" : "bg-white";
+
+  const wrapperBaseClasses = `flex flex-row w-full justify-between items-center ${backgroundColor} transition-colors duration-300`;
   const wrapperDefaultClasses = `px-4 sm:px-5 h-12 sm:h-14 rounded-full border ${defaultBorderColor}`;
-  const wrapperProfileClasses = "px-4 py-3 rounded-lg shadow-sm";
+  const wrapperProfileClasses =
+    "px-4 py-3 rounded-lg shadow-sm border border-transparent";
 
   const wrapperClasses = `${wrapperBaseClasses} ${isProfile ? wrapperProfileClasses : wrapperDefaultClasses} ${props.grid || ""}`;
 
   const inputBaseClasses =
     "flex-1 min-w-0 h-full border-none focus:outline-none focus:ring-0 bg-transparent";
-  const inputDefaultClasses = `text-base sm:text-lg placeholder:text-sm sm:placeholder: text-base ${defaultTextColor}`;
-  const inputProfileClasses =
-    "text-xl text-[#4a2511] font-bold placeholder:text-[#4a2511] placeholder:font-bold";
+  const inputDefaultClasses = `text-base sm:text-lg placeholder:text-sm sm:placeholder:text-base ${defaultTextColor}`;
+
+  const inputProfileClasses = props.readOnly
+    ? "text-xl text-gray-400 font-medium placeholder:text-gray-400 cursor-not-allowed"
+    : "text-xl text-[#4a2511] font-bold placeholder:text-[#4a2511] placeholder:font-bold";
 
   const inputClasses = `${inputBaseClasses} ${hideDefaultCalendarIcon} ${isProfile ? inputProfileClasses : inputDefaultClasses}`;
 
