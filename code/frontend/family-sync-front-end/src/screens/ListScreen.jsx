@@ -7,7 +7,7 @@ function ListScreen() {
   const listProps = useList();
 
   return (
-    <MainLayout>
+    <MainLayout warning={listProps.warning} showWarning={listProps.showWarning}>
       <ListContent {...listProps} />
 
       <ModalList

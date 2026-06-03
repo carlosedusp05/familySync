@@ -3,10 +3,10 @@ import SidebarNavigation from "../components/layout/SidebarNavigation";
 import BackgroundImage from "../components/ui/BackgroundImage";
 import { imageBackground } from "../assets";
 
-function MainLayout({ children }) {
+function MainLayout({ children, warning, showWarning }) {
   return (
     <div className="flex flex-col w-full h-screen overflow-hidden">
-      <DefaultHeader />
+      <DefaultHeader warning={warning} showWarning={warning} />
 
       <div className="flex flex-1 w-full overflow-hidden">
         <SidebarNavigation />

@@ -3,12 +3,13 @@ function ShowAlert({ warning, showWarning }) {
 
   console.log(warning);
   console.log(showWarning);
+  console.log(typeof showWarning, showWarning);
 
   return (
     <div
       className={`
-          fixed
-          top-5
+          absolute
+          text-[16px]
           left-1/2
           -translate-x-1/2
           bg-red-500

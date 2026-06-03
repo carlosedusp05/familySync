@@ -3,8 +3,12 @@ import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { formatToBRL } from "../utils/formatters";
 import { listService } from "../services/listService";
+import { useLocation } from "react-router-dom";
+import { useRef } from "react";
 
 export function useList() {
+  const location = useLocation();
+  const previousPath = useRef(location.pathname);
   const [lists, setLists] = useState([]);
   const [activeListId, setActiveListId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -17,6 +21,13 @@ export function useList() {
 
   const [warning, setWarning] = useState("");
   const [showWarning, setShowWarning] = useState(false);
+
+  const [pendingUpdates, setPendingUpdates] = useState([]);
+  useEffect(() => {
+    console.log("pendingUpdates mudou:", pendingUpdates);
+  }, [pendingUpdates]);
+
+  const [peddingUpdatesFavorites, setPeddingUpdatesFavorites] = useState();
 
   const token = Cookies.get("familysync_token");
 
@@ -85,6 +96,25 @@ export function useList() {
     }
   }, [idFamilia]);
 
+  const syncPendingUpdates = useCallback(async () => {
+    if (!pendingUpdates.length) return;
+
+    await listService.updateItemsBatch(pendingUpdates);
+    setPendingUpdates([]);
+  }, [pendingUpdates]);
+
+  useEffect(() => {
+    const currentPath = location.pathname;
+
+    if (
+      previousPath.current === "dashboard/lists" &&
+      currentPath !== "dashboard/lists"
+    ) {
+      syncPendingUpdates;
+    }
+    previousPath.current = currentPath;
+  }, [location.pathname, syncPendingUpdates]);
+
   useEffect(() => {
     if (idFamilia) {
       fetchLists();
@@ -126,21 +156,45 @@ export function useList() {
 
   const toggleItem = useCallback(
     async (itemId) => {
+      const currentItem = activeList?.items.find((item) => item.id === itemId);
+
+      if (!currentItem) return;
+
+      const novoValor = !currentItem.isSelected;
+
+      setPendingUpdates((prev) => {
+        const existing = prev.find((item) => item.id === itemId);
+
+        if (existing) {
+          return prev.map((item) =>
+            item.id === itemId ? { ...item, comprado: novoValor } : item,
+          );
+        }
+
+        return [
+          ...prev,
+          {
+            id: itemId,
+            comprado: novoValor,
+          },
+        ];
+      });
+
       setLists((prevLists) =>
         prevLists.map((list) => {
           if (list.id !== activeListId) return list;
+
           return {
             ...list,
             items: list.items.map((item) =>
-              item.id === itemId
-                ? { ...item, isSelected: !item.isSelected }
-                : item,
+              item.id === itemId ? { ...item, isSelected: novoValor } : item,
             ),
           };
         }),
       );
     },
-    [activeListId],
+
+    [(activeListId, activeList)],
   );
 
   const handleSelectAllItems = useCallback(() => {
@@ -173,14 +227,16 @@ export function useList() {
         if (!idLista) return;
 
         const newItem = {
-          nome_item: itemData.name || "Sem nome",
+          nome_item: itemData.name || itemData.nome || "Sem nome",
           valor_unitario: parseFloat(itemData.price) || 0,
           quantidade: parseInt(itemData.units) || 1,
           comprado: false,
-          id_lista: activeListId,
+          id_lista: idLista,
         };
 
         const responseItem = await listService.createItems(newItem);
+
+        console.log(responseItem);
 
         if (responseItem.StatusCode !== 201) {
           triggerAlert(
@@ -189,12 +245,18 @@ export function useList() {
           return;
         }
 
+        const formattedItem = {
+          ...newItem,
+          id: responseItem.Response.id_item,
+        };
+
         setLists((prevLists) =>
           prevLists.map((list) => {
             if (list.id !== activeListId) return list;
+
             return {
               ...list,
-              items: [...(list.items || []), newItem],
+              items: [...(list.items || []), formattedItem],
             };
           }),
         );
@@ -237,6 +299,7 @@ export function useList() {
     [activeListId],
   );
 
+  //Funcionando
   const handleDeleteItem = useCallback(
     async (itemId) => {
       try {
@@ -247,14 +310,14 @@ export function useList() {
 
         const response = await listService.deleteItem(itemId);
 
-        console.log(response);
-
         if (response.StatusCode !== 200) {
           triggerAlert(
             "Não foi possível deletar o item... Tente novamente mais tarde!",
           );
           return;
         }
+
+        setPendingUpdates((prev) => prev.filter((item) => item.id !== itemId));
 
         setLists((prevLists) =>
           prevLists.map((list) => {
@@ -299,14 +362,6 @@ export function useList() {
 
           const responseList = await listService.createList(newList);
 
-          console.log(responseList);
-
-          await Promise.all(
-            newList.items.map((item) =>
-              handleAddItem(item, responseList.lista.id_lista),
-            ),
-          );
-
           if (responseList.StatusCode !== 201) {
             triggerAlert(
               "Não foi possível criar a lista... Tente novamente mais tarde!",
@@ -315,9 +370,24 @@ export function useList() {
             return;
           }
 
+          if (newList.items > 0) {
+            const items = await Promise.all(
+              newList.items.map((item) =>
+                handleAddItem(item, responseList.Response.lista.id_lista),
+              ),
+            );
+
+            if (items) {
+              triggerAlert(
+                "Lista criada... Porém houveram problemas na criação dos items. Tente novamente mais tarde!",
+              );
+              handleCloseModal();
+            }
+          }
+
           const newItemToState = {
             ...newList,
-            id: responseList.lista.id_lista,
+            id: responseList.Response.lista.id_lista,
             author: user.nome,
           };
 
@@ -380,5 +450,7 @@ export function useList() {
     isLoading,
     error,
     refreshLists: fetchLists,
+    warning,
+    showWarning,
   };
 }

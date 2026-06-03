@@ -27,7 +27,7 @@ function CalendarView({
   isLoading,
 }) {
   return (
-    <MainLayout>
+    <MainLayout warning={warning} showWarning={showWarning}>
       {isLoading && <LoadingOverlay />}
 
       <div className="h-full flex w-full">
@@ -47,8 +47,6 @@ function CalendarView({
                 events={eventCount}
                 locale={ptBrLocale}
               />
-
-              <ShowAlert warning={warning} showWarning={showWarning} />
 
               <ModalEvents
                 isOpen={isModalOpen}
