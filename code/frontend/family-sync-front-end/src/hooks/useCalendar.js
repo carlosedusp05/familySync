@@ -214,5 +214,7 @@ export function useCalendar() {
     handleOpenModal,
     eventCount,
     isLoading,
+    warning,
+    showWarning,
   };
 }

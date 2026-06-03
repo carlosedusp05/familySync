@@ -67,7 +67,6 @@ const getItems = async function () {
 };
 
 const createItems = async function (data) {
-  console.log(data);
   const url = `/item`;
 
   try {
@@ -79,6 +78,46 @@ const createItems = async function (data) {
     throw error.response?.data;
   }
 };
+
+const updateItem = async function (data) {
+  const url = `/item/${id}`;
+
+  try {
+    const response = await api.put(url, data);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
+const deleteItem = async function (idItem) {
+  const url = `/item/${idItem}`;
+
+  try {
+    const response = await api.delete(url);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
+const updateItemsBatch = async function (items) {
+  console.log(items);
+  const url = "/item/lote";
+
+  try {
+    const response = await api.put(url, items);
+
+    return response.data;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 export const listService = {
   getListsByFamily,
   createList,
@@ -86,4 +125,7 @@ export const listService = {
   deleteList,
   getItems,
   createItems,
+  deleteItem,
+  updateItem,
+  updateItemsBatch,
 };

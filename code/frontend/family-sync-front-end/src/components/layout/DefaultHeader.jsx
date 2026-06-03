@@ -8,8 +8,9 @@ import { useNotifications } from "../../hooks/useNotifications";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { userService } from "../../services/userService";
+import ShowAlert from "../ui/ShowAlert";
 
-function DefaultHeader({ disconnected }) {
+function DefaultHeader({ disconnected, warning, showWarning }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -137,6 +138,7 @@ function DefaultHeader({ disconnected }) {
   return (
     <>
       <header className="w-full flex justify-between py-10 items-center bg-white px-16 relative z-50">
+        <ShowAlert warning={warning} showWarning={showWarning} />
         {disconnected ? (
           <IconFamilySync />
         ) : (
