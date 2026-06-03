@@ -15,6 +15,9 @@ export function useList() {
   const [isModeEdition, setIsModeEdition] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [warning, setWarning] = useState("");
+  const [showWarning, setShowWarning] = useState(false);
+
   const token = Cookies.get("familysync_token");
 
   const user = token
@@ -161,35 +164,43 @@ export function useList() {
   // Funcionando
   const handleAddItem = useCallback(
     async (itemData, listId) => {
-      const idLista = listId || activeListId;
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      console.log(idLista);
+        const idLista = listId || activeListId;
 
-      if (!idLista) return;
+        if (!idLista) return;
 
-      const newItem = {
-        nome_item: itemData.name || "Sem nome",
-        valor_unitario: parseFloat(itemData.price) || 0,
-        quantidade: parseInt(itemData.units) || 1,
-        comprado: false,
-        id_lista: activeListId,
-      };
+        const newItem = {
+          nome_item: itemData.name || "Sem nome",
+          valor_unitario: parseFloat(itemData.price) || 0,
+          quantidade: parseInt(itemData.units) || 1,
+          comprado: false,
+          id_lista: activeListId,
+        };
 
-      const responseItem = await listService.createItems(newItem);
+        const responseItem = await listService.createItems(newItem);
 
-      if (responseItem.StatusCode !== 201) {
-        return;
+        if (responseItem.StatusCode !== 201) {
+          triggerAlert(
+            "Não foi possível adicionar o item... Tente novamente mais tarde!",
+          );
+          return;
+        }
+
+        setLists((prevLists) =>
+          prevLists.map((list) => {
+            if (list.id !== activeListId) return list;
+            return {
+              ...list,
+              items: [...(list.items || []), newItem],
+            };
+          }),
+        );
+      } finally {
+        setIsLoading(false);
       }
-
-      setLists((prevLists) =>
-        prevLists.map((list) => {
-          if (list.id !== activeListId) return list;
-          return {
-            ...list,
-            items: [...(list.items || []), newItem],
-          };
-        }),
-      );
     },
     [activeListId],
   );
@@ -205,34 +216,59 @@ export function useList() {
   //Funcionando
   const handleDeleteList = useCallback(
     async (listId) => {
-      console.log(listId);
-      const response = await listService.deleteList(listId);
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await listService.deleteList(listId);
 
-      console.log(response);
+        if (response.StatusCode !== 200) {
+          triggerAlert(
+            "Não foi possível deletar a lista... Tente novamente mais tarde!",
+          );
+          return;
+        }
 
-      if (response.StatusCode !== 200) {
-        return;
+        setLists((prev) => prev.filter((list) => list.id !== listId));
+        if (activeListId === listId) setActiveListId(null);
+      } finally {
+        setIsLoading(false);
       }
-
-      setLists((prev) => prev.filter((list) => list.id !== listId));
-      if (activeListId === listId) setActiveListId(null);
     },
     [activeListId],
   );
 
   const handleDeleteItem = useCallback(
     async (itemId) => {
-      if (!activeListId) return;
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      setLists((prevLists) =>
-        prevLists.map((list) => {
-          if (list.id !== activeListId) return list;
-          return {
-            ...list,
-            items: list.items.filter((item) => item.id !== itemId),
-          };
-        }),
-      );
+        if (!activeListId) return;
+
+        const response = await listService.deleteItem(itemId);
+
+        console.log(response);
+
+        if (response.StatusCode !== 200) {
+          triggerAlert(
+            "Não foi possível deletar o item... Tente novamente mais tarde!",
+          );
+          return;
+        }
+
+        setLists((prevLists) =>
+          prevLists.map((list) => {
+            if (list.id !== activeListId) return list;
+
+            return {
+              ...list,
+              items: list.items.filter((item) => item.id !== itemId),
+            };
+          }),
+        );
+      } finally {
+        setIsLoading(false);
+      }
     },
     [activeListId],
   );
@@ -240,46 +276,58 @@ export function useList() {
   //Funcionando
   const handleSaveList = useCallback(
     async (data) => {
-      if (selectedListToEdit) {
-        setLists((prev) =>
-          prev.map((list) =>
-            list.id === selectedListToEdit.id
-              ? { ...list, nome: data.nome, items: data.items }
-              : list,
-          ),
-        );
-      } else {
-        const newList = {
-          id_usuario: user.id,
-          id_familia: idFamilia,
-          nome: data.nome,
-          isFavorite: false,
-          items: data.items || [],
-        };
+      try {
+        setIsLoading(true);
+        setError(null);
 
-        const responseList = await listService.createList(newList);
+        if (selectedListToEdit) {
+          setLists((prev) =>
+            prev.map((list) =>
+              list.id === selectedListToEdit.id
+                ? { ...list, nome: data.nome, items: data.items }
+                : list,
+            ),
+          );
+        } else {
+          const newList = {
+            id_usuario: user.id,
+            id_familia: idFamilia,
+            nome: data.nome,
+            isFavorite: false,
+            items: data.items || [],
+          };
 
-        await Promise.all(
-          newList.items.map((item) =>
-            handleAddItem(item, responseList.Response.id_list),
-          ),
-        );
+          const responseList = await listService.createList(newList);
 
-        if (responseList.StatusCode !== 201) {
-          handleCloseModal();
-          return;
+          console.log(responseList);
+
+          await Promise.all(
+            newList.items.map((item) =>
+              handleAddItem(item, responseList.lista.id_lista),
+            ),
+          );
+
+          if (responseList.StatusCode !== 201) {
+            triggerAlert(
+              "Não foi possível criar a lista... Tente novamente mais tarde!",
+            );
+            handleCloseModal();
+            return;
+          }
+
+          const newItemToState = {
+            ...newList,
+            id: responseList.lista.id_lista,
+            author: user.nome,
+          };
+
+          setLists((prev) => [newItemToState, ...prev]);
         }
 
-        const newItemToState = {
-          ...newList,
-          id_list: responseList.Response.id_list,
-          author: user.nome,
-        };
-
-        setLists((prev) => [newItemToState, ...prev]);
+        handleCloseModal();
+      } finally {
+        setIsLoading(false);
       }
-
-      handleCloseModal();
     },
     [selectedListToEdit],
   );
@@ -297,6 +345,19 @@ export function useList() {
       setIsModeEdition(false);
     }, 200);
   }, []);
+
+  function triggerAlert(message) {
+    setWarning(message);
+    setShowWarning(true);
+
+    setTimeout(() => {
+      setShowWarning(false);
+    }, 2500);
+
+    setTimeout(() => {
+      setWarning("");
+    }, 3000);
+  }
 
   return {
     lists: computedLists,
