@@ -8,6 +8,7 @@ function MultLists({
 }) {
   return (
     <div className="flex flex-col gap-2 h-full overflow-y-auto px-2 [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#282828] [&::-webkit-scrollbar-thumb]:rounded-md">
+      {console.log(lists)}
       {lists.map((list, index) => (
         <ListContainer
           key={list.id}
