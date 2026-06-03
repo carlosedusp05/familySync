@@ -63,9 +63,9 @@ function InfoFamiliarContent({
             />
           </div>
 
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex-1 flex items-center justify-center min-h-0 w-full">
             {infos.length > 0 ? (
-              <div className="w-full h-full overflow-y-auto pt-24 pr-2">
+              <div className="w-full h-full pt-24">
                 <MultInfos
                   infos={infos}
                   onEditItem={(item) => handleOpenModal(item, false)}

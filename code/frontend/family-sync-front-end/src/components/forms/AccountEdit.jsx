@@ -20,8 +20,6 @@ function AccountEdit({
   setIsFamiliesOpen,
   editableFields,
   errosCampos,
-  preview,
-  setPreview,
   mostrarSenha,
   isDeleteModalOpen,
   setIsDeleteModalOpen,
@@ -39,6 +37,9 @@ function AccountEdit({
   setPasswordData,
   errosSenhaModal,
   handleUpdatePassword,
+  preview,
+  setPreview,
+  setFotoArquivo,
 }) {
   const fileInputRef = useRef(null);
 
@@ -98,23 +99,36 @@ function AccountEdit({
               src={preview}
               className="w-full h-full rounded-full object-cover"
               alt="Perfil"
+              onClick={handleButtonClick}
             />
           ) : (
-            <IconPerfil is_white_backgroud={true} another_size="h-70%" />
+            <IconPerfil
+              is_white_backgroud={true}
+              another_size="h-70%"
+              onClick={handleButtonClick}
+            />
           )}
           <div className="absolute -bottom-3 -right-3">
             <input
               type="file"
               ref={fileInputRef}
               className="hidden"
+              accept="image/*"
               onChange={(e) => {
                 if (e.target.files && e.target.files[0]) {
-                  setPreview(URL.createObjectURL(e.target.files[0]));
+                  const arquivoSelecionado = e.target.files[0];
+
+                  setPreview(URL.createObjectURL(arquivoSelecionado));
+
+                  setFotoArquivo(arquivoSelecionado);
                 }
               }}
             />
             <DefaultButton
-              onClick={preview ? removeImagem : handleButtonClick}
+              onClick={() => {
+                if (preview) removeImagem();
+                handleButtonClick();
+              }}
               another_padding={"px-0 pb-1"}
               another_size={"h-12 w-12"}
               another_text_size={"text-3xl"}

@@ -66,8 +66,17 @@ function MembersList({
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-gray-300 flex-shrink-0 overflow-hidden">
                 <img
-                  src={`https://ui-avatars.com/api/?name=${member.name}&background=random`}
+                  src={
+                    member.foto
+                      ? member.foto
+                      : `https://ui-avatars.com/api/?name=${member.name}&background=random`
+                  }
                   alt={member.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = `https://ui-avatars.com/api/?name=${member.name}&background=random`;
+                  }}
                 />
               </div>
               <div>

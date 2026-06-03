@@ -31,13 +31,14 @@ export function usePerfil() {
   });
   const [userId, setUserId] = useState(null);
 
-  // --- NOVOS ESTADOS PARA O MODAL DE ALTERAÇÃO DE SENHA ---
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [passwordData, setPasswordData] = useState({
     senhaAnterior: "",
     novaSenha: "",
     confirmarNovaSenha: "",
   });
+
+  const [fotoArquivo, setFotoArquivo] = useState(null);
   const [errosSenhaModal, setErrosSenhaModal] = useState({});
 
   const [familiasDisponiveis, setFamiliasDisponiveis] = useState([]);
@@ -72,6 +73,8 @@ export function usePerfil() {
         setIsLoading(true);
 
         const id_usuario = parseInt(decodedUser.id_usuario);
+        setUserId(id_usuario);
+
         const response = await userService.getFamiliesByUser(id_usuario);
 
         setFormData({
@@ -82,7 +85,13 @@ export function usePerfil() {
           senha: "",
         });
 
-        if (response.user.foto_perfil) setPreview(response.user.foto_perfil);
+        // --- ALTERAÇÃO AQUI ---
+        // Verifica se a imagem vem no atributo 'foto' ou 'foto_perfil'
+        const fotoUsuario = response.user.foto || response.user.foto_perfil;
+        if (fotoUsuario) {
+          setPreview(fotoUsuario);
+        }
+        // ----------------------
 
         setFamiliasDisponiveis(response.family);
 
@@ -200,6 +209,11 @@ export function usePerfil() {
       setIsLoading(false);
     }
   };
+  const removeImagem = () => {
+    setPreview(null);
+    setFotoArquivo(null);
+  };
+
   const handleUpdate = async () => {
     const erros = {
       nome: validateName(formData.nome),
@@ -217,26 +231,29 @@ export function usePerfil() {
 
     setIsLoading(true);
     try {
-      const dadosUpdate = {
-        ...formData,
-        nome: formatUserName(formData.nome),
-        cpf: cleanCPF(formData.cpf),
-        familias: familiasSelecionadas,
-      };
+      const formDataEnvio = new FormData();
 
-      delete dadosUpdate.senha;
+      formDataEnvio.append("nome", formatUserName(formData.nome));
+      formDataEnvio.append("email", formData.email);
+      formDataEnvio.append("cpf", cleanCPF(formData.cpf));
+      formDataEnvio.append("dataNascimento", formData.dataNascimento);
 
-      await userService.updateUser(dadosUpdate);
+      formDataEnvio.append("familias", JSON.stringify(familiasSelecionadas));
+
+      if (fotoArquivo) {
+        formDataEnvio.append("foto_perfil", fotoArquivo);
+      } else if (preview === null) {
+        formDataEnvio.append("remover_foto", "true");
+      }
+
+      await userService.updateUser(userId, formDataEnvio);
+
       navigate("/dashboard");
     } catch (error) {
       console.error(error);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const removeImagem = () => {
-    setPreview(null);
   };
 
   const handleButtonClick = () => {
@@ -305,5 +322,7 @@ export function usePerfil() {
     setPasswordData,
     errosSenhaModal,
     handleUpdatePassword,
+    fotoArquivo,
+    setFotoArquivo,
   };
 }

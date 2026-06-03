@@ -10,7 +10,7 @@ import {
   infoIcon,
 } from "../../assets";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useMemo, memo } from "react";
 
 const prefetchRoutes = {
   list: () => import("../../screens/ListScreen").catch(console.error),
@@ -33,6 +33,41 @@ function MenuStart(props) {
       easing: "ease-out-cubic",
     });
   }, []);
+
+  const upcomingEvents = useMemo(() => {
+    if (!props.events || props.events.length === 0) return Array(4).fill(null);
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    const timestampHoje = hoje.getTime();
+
+    const sortedEvents = props.events
+      .map((ev) => {
+        let dateObj;
+        if (ev.data && ev.data.includes("/")) {
+          const [dia, mes, ano] = ev.data.split("/");
+          dateObj = new Date(ano, mes - 1, dia);
+        } else {
+          dateObj = new Date(ev.data);
+        }
+        return { ...ev, timestamp: dateObj.getTime(), dateObj };
+      })
+      .filter((ev) => ev.timestamp >= timestampHoje)
+      .sort((a, b) => a.timestamp - b.timestamp)
+      .slice(0, 4);
+
+    const paddedEvents = [...sortedEvents];
+    while (paddedEvents.length < 4) {
+      paddedEvents.push(null);
+    }
+
+    return paddedEvents;
+  }, [props.events]);
+
+  const recentInfos = useMemo(() => {
+    if (!Array.isArray(props.infos) || props.infos.length === 0) return [];
+    return [...props.infos].reverse().slice(0, 3);
+  }, [props.infos]);
 
   return (
     <LargeCard
@@ -112,21 +147,29 @@ function MenuStart(props) {
               onClick={() => navigate("/dashboard/calendar")}
             >
               <div className="flex w-full rounded-2xl overflow-hidden bg-white">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="flex flex-col w-full">
-                    <div className="bg-brown-dark text-white font-bold text-[12px] md:text-[14px] xl:text-[14px] 2xl:text-[15px] text-center py-1 md:py-1.5 2xl:py-2">
-                      Título
+                {upcomingEvents.map((ev, i) => {
+                  const tituloLimitado = ev
+                    ? ev.titulo.length > 8
+                      ? `${ev.titulo.substring(0, 8)}...`
+                      : ev.titulo
+                    : "Livre";
+
+                  return (
+                    <div key={i} className="flex flex-col w-full min-w-0">
+                      <div className="bg-brown-dark text-white font-bold text-[12px] md:text-[14px] xl:text-[14px] 2xl:text-[15px] text-center py-1 md:py-1.5 2xl:py-2 whitespace-nowrap overflow-hidden text-ellipsis px-1">
+                        {tituloLimitado}
+                      </div>
+                      <div
+                        className={`flex justify-between p-1.5 md:p-2 xl:p-2.5 2xl:p-3 text-terracota text-[10px] md:text-[11px] xl:text-[8px] 2xl:text-[12px] font-medium ${
+                          i !== 3 ? "border-r-2 border-brown-dark" : ""
+                        }`}
+                      >
+                        <p>{ev ? ev.hora : "--:--"}</p>
+                        <p>{ev ? ev.data.substring(0, 5) : "--/--"}</p>
+                      </div>
                     </div>
-                    <div
-                      className={`flex justify-between p-1.5 md:p-2 xl:p-2.5 2xl:p-3 text-terracota text-[10px] md:text-[11px] xl:text-[8px] 2xl:text-[12px] font-medium ${
-                        i !== 4 ? "border-r-2 border-brown-dark" : ""
-                      }`}
-                    >
-                      <p>20:00</p>
-                      <p>01/01</p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="flex items-center gap-2 text-orange-dark text-xl md:text-2xl xl:text-3xl 2xl:text-4xl font-bold">
@@ -214,6 +257,7 @@ function MenuStart(props) {
           </div>
 
           {/* Informações Familiares */}
+          {/* Informações Familiares */}
           <div className="col-span-3" data-aos="fade-left" data-aos-delay="900">
             <div
               className={`w-full h-full flex flex-col items-center justify-center bg-brown-dark rounded-2xl gap-1 md:gap-2 xl:gap-3 2xl:gap-4 ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
@@ -236,9 +280,12 @@ function MenuStart(props) {
                   Principais informações:
                 </h3>
                 <ul className="font-bold text-white text-[11px] md:text-[13px] xl:text-[14px] 2xl:text-[17px]">
-                  {Array.isArray(props.infos) && props.infos.length > 0 ? (
-                    props.infos.map((info, index) => (
-                      <li key={index}>{info.descricao || info}</li>
+                  {/* Utilizando o recentInfos no lugar do array cru */}
+                  {recentInfos.length > 0 ? (
+                    recentInfos.map((info, index) => (
+                      <li key={index} className="truncate">
+                        {info.descricao || info.titulo || info}
+                      </li>
                     ))
                   ) : (
                     <li>Você ainda não tem informações cadastradas!</li>
@@ -253,4 +300,4 @@ function MenuStart(props) {
   );
 }
 
-export default MenuStart;
+export default memo(MenuStart);

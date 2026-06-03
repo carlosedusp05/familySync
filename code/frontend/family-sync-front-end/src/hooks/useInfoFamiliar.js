@@ -118,17 +118,27 @@ export function useInfoFamiliar() {
     }, 200);
   }, []);
 
-  const handleDelete = useCallback(async (id_info) => {
+  const handleDelete = useCallback(async () => {
+    if (!selectedInfo || !selectedInfo.id_info) {
+      console.warn("Nenhuma informação selecionada para deletar.");
+      return;
+    }
+
+    const id_info = selectedInfo.id_info;
+
     try {
+      console.log("Deletando a info:", id_info);
       await infoService.deleteInfo(id_info);
 
       setAllFamilyInfos((prevInfos) =>
         prevInfos.filter((info) => info.id_info !== id_info),
       );
+
+      handleCloseModal();
     } catch (error) {
       console.error("Erro ao deletar:", error);
     }
-  }, []);
+  }, [selectedInfo, handleCloseModal]);
 
   const handleSave = useCallback(
     async (data) => {
@@ -141,6 +151,7 @@ export function useInfoFamiliar() {
             titulo: title,
             descricao: description,
           };
+
           await infoService.updateInfo(selectedInfo.id_info, infoAtualizada);
 
           setAllFamilyInfos((prev) =>
@@ -160,10 +171,9 @@ export function useInfoFamiliar() {
 
           const infoCriada =
             responseCreate.dados || responseCreate.data || responseCreate;
-          const idGerado = infoCriada.id_info || infoCriada.id;
+          const idGerado = infoCriada.Response.id_info;
 
           if (!idGerado) {
-            console.error("Dados retornados da criação:", responseCreate);
             throw new Error(
               "Não foi possível recuperar o ID da informação recém-criada.",
             );
@@ -172,10 +182,17 @@ export function useInfoFamiliar() {
           const targetId =
             activeMemberId === "me" ? decodedUser.id_usuario : activeMemberId;
 
-          await infoService.createInfoWithUser({
-            id_info: idGerado,
-            id_usuario: targetId,
-          });
+          try {
+            await infoService.createInfoWithUser({
+              id_info: idGerado,
+              id_usuario: targetId,
+            });
+          } catch (vinculoError) {
+            console.error(
+              "Aviso: Informação criada, mas erro ao vincular ao usuário:",
+              vinculoError,
+            );
+          }
 
           const novaInfoNormalizada = {
             ...infoCriada,
@@ -187,16 +204,22 @@ export function useInfoFamiliar() {
 
           setAllFamilyInfos((prev) => [novaInfoNormalizada, ...prev]);
         }
+
         handleCloseModal();
       } catch (error) {
-        console.error("Erro ao salvar:", error);
-        alert("Erro ao salvar. Verifique o console para mais detalhes.");
+        console.error("Erro geral ao salvar/criar a informação:", error);
       } finally {
         setIsLoading(false);
       }
     },
     [selectedInfo, handleCloseModal, activeMemberId, decodedUser.id_usuario],
   );
+
+  useEffect(() => {
+    if (activeMemberId) {
+      sessionStorage.setItem("@FamilySync:activeMemberId", activeMemberId);
+    }
+  }, [activeMemberId]);
 
   return {
     members,

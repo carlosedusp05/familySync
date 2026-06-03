@@ -136,6 +136,19 @@ const createUserFamily = async function (data) {
   }
 };
 
+const deleteUserFamily = async function (id) {
+  const url = `/usuario-familia/${id}`;
+
+  try {
+    const response = await api.delete(url);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 const addUserFamilyByEmail = async function (data) {
   const url = "/usuario-familia/email/";
 

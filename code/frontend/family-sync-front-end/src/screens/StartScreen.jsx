@@ -6,10 +6,14 @@ import MenuStart from "../components/ui/MenuStart";
 import { useUserData } from "../hooks/useUserData";
 import AddFamilyForm from "../components/features/AddFamiliar/AddFamilyForm";
 import { useAddFamily } from "../hooks/useAddFamily";
+import { useCalendar } from "../hooks/useCalendar";
+import { MenuStartSkeleton } from "../components/ui/MenuStartSkeleton.jsx";
 
 function StartScreen(props) {
   const { userData, infos, isFamily } = useUserData();
   const addFamilyProps = useAddFamily();
+
+  const { dateEvent } = useCalendar();
 
   useEffect(() => {
     const invites_family = sessionStorage.getItem("family_invite_token");
@@ -20,21 +24,23 @@ function StartScreen(props) {
 
   const estaCarregando = !userData || isFamily === null;
 
+  useEffect(() => {
+    if (isFamily && isFamily.length > 0) {
+      const activeFamilyId = sessionStorage.getItem("@FamilySync:family:id");
+      if (!activeFamilyId) {
+        sessionStorage.setItem("@FamilySync:family:id", isFamily[0].id);
+      }
+    }
+  }, [isFamily]);
+
   const userDataSincronizado = useMemo(() => {
     if (estaCarregando || !isFamily || isFamily.length === 0) {
       return userData;
     }
 
-    let activeFamilyId = sessionStorage.getItem("@FamilySync:family:id");
-
-    if (!activeFamilyId) {
-      activeFamilyId = isFamily[0].id;
-      sessionStorage.setItem("@FamilySync:family:id", activeFamilyId);
-    }
-
-    const familiaAtiva = isFamily.find(
-      (f) => f.id === parseInt(activeFamilyId),
-    );
+    const activeId =
+      sessionStorage.getItem("@FamilySync:family:id") || isFamily[0].id;
+    const familiaAtiva = isFamily.find((f) => f.id === parseInt(activeId));
 
     if (familiaAtiva) {
       return {
@@ -55,15 +61,20 @@ function StartScreen(props) {
       />
       <DefaultHeader />
       <div className="w-full flex justify-center items-center h-full">
-        {estaCarregando ? null : isFamily && isFamily.length > 0 ? (
-          <MenuStart
-            props={props}
-            userData={userDataSincronizado}
-            infos={infos}
-          />
-        ) : (
-          <AddFamilyForm {...addFamilyProps} />
-        )}
+        <div className="w-full flex justify-center items-center h-full">
+          {estaCarregando ? (
+            <MenuStartSkeleton />
+          ) : isFamily && isFamily.length > 0 ? (
+            <MenuStart
+              props={props}
+              userData={userDataSincronizado}
+              infos={infos}
+              events={dateEvent}
+            />
+          ) : (
+            <AddFamilyForm {...addFamilyProps} />
+          )}
+        </div>
       </div>
     </div>
   );

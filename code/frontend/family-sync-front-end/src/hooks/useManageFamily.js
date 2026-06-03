@@ -90,6 +90,7 @@ export function useManageFamily() {
           id: user.id_usuario,
           name: user.nome,
           degree_of_relatives: user.parentesco || "Membro",
+          foto: user.foto_perfil || user.foto || user.avatar || null,
         }));
 
         setFamiliars(membrosFormatados);

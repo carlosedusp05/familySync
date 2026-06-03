@@ -83,7 +83,7 @@ const createInfo = async function (data) {
 
 // PUT - Editar Informação
 const updateInfo = async function (id, data) {
-  const url = `/usuario-informacao/${id}`;
+  const url = `/informacao/${id}`;
 
   try {
     const response = await api.put(url, data);

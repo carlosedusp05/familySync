@@ -21,7 +21,7 @@ function MultInfos({ infos = [], onEditItem, onEditClick }) {
   }, [infos, onEditItem, onEditClick]);
 
   return (
-    <div className="flex flex-col items-center gap-4 h-full w-[95%] mx-auto overflow-y-auto pr-3">
+    <div className="flex flex-col items-center gap-4 h-full w-[95%] mx-auto overflow-y-auto pr-3 custom-scrollbar [&::-webkit-scrollbar]:w-2.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#282828] [&::-webkit-scrollbar-thumb]:rounded-md">
       {renderedList}
     </div>
   );
