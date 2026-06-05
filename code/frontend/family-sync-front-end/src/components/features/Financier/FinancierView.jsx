@@ -1,11 +1,30 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState, useMemo } from "react";
 import LargeCard from "../../ui/LargeCard.jsx";
 import MainLayout from "../../../layouts/MainLayout.jsx";
 import DefaultButton from "../../ui/DefaultButton.jsx";
 import AddExpenses from "./AddExpenses.jsx";
 import { ExpenseListModal } from "./ExpenseListModal.jsx";
 import LoadingOverlay from "../../ui/LoadingOverlay.jsx";
+import CalendarModal from "./CalendarModal.jsx";
+
+// Certifique-se de que o caminho do ícone está correto de acordo com seu projeto
+import { chevronDownBrownIcon } from "../../../assets";
+
+const mesesNomes = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
+];
 
 function FinancierView({
   PERIODOS,
@@ -37,11 +56,66 @@ function FinancierView({
   isLoading,
   handleDayClick,
   dataFiltroDia,
+  isCalendarOpen,
+  setIsCalendarOpen,
+  diasComGastos,
+  onSelectDate,
+  dataResponsivaModal,
 }) {
   const isScrollable = chartData.length > 8;
 
   const topScrollRef = useRef(null);
   const chartScrollRef = useRef(null);
+
+  const [isMainMonthSelectorOpen, setIsMainMonthSelectorOpen] = useState(false);
+  const [isMainYearSelectorOpen, setIsMainYearSelectorOpen] = useState(false);
+
+  const mesAtualStr = useMemo(() => {
+    if (!dataFiltroDia) return "";
+    const ano = dataFiltroDia.getFullYear();
+    const mes = String(dataFiltroDia.getMonth() + 1).padStart(2, "0");
+    return `${ano}-${mes}`;
+  }, [dataFiltroDia]);
+
+  const { anoAtual, mesAtualIndex } = useMemo(() => {
+    if (!mesAtualStr) {
+      return {
+        anoAtual: new Date().getFullYear(),
+        mesAtualIndex: new Date().getMonth(),
+      };
+    }
+    const [anoStr, mesStr] = mesAtualStr.split("-");
+    return {
+      anoAtual: parseInt(anoStr, 10),
+      mesAtualIndex: parseInt(mesStr, 10) - 1,
+    };
+  }, [mesAtualStr]);
+
+  const mesHojeStr = useMemo(() => {
+    const hojeObj = new Date();
+    return `${hojeObj.getFullYear()}-${String(hojeObj.getMonth() + 1).padStart(2, "0")}`;
+  }, []);
+
+  const mesesDisponiveis = useMemo(() => {
+    const meses = diasComGastos
+      ? diasComGastos.map((data) => data.substring(0, 7))
+      : [];
+    if (!meses.includes(mesHojeStr)) {
+      meses.push(mesHojeStr);
+    }
+    return [...new Set(meses)].sort();
+  }, [diasComGastos, mesHojeStr]);
+
+  const anosDisponiveis = useMemo(() => {
+    const anos = diasComGastos
+      ? diasComGastos.map((data) => data.substring(0, 4))
+      : [];
+    const anoHojeStr = new Date().getFullYear().toString();
+    if (!anos.includes(anoHojeStr)) {
+      anos.push(anoHojeStr);
+    }
+    return [...new Set(anos)].sort((a, b) => b.localeCompare(a));
+  }, [diasComGastos]);
 
   const obterTituloModal = () => {
     if (periodo === "Semana") return "Gastos por Dia";
@@ -73,7 +147,11 @@ function FinancierView({
                 <div
                   key={item}
                   className="flex flex-col items-center cursor-pointer relative"
-                  onClick={() => setPeriodo(item)}
+                  onClick={() => {
+                    setPeriodo(item);
+                    setIsMainMonthSelectorOpen(false);
+                    setIsMainYearSelectorOpen(false);
+                  }}
                 >
                   <span
                     className={`text-2xl pb-2 transition-colors ${
@@ -99,8 +177,188 @@ function FinancierView({
               ))}
             </div>
 
-            <div className="text-orange font-semibold mt-6 mb-5 text-xl">
-              {labelsData[periodo]}
+            <div className="text-orange font-semibold mt-6 mb-5 text-xl relative flex justify-center w-full z-30">
+              {periodo === "Dia" || periodo === "Semana" ? (
+                <button
+                  onClick={() => setIsCalendarOpen(true)}
+                  className="flex items-center gap-2 px-5 py-2 bg-orange-50 border border-orange/30 rounded-full hover:bg-orange hover:text-white transition-all shadow-sm active:scale-95 group"
+                >
+                  <span>{labelsData[periodo]}</span>
+                  <span className="text-xl group-hover:scale-110 transition-transform duration-200">
+                    📅
+                  </span>
+                </button>
+              ) : periodo === "Mês" ? (
+                <div className="relative w-64 bg-white rounded-2xl shadow-md border border-gray-100">
+                  <div
+                    className="relative p-3 px-5 flex justify-between items-center cursor-pointer hover:bg-gray-50 rounded-2xl transition-colors"
+                    onClick={() =>
+                      setIsMainMonthSelectorOpen(!isMainMonthSelectorOpen)
+                    }
+                  >
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-[#4a2511] font-bold text-base">
+                        Mês:
+                      </h3>
+                      <span className="text-orange font-semibold text-base capitalize">
+                        {mesesNomes[mesAtualIndex]} {anoAtual}
+                      </span>
+                    </div>
+                    <motion.img
+                      src={chevronDownBrownIcon}
+                      animate={{ rotate: isMainMonthSelectorOpen ? 180 : 0 }}
+                      className="w-5 h-5 object-contain"
+                    />
+                  </div>
+
+                  <AnimatePresence>
+                    {isMainMonthSelectorOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="absolute left-0 right-0 top-[105%] bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                      >
+                        <div className="p-2 flex flex-col gap-1 max-h-48 overflow-y-auto custom-scrollbar">
+                          {mesesDisponiveis.map((mDisponivel) => {
+                            const [y, m] = mDisponivel.split("-");
+                            const isSelected = mDisponivel === mesAtualStr;
+                            return (
+                              <div
+                                key={mDisponivel}
+                                className="flex items-center gap-3 cursor-pointer p-2 hover:bg-orange-50 rounded-xl transition-colors"
+                                onClick={() => {
+                                  const novaData = new Date(
+                                    parseInt(y, 10),
+                                    parseInt(m, 10) - 1,
+                                    1,
+                                  );
+
+                                  if (onSelectDate) {
+                                    onSelectDate(novaData);
+                                  } else if (handleDayClick) {
+                                    handleDayClick({ exactDate: novaData });
+                                  }
+
+                                  setPeriodo("Mês");
+                                  setIsMainMonthSelectorOpen(false);
+                                }}
+                              >
+                                <div
+                                  className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                                    isSelected
+                                      ? "border-orange"
+                                      : "border-[#4a2511]/30"
+                                  }`}
+                                >
+                                  {isSelected && (
+                                    <div className="w-2 h-2 bg-orange rounded-full" />
+                                  )}
+                                </div>
+                                <span
+                                  className={`text-sm capitalize ${
+                                    isSelected
+                                      ? "text-orange font-bold"
+                                      : "text-[#4a2511] font-medium"
+                                  }`}
+                                >
+                                  {mesesNomes[parseInt(m, 10) - 1]} {y}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : periodo === "Ano" ? (
+                <div className="relative w-64 bg-white rounded-2xl shadow-md border border-gray-100">
+                  <div
+                    className="relative p-3 px-5 flex justify-between items-center cursor-pointer hover:bg-gray-50 rounded-2xl transition-colors"
+                    onClick={() =>
+                      setIsMainYearSelectorOpen(!isMainYearSelectorOpen)
+                    }
+                  >
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-[#4a2511] font-bold text-base">
+                        Ano:
+                      </h3>
+                      <span className="text-orange font-semibold text-base">
+                        {anoAtual}
+                      </span>
+                    </div>
+                    <motion.img
+                      src={chevronDownBrownIcon}
+                      animate={{ rotate: isMainYearSelectorOpen ? 180 : 0 }}
+                      className="w-5 h-5 object-contain"
+                    />
+                  </div>
+
+                  <AnimatePresence>
+                    {isMainYearSelectorOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="absolute left-0 right-0 top-[105%] bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                      >
+                        <div className="p-2 flex flex-col gap-1 max-h-48 overflow-y-auto custom-scrollbar">
+                          {anosDisponiveis.map((ano) => {
+                            const isSelected = ano === String(anoAtual);
+                            return (
+                              <div
+                                key={ano}
+                                className="flex items-center gap-3 cursor-pointer p-2 hover:bg-orange-50 rounded-xl transition-colors"
+                                onClick={() => {
+                                  // Seta para 1º de Janeiro do ano selecionado para não quebrar a lógica do `dataFiltroDia`
+                                  const novaData = new Date(
+                                    parseInt(ano, 10),
+                                    0, // Janeiro
+                                    1, // Dia 1
+                                  );
+
+                                  if (onSelectDate) {
+                                    onSelectDate(novaData);
+                                  } else if (handleDayClick) {
+                                    handleDayClick({ exactDate: novaData });
+                                  }
+
+                                  setPeriodo("Ano");
+                                  setIsMainYearSelectorOpen(false);
+                                }}
+                              >
+                                <div
+                                  className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                                    isSelected
+                                      ? "border-orange"
+                                      : "border-[#4a2511]/30"
+                                  }`}
+                                >
+                                  {isSelected && (
+                                    <div className="w-2 h-2 bg-orange rounded-full" />
+                                  )}
+                                </div>
+                                <span
+                                  className={`text-sm ${
+                                    isSelected
+                                      ? "text-orange font-bold"
+                                      : "text-[#4a2511] font-medium"
+                                  }`}
+                                >
+                                  {ano}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <span className="px-5 py-2">{labelsData[periodo]}</span>
+              )}
             </div>
 
             {isScrollable && (
@@ -158,8 +416,8 @@ function FinancierView({
                   const valorItem = item.valorItem;
                   let labelItem = item.labelItem;
 
-                  if (labelItem && labelItem.length > 22) {
-                    labelItem = labelItem.substring(0, 22) + "...";
+                  if (labelItem && labelItem.length > 23) {
+                    labelItem = labelItem.substring(0, 23) + "...";
                   }
 
                   const alturaBarra =
@@ -240,12 +498,17 @@ function FinancierView({
             </div>
 
             <div className="flex gap-10 mt-4 z-10">
-              <DefaultButton
-                text="Editar"
-                another_size="h-14 w-40"
-                onClick={handleOpenFullList}
-                theme={false}
-              />
+              {periodo != "Ano" ? (
+                <DefaultButton
+                  text="Editar"
+                  another_size="h-14 w-40"
+                  onClick={handleOpenFullList}
+                  theme={false}
+                />
+              ) : (
+                ""
+              )}
+
               <DefaultButton
                 text="Incluir"
                 another_size="h-14 w-40"
@@ -261,9 +524,12 @@ function FinancierView({
               isOpen={isListModalOpen}
               expenses={selectedExpenses}
               title={obterTituloModal()}
+              periodo={periodo}
+              diasComGastos={diasComGastos}
               onClose={() => setIsListModalOpen(false)}
               onDayClick={handleDayClick}
-              dataFiltroDia={dataFiltroDia}
+              // 🚀 ALTERADO AQUI: Passa a data corrigida baseada nos gastos existentes
+              dataFiltroDia={dataResponsivaModal}
               onDelete={handleDeleteExpense}
               onEdit={(item) => {
                 setExpenseToEdit(item);
@@ -273,7 +539,6 @@ function FinancierView({
               onAdd={handleOpenAddForm}
             />
           )}
-
           {isFormModalOpen && (
             <AddExpenses
               is_edit_expenses={!!expenseToEdit}
@@ -283,6 +548,18 @@ function FinancierView({
                 setExpenseToEdit(null);
               }}
               onSave={handleSaveExpense}
+            />
+          )}
+          {isCalendarOpen && (
+            <CalendarModal
+              isOpen={isCalendarOpen}
+              onClose={() => setIsCalendarOpen(false)}
+              diasComGastos={diasComGastos}
+              dataFiltroDia={dataFiltroDia}
+              onSelectDate={(novaData) => {
+                handleDayClick({ exactDate: novaData });
+                setIsCalendarOpen(false);
+              }}
             />
           )}
         </AnimatePresence>

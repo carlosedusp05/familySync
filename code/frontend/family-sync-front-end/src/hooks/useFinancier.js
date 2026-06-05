@@ -40,6 +40,13 @@ const ordemDias = {
   Domingo: 7,
 };
 
+// 🛠️ Função utilitária global para evitar problemas com fuso horário local ao quebrar a string de data
+const getLocalDate = (dateStr) => {
+  if (!dateStr) return new Date();
+  const [y, m, dStr] = dateStr.substring(0, 10).split("-");
+  return new Date(Number(y), Number(m) - 1, Number(dStr));
+};
+
 export function useFinancier() {
   const [periodo, setPeriodoState] = useState("Mês");
   const [dataFiltroDia, setDataFiltroDia] = useState(new Date());
@@ -53,6 +60,8 @@ export function useFinancier() {
   const [gastosAtuais, setGastosAtuais] = useState([]);
   const [selectedExpenses, setSelectedExpenses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const authorName = useMemo(() => {
     try {
@@ -78,7 +87,6 @@ export function useFinancier() {
   const fetchGastos = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Trazemos SEMPRE a lista crua e completa do backend
       const dados = await financeService.getFinancasDailyByIdFamily(idFamilia);
 
       if (dados && Array.isArray(dados)) {
@@ -107,6 +115,37 @@ export function useFinancier() {
     fetchGastos();
   }, [fetchGastos]);
 
+  const mesesDisponiveis = useMemo(() => {
+    const rawList = Array.isArray(gastosAtuais) ? gastosAtuais : [];
+    const meses = rawList
+      .filter((item) => item.data_movimentacao)
+      .map((item) => item.data_movimentacao.substring(0, 7));
+
+    const filtroMesStr = dataFiltroDia.toISOString().substring(0, 7);
+    if (!meses.includes(filtroMesStr)) {
+      meses.push(filtroMesStr);
+    }
+    return [...new Set(meses)].sort();
+  }, [gastosAtuais, dataFiltroDia]);
+
+  const handlePeriodLabelClick = useCallback(() => {
+    if (periodo === "Mês") {
+      if (mesesDisponiveis.length <= 1) return;
+      const currentMesStr = dataFiltroDia.toISOString().substring(0, 7);
+      const currentIndex = mesesDisponiveis.indexOf(currentMesStr);
+
+      let nextIndex = currentIndex + 1;
+      if (nextIndex >= mesesDisponiveis.length) {
+        nextIndex = 0;
+      }
+
+      const [anoStr, mesStr] = mesesDisponiveis[nextIndex].split("-");
+      setDataFiltroDia(
+        new Date(parseInt(anoStr, 10), parseInt(mesStr, 10) - 1, 1),
+      );
+    }
+  }, [periodo, mesesDisponiveis, dataFiltroDia]);
+
   const processedData = useMemo(() => {
     const rawList = Array.isArray(gastosAtuais) ? gastosAtuais : [];
     let chartData = [];
@@ -121,13 +160,6 @@ export function useFinancier() {
     const filtroMesStr = `${year}-${month}`;
     const filtroAnoStr = `${year}`;
 
-    // 🔥 Função salva-vidas para evitar o bug de fuso horário (UTC vs Local)
-    const getLocalDate = (dateStr) => {
-      const [y, m, dStr] = dateStr.substring(0, 10).split("-");
-      return new Date(Number(y), Number(m) - 1, Number(dStr));
-    };
-
-    // Limites exatos da Semana (Domingo a Sábado) baseados no dataFiltroDia
     const dom = new Date(d);
     dom.setDate(d.getDate() - d.getDay());
     dom.setHours(0, 0, 0, 0);
@@ -153,12 +185,10 @@ export function useFinancier() {
     } else if (periodo === "Semana") {
       const filtered = rawList.filter((item) => {
         if (!item.data_movimentacao) return false;
-        // Usamos a função blindada contra fuso horário aqui
         const itemDate = getLocalDate(item.data_movimentacao);
         return itemDate >= dom && itemDate <= sab;
       });
 
-      // Agrupando e somando os valores por Dia da Semana
       const agrupado = {};
       const diasSemana = [
         "Domingo",
@@ -190,6 +220,7 @@ export function useFinancier() {
             icone: "📅",
             valor: agrupado[diaBr],
             isVirtual: true,
+            domDate: dom, // Guarda a referência da semana ativa
           },
           isGroup: true,
         }));
@@ -199,39 +230,78 @@ export function useFinancier() {
         return (item.data_movimentacao || "").substring(0, 7) === filtroMesStr;
       });
 
-      // Agrupando e somando os valores por Semana do Mês
-      const agrupado = {};
+      const weeksMap = {};
+      const diasSemana = [
+        "Domingo",
+        "Segunda",
+        "Terça",
+        "Quarta",
+        "Quinta",
+        "Sexta",
+        "Sábado",
+      ];
+
       filtered.forEach((item) => {
-        // Pega o dia direto da string: "2026-06-15" -> 15
-        const diaMes = parseInt(item.data_movimentacao.substring(8, 10), 10);
-        const semana = `Semana ${Math.ceil(diaMes / 7)}`;
-        if (!agrupado[semana]) agrupado[semana] = 0;
-        agrupado[semana] += Number(item.valor || item.total || 0);
+        const itemDate = getLocalDate(item.data_movimentacao);
+
+        const startOfWeek = new Date(itemDate);
+        startOfWeek.setDate(itemDate.getDate() - itemDate.getDay());
+        const endOfWeek = new Date(itemDate);
+        endOfWeek.setDate(itemDate.getDate() + (6 - itemDate.getDay()));
+
+        const keyStr = startOfWeek.toISOString().substring(0, 10);
+
+        if (!weeksMap[keyStr]) {
+          const fmt = (dateObj) =>
+            dateObj.toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+            });
+          weeksMap[keyStr] = {
+            descricao: `Semana de ${fmt(startOfWeek)} a ${fmt(endOfWeek)}`,
+            semana_mes: `Semana de ${fmt(startOfWeek)} a ${fmt(endOfWeek)}`,
+            valor: 0,
+            dias_com_gasto: new Set(),
+            icone: "📅",
+            isVirtual: true,
+            domDate: startOfWeek,
+          };
+        }
+
+        weeksMap[keyStr].valor += Number(item.valor || item.total || 0);
+        weeksMap[keyStr].dias_com_gasto.add(diasSemana[itemDate.getDay()]);
       });
 
       listData = filtered;
-      chartData = Object.keys(agrupado)
+      chartData = Object.keys(weeksMap)
         .sort()
-        .map((semana, index) => ({
-          id_financas: `month-${index}`,
-          labelItem: semana,
-          valorItem: agrupado[semana],
-          icone: "📅",
-          rawItem: {
-            descricao: semana,
+        .map((key, index) => {
+          const w = weeksMap[key];
+          return {
+            id_financas: `month-week-${index}`,
+            labelItem: w.descricao,
+            valorItem: w.valor,
             icone: "📅",
-            valor: agrupado[semana],
-            isVirtual: true,
-          },
-          isGroup: true,
-        }));
+            isGroup: true,
+            rawItem: {
+              id_financas: `month-week-raw-${index}`,
+              descricao: w.descricao,
+              semana_mes: w.semana_mes,
+              valor: w.valor,
+              total: w.valor,
+              dias_com_gasto: Array.from(w.dias_com_gasto),
+              icone: "📅",
+              isVirtual: true,
+              domDate: w.domDate,
+            },
+          };
+        });
     } else if (periodo === "Ano") {
       const filtered = rawList.filter((item) => {
         if (!item.data_movimentacao) return false;
         return (item.data_movimentacao || "").substring(0, 4) === filtroAnoStr;
       });
 
-      // Agrupando e somando os valores por Mês
       const agrupado = {};
       const mesesStr = [
         "Janeiro",
@@ -372,74 +442,216 @@ export function useFinancier() {
     [fetchGastos, idFamilia],
   );
 
-  const handleBarClick = useCallback((item) => {
-    if (item.isGroup) {
-      setSelectedExpenses([item.rawItem]);
-      setIsListModalOpen(true);
-    } else {
-      setExpenseToEdit(item.rawItem);
-      setIsFormModalOpen(true);
-      setIsListModalOpen(false);
-    }
-  }, []);
+  const handleBarClick = useCallback(
+    (item) => {
+      if (item.isGroup) {
+        if (periodo === "Ano") {
+          // 🎯 Filtra os gastos reais do mês clicado
+          const mesesStr = [
+            "Janeiro",
+            "Fevereiro",
+            "Março",
+            "Abril",
+            "Maio",
+            "Junho",
+            "Julho",
+            "Agosto",
+            "Setembro",
+            "Outubro",
+            "Novembro",
+            "Dezembro",
+          ];
+          const mesIndex = mesesStr.indexOf(item.labelItem);
 
-  const handleDayClick = useCallback((item) => {
-    if (item.exactDate) {
-      setDataFiltroDia(item.exactDate);
-      setPeriodoState("Dia");
-      setIsListModalOpen(false);
+          const gastosDoMes = processedData.listData
+            .filter((g) => {
+              if (!g.data_movimentacao) return false;
+              const gDate = getLocalDate(g.data_movimentacao);
+              return gDate.getMonth() === mesIndex;
+            })
+            .map((g) => ({
+              ...g,
+              descricao: `${item.labelItem} - ${g.descricao || g.tipo}`,
+              icone: g.icone || "📅",
+              valor: g.valor || g.total || 0,
+            }));
+
+          setSelectedExpenses(gastosDoMes);
+          setIsListModalOpen(true);
+        } else if (periodo === "Semana") {
+          // 🎯 Filtra os gastos reais do dia da semana clicado
+          const diasSemana = [
+            "Domingo",
+            "Segunda",
+            "Terça",
+            "Quarta",
+            "Quinta",
+            "Sexta",
+            "Sábado",
+          ];
+          const diaIndex = diasSemana.indexOf(item.labelItem);
+
+          const gastosDoDia = processedData.listData
+            .filter((g) => {
+              if (!g.data_movimentacao) return false;
+              const gDate = getLocalDate(g.data_movimentacao);
+              return gDate.getDay() === diaIndex;
+            })
+            .map((g) => ({
+              ...g,
+              descricao: `${item.labelItem} - ${g.descricao || g.tipo}`,
+              icone: g.icone || "📅",
+              valor: g.valor || g.total || 0,
+            }));
+
+          setSelectedExpenses(gastosDoDia);
+          setIsListModalOpen(true);
+        } else {
+          // 🎯 Para a visão de "Mês" (que usa as semanas virtuais no calendário), mantém como estava
+          setSelectedExpenses([item.rawItem]);
+          setIsListModalOpen(true);
+        }
+      } else {
+        // 🎯 Clicou em um gasto único direto (na visão de "Dia")
+        setExpenseToEdit(item.rawItem);
+        setIsFormModalOpen(true);
+        setIsListModalOpen(false);
+      }
+    },
+    [periodo, processedData.listData],
+  );
+
+  const handleDayClick = useCallback(
+    (item) => {
+      if (item.exactDate) {
+        setDataFiltroDia(item.exactDate);
+        setPeriodoState((prev) => (prev === "Semana" ? "Semana" : "Dia"));
+        setIsListModalOpen(false);
+        return;
+      }
+
+      const nomeDiaBr = item.descricao || item.tipo;
+
+      if (
+        item.id_financas &&
+        String(item.id_financas).startsWith("month-week")
+      ) {
+        if (item.domDate) {
+          setDataFiltroDia(new Date(item.domDate));
+          setPeriodoState("Semana");
+          setIsListModalOpen(false);
+          return;
+        }
+      }
+
+      const mesesStr = [
+        "Janeiro",
+        "Fevereiro",
+        "Março",
+        "Abril",
+        "Maio",
+        "Junho",
+        "Julho",
+        "Agosto",
+        "Setembro",
+        "Outubro",
+        "Novembro",
+        "Dezembro",
+      ];
+      const mesIndex = mesesStr.indexOf(nomeDiaBr);
+      if (mesIndex !== -1) {
+        const novaData = new Date(dataFiltroDia.getFullYear(), mesIndex, 1);
+        setDataFiltroDia(novaData);
+        setPeriodoState("Mês");
+        setIsListModalOpen(false);
+        return;
+      }
+
+      // 🔄 3. Se clicou em um dia da semana -> Muda para o dia exato
+      const mapaDias = {
+        Domingo: 0,
+        Segunda: 1,
+        Terça: 2,
+        Quarta: 3,
+        Quinta: 4,
+        Sexta: 5,
+        Sábado: 6,
+      };
+
+      const diaAlvo = mapaDias[nomeDiaBr];
+
+      if (diaAlvo !== undefined) {
+        const baseDate = item.domDate
+          ? new Date(item.domDate)
+          : new Date(dataFiltroDia);
+        const diaAtual = baseDate.getDay();
+        const diferenca = diaAlvo - diaAtual;
+
+        const dataClicada = new Date(baseDate);
+        dataClicada.setDate(baseDate.getDate() + diferenca);
+
+        setDataFiltroDia(dataClicada);
+        setPeriodoState("Dia");
+        setIsListModalOpen(false);
+      }
+    },
+    [dataFiltroDia],
+  );
+
+  const handleOpenFullList = useCallback(() => {
+    // 🎯 Mudança aqui: Mês e Ano agora enviam os dados agrupados (semanas virtuais ou meses virtuais)
+    if (periodo === "Mês" || periodo === "Ano") {
+      const listFormatted = processedData.chartData.map((c) => c.rawItem);
+      setSelectedExpenses(listFormatted);
+      setIsListModalOpen(true);
       return;
     }
 
-    const nomeDiaBr = item.descricao || item.tipo;
-    const mapaDias = {
-      Domingo: 0,
-      Segunda: 1,
-      Terça: 2,
-      Quarta: 3,
-      Quinta: 4,
-      Sexta: 5,
-      Sábado: 6,
-    };
-
-    const diaAlvo = mapaDias[nomeDiaBr];
-
-    if (diaAlvo !== undefined) {
-      const hoje = new Date();
-      const diaAtual = hoje.getDay();
-      const diferenca = diaAlvo - diaAtual;
-
-      const dataClicada = new Date(hoje);
-      dataClicada.setDate(hoje.getDate() + diferenca);
-
-      setDataFiltroDia(dataClicada);
-      setPeriodoState("Dia");
-      setIsListModalOpen(false);
-    }
-  }, []);
-
-  const handleOpenFullList = useCallback(() => {
     const listFormatted = processedData.listData.map((item) => {
-      let desc = item.descricao;
-      if (periodo === "Semana") desc = traduzirDia[item.dia_semana];
-      if (periodo === "Mês") desc = item.semana_mes || item.data_movimentacao;
-      if (periodo === "Ano") desc = traduzirMes[item.mes];
+      let desc = item.descricao || item.tipo;
+
+      if (periodo === "Semana") {
+        const itemDate = getLocalDate(item.data_movimentacao);
+        const diasSemana = [
+          "Domingo",
+          "Segunda",
+          "Terça",
+          "Quarta",
+          "Quinta",
+          "Sexta",
+          "Sábado",
+        ];
+        const nomeDia = diasSemana[itemDate.getDay()];
+        desc = `${nomeDia} - ${item.descricao || item.tipo}`;
+      }
+
+      // O bloco (periodo === "Ano") que ficava aqui foi removido, pois agora é tratado no if acima!
+
       return {
         ...item,
         descricao: desc,
         icone: item.icone || "📅",
-        valor: item.total || item.valor,
+        valor: item.valor || item.total || 0,
       };
     });
+
     setSelectedExpenses(listFormatted);
     setIsListModalOpen(true);
-  }, [processedData.listData, periodo]);
-
+  }, [processedData.chartData, processedData.listData, periodo]);
   const handleOpenAddForm = () => {
     setExpenseToEdit(null);
     setIsFormModalOpen(true);
     setIsListModalOpen(false);
   };
+
+  const diasComGastos = useMemo(() => {
+    const rawList = Array.isArray(gastosAtuais) ? gastosAtuais : [];
+    const datas = rawList
+      .filter((item) => item.data_movimentacao)
+      .map((item) => item.data_movimentacao.substring(0, 10));
+
+    return [...new Set(datas)].sort();
+  }, [gastosAtuais]);
 
   return {
     PERIODOS,
@@ -469,5 +681,9 @@ export function useFinancier() {
     handleBarClick,
     handleOpenFullList,
     handleDayClick,
+    handlePeriodLabelClick,
+    isCalendarOpen,
+    setIsCalendarOpen,
+    diasComGastos,
   };
 }

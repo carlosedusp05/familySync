@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import DefaultButton from "../../ui/DefaultButton.jsx";
 import { pencilTerracotaIcon, trashIconRed } from "../../../assets/index.jsx";
 
@@ -38,8 +38,7 @@ export function ExpenseListModal({
   onDayClick,
   dataFiltroDia = new Date(),
 }) {
-  const [selectedMonth, setSelectedMonth] = useState(null);
-  const [itemToDelete, setItemToDelete] = useState(null); // Novo estado para confirmação
+  const [itemToDelete, setItemToDelete] = React.useState(null);
 
   const localTotal = useMemo(() => {
     return expenses.reduce(
@@ -48,16 +47,9 @@ export function ExpenseListModal({
     );
   }, [expenses]);
 
-  useEffect(() => {
-    if (isOpen) {
-      if (title === "Gastos por Mês" && expenses.length === 1) {
-        setSelectedMonth(expenses[0]);
-      } else {
-        setSelectedMonth(null);
-      }
-      setItemToDelete(null); // Reseta ao abrir
-    }
-  }, [isOpen, expenses, title]);
+  React.useEffect(() => {
+    if (isOpen) setItemToDelete(null);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -65,108 +57,93 @@ export function ExpenseListModal({
   const isGastosPorMes = title === "Gastos por Mês";
 
   const renderCalendarView = () => {
-    const nomeMes = selectedMonth.descricao || selectedMonth.mes || "Maio";
-    const year = dataFiltroDia.getFullYear();
-    const mesIndex =
-      MESES_MAP[nomeMes] !== undefined
-        ? MESES_MAP[nomeMes]
-        : new Date().getMonth();
+    let mesIndex = dataFiltroDia.getMonth();
+    let year = dataFiltroDia.getFullYear();
 
-    const firstDay = new Date(year, mesIndex, 1).getDay();
-    const daysInMonth = new Date(year, mesIndex + 1, 0).getDate();
+    if (expenses.length > 0 && expenses[0].data_movimentacao) {
+      const dataGasto = new Date(expenses[0].data_movimentacao);
+      mesIndex = dataGasto.getUTCMonth();
+      year = dataGasto.getUTCFullYear();
+    }
 
-    const startOffset = firstDay === 0 ? 6 : firstDay - 1;
-    const blanks = Array.from({ length: startOffset }, () => null);
-    const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+    const nomesDosMeses = Object.keys(MESES_MAP);
+    const nomeMes =
+      nomesDosMeses.find((k) => MESES_MAP[k] === mesIndex) || "Mês";
 
-    const diasComGasto = selectedMonth.dias_com_gasto || [];
+    const diasNoMes = new Date(year, mesIndex + 1, 0).getDate();
+    const primeiroDiaSemana = new Date(year, mesIndex, 1).getDay();
+
+    const grade = Array(primeiroDiaSemana).fill(null);
+    for (let i = 1; i <= diasNoMes; i++) grade.push(i);
+
+    const diasComGasto = expenses
+      .map((exp) => {
+        if (!exp.data_movimentacao) return null;
+        return new Date(exp.data_movimentacao).getUTCDate();
+      })
+      .filter(Boolean);
 
     return (
-      <div className="flex flex-col w-full mt-2 animate-in fade-in zoom-in duration-200">
-        <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 flex flex-col items-center gap-3 shadow-sm w-full">
-          <div
-            className={`flex justify-between items-center w-full max-w-[340px] px-2 mb-1 transition-opacity ${expenses.length > 1 ? "cursor-pointer group hover:opacity-80" : ""}`}
-            onClick={() => {
-              if (expenses.length > 1) {
-                setSelectedMonth(null);
-              }
-            }}
-            title={expenses.length > 1 ? "Ver todos os meses com gastos" : ""}
-          >
-            <span className="font-extrabold text-2xl text-brown-dark capitalize">
+      <div className="flex flex-col w-full mt-2 animate-in fade-in zoom-in duration-200 items-center">
+        <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col items-center shadow-sm w-full max-w-[340px]">
+          <div className="flex justify-between items-center w-full px-4 mb-6">
+            <span className="font-extrabold text-xl text-[#4a2511] capitalize">
               {nomeMes}
             </span>
-            <div className="flex items-center gap-2">
-              <span className="font-extrabold text-2xl text-brown-dark">
-                {year}
-              </span>
-              {expenses.length > 1 && (
+            <span className="font-extrabold text-xl text-[#4a2511]">
+              {year}
+            </span>
+          </div>
+
+          <div className="w-full grid grid-cols-7 gap-2 mb-4 text-center text-gray-400 font-bold text-sm">
+            <span>D</span>
+            <span>S</span>
+            <span>T</span>
+            <span>Q</span>
+            <span>Q</span>
+            <span>S</span>
+            <span>S</span>
+          </div>
+
+          <div className="w-full grid grid-cols-7 gap-2">
+            {grade.map((diaNumero, index) => {
+              if (!diaNumero) return <div key={`empty-${index}`} />;
+
+              const temGasto = diasComGasto.includes(diaNumero);
+
+              return (
                 <button
-                  className="bg-orange/10 p-1.5 rounded-md transition-transform group-hover:scale-105"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedMonth(null);
+                  key={diaNumero}
+                  disabled={!temGasto}
+                  onClick={() => {
+                    if (onDayClick && temGasto) {
+                      onDayClick({
+                        exactDate: new Date(year, mesIndex, diaNumero),
+                      });
+                    }
                   }}
+                  className={`relative flex items-center justify-center h-10 w-10 mx-auto rounded-full text-sm font-bold transition-all ${
+                    temGasto
+                      ? "text-[#4a2511] hover:bg-orange-100 hover:text-orange cursor-pointer"
+                      : "text-gray-300 cursor-not-allowed opacity-50"
+                  }`}
                 >
-                  <img
-                    src={pencilTerracotaIcon}
-                    alt="Editar Mês"
-                    className="h-4 w-4"
-                  />
+                  {diaNumero}
+                  {temGasto && (
+                    <span className="absolute bottom-1 w-1 h-1 bg-orange rounded-full"></span>
+                  )}
                 </button>
-              )}
-            </div>
+              );
+            })}
           </div>
 
-          <div className="bg-[#F4EBE6] rounded-3xl w-full max-w-[340px] pb-6 shadow-sm overflow-hidden">
-            <div className="bg-orange flex justify-between px-5 py-3 rounded-t-3xl text-white font-extrabold text-[13px] uppercase">
-              <span>Seg</span>
-              <span>Ter</span>
-              <span>Qua</span>
-              <span>Qui</span>
-              <span>Sex</span>
-              <span>Sab</span>
-              <span>Dom</span>
-            </div>
-
-            <div className="grid grid-cols-7 gap-y-4 gap-x-1 px-3 pt-5">
-              {blanks.map((_, i) => (
-                <div key={`blank-${i}`} />
-              ))}
-              {days.map((d) => {
-                const temGasto = diasComGasto.includes(d);
-                return (
-                  <button
-                    key={d}
-                    onClick={() => {
-                      if (onDayClick) {
-                        onDayClick({ exactDate: new Date(year, mesIndex, d) });
-                      }
-                    }}
-                    className={`w-9 h-9 mx-auto flex items-center justify-center rounded-full font-extrabold text-[15px] transition-all cursor-pointer
-                      ${
-                        temGasto
-                          ? "bg-orange text-white shadow-md hover:brightness-110 active:scale-95"
-                          : "text-orange hover:bg-orange/10 active:scale-95"
-                      }
-                    `}
-                  >
-                    {d}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="w-full max-w-[340px] flex justify-between items-center mt-3 pt-4 border-t border-gray-200">
-            <span className="text-brown-dark font-black text-lg">
+          <div className="w-full flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
+            <span className="text-[#4a2511] font-black text-base">
               Total Gasto
             </span>
             <span className="text-orange font-bold text-sm bg-orange/10 px-3 py-1 rounded-full">
               R${" "}
-              {Number(
-                selectedMonth.valor || selectedMonth.total || 0,
-              ).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              {localTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
             </span>
           </div>
         </div>
@@ -176,9 +153,7 @@ export function ExpenseListModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      {/* Modal Width Aumentado para max-w-[650px] */}
-      <div className="bg-white rounded-[2rem] shadow-2xl w-11/12 max-w-[650px] p-8 relative flex flex-col max-h-[85vh] overflow-hidden">
-        {/* Confirmação de Deleção (Overlay interno) */}
+      <div className="bg-white rounded-[2rem] shadow-2xl w-11/12 max-w-[650px] p-8 relative flex flex-col max-h-[55vh] overflow-hidden">
         {itemToDelete && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/95 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
             <div className="p-8 flex flex-col items-center max-w-sm text-center">
@@ -191,7 +166,7 @@ export function ExpenseListModal({
               <p className="text-gray-500 font-medium mb-8 text-lg">
                 Tem certeza que deseja excluir{" "}
                 <strong>
-                  {itemToDelete.descricao || itemToDelete.tipo || "este item"}
+                  {itemToDelete.tipo || itemToDelete.descricao || "este item"}
                 </strong>
                 ? <br />
                 <span className="text-sm">
@@ -253,15 +228,13 @@ export function ExpenseListModal({
             <div className="flex items-center justify-center h-full text-gray-400 font-medium text-center">
               Nenhum gasto registrado neste período.
             </div>
-          ) : isGastosPorMes && selectedMonth ? (
+          ) : isGastosPorMes ? (
             renderCalendarView()
           ) : isGastosPorSemana ? (
             <div className="flex flex-col gap-4">
               {expenses.map((semana, index) => {
                 const nomeSemana =
-                  semana.descricao ||
-                  semana.semana_mes ||
-                  `Semana ${index + 1}`;
+                  semana.tipo || semana.semana_mes || `Semana ${index + 1}`;
                 const totalSemana = Number(semana.valor || semana.total || 0);
                 const diasComGasto = semana.dias_com_gasto || [];
 
@@ -292,22 +265,26 @@ export function ExpenseListModal({
                         { nome: "Sexta", sigla: "SEX" },
                         { nome: "Sábado", sigla: "SAB" },
                       ].map((dia) => {
-                        const temGastoNesteDia =
-                          diasComGasto.length === 0 ||
-                          diasComGasto.includes(dia.nome);
+                        const temGastoNesteDia = diasComGasto.includes(
+                          dia.nome,
+                        );
 
                         return (
                           <button
                             key={dia.nome}
+                            disabled={!temGastoNesteDia}
                             onClick={() => {
                               if (onDayClick) {
-                                onDayClick({ descricao: dia.nome });
+                                onDayClick({
+                                  descricao: dia.nome,
+                                  domDate: semana.domDate,
+                                });
                               }
                             }}
                             className={`flex-1 min-w-[40px] py-2 rounded-xl font-extrabold text-[11px] text-center shadow-sm transition-all ${
                               temGastoNesteDia
                                 ? "bg-orange text-white hover:brightness-110 active:scale-95 cursor-pointer"
-                                : "bg-gray-200 text-gray-400 opacity-60 cursor-pointer"
+                                : "bg-gray-200 text-gray-400 opacity-40 cursor-not-allowed"
                             }`}
                           >
                             {dia.sigla}
@@ -322,15 +299,13 @@ export function ExpenseListModal({
           ) : (
             <ul className="space-y-3">
               {expenses.map((item, index) => {
-                const nomeOriginal = item.descricao || item.tipo || "Gasto";
+                const nomeOriginal = item.tipo || item.descricao || "Gasto";
                 const valorExibicao = Number(item.valor || item.total || 0);
-
                 const isDiaDaSemana = DIAS_DA_SEMANA.includes(nomeOriginal);
                 const isMes = Object.keys(MESES_MAP).includes(nomeOriginal);
 
                 let nomeExibicao = nomeOriginal;
                 if (nomeExibicao.length > 25) {
-                  // Aumentei um pouquinho o limite do texto
                   nomeExibicao = nomeExibicao.substring(0, 25) + "...";
                 }
 
@@ -344,8 +319,6 @@ export function ExpenseListModal({
                     onClick={() => {
                       if (isDiaDaSemana && onDayClick) {
                         onDayClick(item);
-                      } else if (isMes) {
-                        setSelectedMonth(item);
                       }
                     }}
                     className={`flex items-center justify-between p-4 rounded-2xl border transition-colors cursor-pointer gap-2 ${
@@ -397,7 +370,7 @@ export function ExpenseListModal({
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setItemToDelete(item); // Abre o overlay de confirmação
+                              setItemToDelete(item);
                             }}
                             className="bg-red-50 hover:bg-red-100 p-2 rounded-xl transition-colors shrink-0"
                             title="Excluir"

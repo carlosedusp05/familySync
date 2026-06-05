@@ -22,7 +22,6 @@ const FINANCE_EMOJIS = [
 ];
 
 function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
-  // CORREÇÃO: Alinhando os campos com o que vem do seu backend (valor, tipo, icone)
   const [valor, setValor] = useState(
     initialData ? initialData.valor || initialData.total || 0 : 0,
   );
@@ -240,7 +239,7 @@ function AddExpenses({ is_edit_expenses, onClose, onSave, initialData }) {
               <textarea
                 placeholder="Descrição"
                 rows={2}
-                className={`w-full min-h-50 max-h-100 rounded-xl outline-none border-2 px-6 py-3 text-lg font-bold bg-white transition-colors resize-none custom-scrollbar ${
+                className={`w-full min-h-30 max-h-100 rounded-xl outline-none border-2 px-6 py-3 text-lg font-bold bg-white transition-colors resize-none custom-scrollbar ${
                   errors.descricao
                     ? "border-red-400"
                     : "border-transparent focus:border-orange"
