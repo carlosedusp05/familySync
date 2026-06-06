@@ -132,7 +132,6 @@ function CardLogin({
       <div className="flex w-[70%] max-sm:w-[50%] md:w-[50%] lg:w-[40%] flex-col gap-1 mt-2">
         <DefaultButton
           text="Entrar"
-          another_size={"w[80%]"}
           theme={true}
           type="submit"
           onMouseEnter={prefetchLoggedIn}
@@ -149,7 +148,6 @@ function CardLogin({
 
         <DefaultButton
           text="Cadastrar"
-          another_size={"w[80%]"}
           theme={false}
           border={true}
           type="button"

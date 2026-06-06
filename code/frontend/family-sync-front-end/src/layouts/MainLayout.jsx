@@ -11,7 +11,7 @@ function MainLayout({ children, warning, showWarning }) {
       <div className="flex flex-1 w-full overflow-hidden">
         <SidebarNavigation />
 
-        <main className="flex-1 h-full overflow-y-auto relative">
+        <main className="flex-1 h-full overflow-y-auto relative max-md:pb-28">
           <BackgroundImage
             src={imageBackground}
             alt={"Imagem Fundo"}

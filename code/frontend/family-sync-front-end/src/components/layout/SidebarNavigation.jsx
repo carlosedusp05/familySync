@@ -46,9 +46,8 @@ function SideBarNavegation() {
 
   return (
     <div
-      className="p-4 gap-10 bg-orange flex flex-col items-center justify-center relative transform-gpu
-    max-md:gap-8 max-md:py-0 max-md:px-4
-    "
+      className="p-4 gap-10 xl:gap-2 bg-orange flex flex-col items-center justify-center relative transform-gpu
+      max-md:flex-row max-md:fixed max-md:bottom-6 max-md:left-4 max-md:right-4 max-md:h-auto max-md:py-3 max-md:px-4 max-md:gap-1 max-md:justify-between max-md:rounded-[1.5rem] max-md:z-[100] max-md:shadow-xl"
     >
       <LayoutGroup>
         {navLinks.map((link) => {
@@ -58,13 +57,13 @@ function SideBarNavegation() {
             <Link
               key={link.path}
               to={link.path}
-              className="relative p-2 hover:scale-110 transition-transform duration-300 ease-in-out"
+              className="relative p-2 hover:scale-110 transition-transform duration-300 ease-in-out flex justify-center items-center max-md:flex-1"
             >
               {isActive && (
                 <motion.div
                   layoutId="activeBackground"
                   initial={false}
-                  className="absolute inset-0 bg-black/20   rounded-2xl"
+                  className="absolute inset-0 bg-black/20 rounded-2xl max-md:bg-white max-md:rounded-[1.2rem] max-md:shadow-sm"
                   style={{ willChange: "transform" }}
                   transition={{
                     type: "spring",
@@ -74,7 +73,7 @@ function SideBarNavegation() {
                   }}
                 />
               )}
-              <div className="relative z-10">
+              <div className="relative z-10 flex justify-center items-center w-full">
                 <ImgSidebar isPage={isActive} src={link.icon} alt={link.alt} />
               </div>
             </Link>
