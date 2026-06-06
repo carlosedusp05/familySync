@@ -35,14 +35,14 @@ function DefaultButton({
   const border_radius = most_radius ? "rounded-[50%]" : "rounded-[15px]";
   const size = another_size
     ? another_size
-    : "h-12 md:h-14 w-full max-sm-90 flex-1";
+    : "h-9 md:h-12 w-full max-sm-90 flex-1";
   const textSize = another_text_size
     ? another_text_size
-    : "text-sm sm:text-base";
+    : "text-[12px] sm:text-sm md:text-base";
   const textStyle = another_text_weight ? another_text_weight : "font-bold";
   const padding = another_padding
     ? another_padding
-    : "py-2 px-2 sm:px-4 md:py-3 md:px-8 lg:py-4 lg:px-10";
+    : "py-2 px-3 sm:px-5 md:py-3 md:px-6 lg:px-8";
 
   return (
     <button

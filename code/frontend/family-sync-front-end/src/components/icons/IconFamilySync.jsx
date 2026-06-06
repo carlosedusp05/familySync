@@ -6,7 +6,7 @@ function IconFamilySync({ ...props }) {
       src={logoIcon}
       alt="Logotipo FamilySync"
       {...props}
-      className={`w-80 max-lg:w-70 max-sm:w-50 h-auto ${props.className || ""}`}
+      className={`w-70 max-lg:w-70 2xl:w-90  max-sm:w-40 h-auto ${props.className || ""}`}
       draggable="false"
     />
   );

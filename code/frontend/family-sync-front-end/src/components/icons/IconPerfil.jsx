@@ -27,7 +27,6 @@ function IconPerfil({
       ? "border border-default"
       : "bg-orange-dark";
 
-  // Se não passar tamanho, assume um tamanho base fixo
   const size = another_size ? another_size : "w-12 h-12";
 
   return (
