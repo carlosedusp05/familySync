@@ -1,4 +1,4 @@
-import ItemNotification from "./ItemNotication";
+import ItemNotication from "./ItemNotication";
 
 function MultNotificationField({ notifications = [] }) {
   const sortedNotifications = [...notifications].sort((a, b) => {
@@ -7,7 +7,7 @@ function MultNotificationField({ notifications = [] }) {
 
   return sortedNotifications.map((notification) => {
     return (
-      <ItemNotification
+      <ItemNotication
         key={notification.id_notificacao}
         title={notification.titulo}
         text={notification.descricao}

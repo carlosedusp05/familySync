@@ -1,11 +1,15 @@
 function ItemNotication(props) {
   return (
-    <div className="w-[88%] p-10 relative bg-yellow-light rounded-2xl flex flex-col gap-2 transition-all duration-400 hover:scale-104">
-      <h2 className="text-terracota font-extrabold  text-2xl">{props.title}</h2>
-      <p className="w-full text-orange-dark text-xl font-medium">
+    <div className="w-full p-4 md:p-6 lg:p-8 relative bg-yellow-light rounded-xl md:rounded-2xl flex flex-col gap-1 transition-all duration-300 hover:scale-[1.02]">
+      <h2 className="text-terracota font-extrabold text-lg md:text-xl break-words">
+        {props.title}
+      </h2>
+
+      <p className="w-full text-orange-dark text-sm md:text-base font-medium mb-6 md:mb-5 break-words">
         {props.text}
       </p>
-      <span className="absolute text-terracota right-0 bottom-0 py-3 px-10">
+
+      <span className="absolute text-terracota right-0 bottom-0 py-3 px-4 md:px-8 text-xs md:text-sm font-semibold">
         {props.time}
       </span>
     </div>

@@ -30,6 +30,8 @@ function DefaultHeader({ disconnected, warning, showWarning }) {
             const decoded = jwtDecode(token);
             const userData = await userService.getUserById(decoded.id_usuario);
 
+            console.log(userData);
+
             const urlFoto = userData?.Response?.[0]?.foto;
 
             if (urlFoto) {
