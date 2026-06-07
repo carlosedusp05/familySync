@@ -23,11 +23,10 @@ export function useList() {
   const [showWarning, setShowWarning] = useState(false);
 
   const [pendingUpdates, setPendingUpdates] = useState([]);
-  useEffect(() => {
-    console.log("pendingUpdates mudou:", pendingUpdates);
-  }, [pendingUpdates]);
+  const pendingUpdatesRef = useRef([]);
 
-  const [peddingUpdatesFavorites, setPeddingUpdatesFavorites] = useState();
+  const [peddingUpdatesFavorite, setPendingUpdatesFavorite] = useState([]);
+  const pendingUpdatesFavoriteRef = useRef([]);
 
   const token = Cookies.get("familysync_token");
 
@@ -60,7 +59,7 @@ export function useList() {
           const userLists = usuario.listas || [];
           userLists.forEach((lista) => {
             const listItems = (lista.itens || []).map((item) => ({
-              id: item.id_item,
+              id_item: item.id_item,
               nome_item:
                 item.nome || item.nome_item || item.nome || "Item sem nome",
               valor_unitario: parseFloat(item.valor_unitario) || 0,
@@ -73,7 +72,7 @@ export function useList() {
               id: lista.id_lista,
               nome: lista.nome_lista || lista.nome || "Lista sem nome",
               author: usuario.nome_usuario,
-              isFavorite: false,
+              favorita: false,
               items: listItems,
               id_familia: id_familia,
               id_usuario: usuario.id_usuario,
@@ -96,24 +95,41 @@ export function useList() {
     }
   }, [idFamilia]);
 
-  const syncPendingUpdates = useCallback(async () => {
-    if (!pendingUpdates.length) return;
-
-    await listService.updateItemsBatch(pendingUpdates);
-    setPendingUpdates([]);
+  useEffect(() => {
+    pendingUpdatesRef.current = pendingUpdates;
   }, [pendingUpdates]);
 
   useEffect(() => {
-    const currentPath = location.pathname;
+    return () => {
+      if (pendingUpdatesRef.current.length) {
+        listService.updateItemsBatch(pendingUpdatesRef.current);
+      }
+    };
+  }, []);
 
-    if (
-      previousPath.current === "dashboard/lists" &&
-      currentPath !== "dashboard/lists"
-    ) {
-      syncPendingUpdates;
-    }
-    previousPath.current = currentPath;
-  }, [location.pathname, syncPendingUpdates]);
+  useEffect(() => {
+    pendingUpdatesFavoriteRef.current = peddingUpdatesFavorite;
+  }, [peddingUpdatesFavorite]);
+
+  useEffect(() => {
+    return () => {
+      if (pendingUpdatesFavoriteRef.current.length) {
+        listService.updateFavoritesBatch(pendingUpdatesFavoriteRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (pendingUpdatesRef.current.length) {
+        listService.updateItemsBatch(pendingUpdatesRef.current);
+      }
+
+      if (pendingUpdatesFavoriteRef.current.length) {
+        listService.updateFavoritesBatch(pendingUpdatesFavoriteRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (idFamilia) {
@@ -147,7 +163,7 @@ export function useList() {
       .filter((list) =>
         list.nome.toLowerCase().includes(searchQuery.toLowerCase()),
       )
-      .sort((a, b) => (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0));
+      .sort((a, b) => (b.favorita ? 1 : 0) - (a.favorita ? 1 : 0));
   }, [lists, searchQuery]);
 
   const activeList = useMemo(() => {
@@ -156,25 +172,27 @@ export function useList() {
 
   const toggleItem = useCallback(
     async (itemId) => {
-      const currentItem = activeList?.items.find((item) => item.id === itemId);
+      const currentItem = activeList?.items.find(
+        (item) => item.id_item === itemId,
+      );
 
       if (!currentItem) return;
 
       const novoValor = !currentItem.isSelected;
 
       setPendingUpdates((prev) => {
-        const existing = prev.find((item) => item.id === itemId);
+        const existing = prev.find((item) => item.id_item === itemId);
 
         if (existing) {
           return prev.map((item) =>
-            item.id === itemId ? { ...item, comprado: novoValor } : item,
+            item.id_item === itemId ? { ...item, comprado: novoValor } : item,
           );
         }
 
         return [
           ...prev,
           {
-            id: itemId,
+            id_item: itemId,
             comprado: novoValor,
           },
         ];
@@ -187,7 +205,9 @@ export function useList() {
           return {
             ...list,
             items: list.items.map((item) =>
-              item.id === itemId ? { ...item, isSelected: novoValor } : item,
+              item.id_item === itemId
+                ? { ...item, isSelected: novoValor }
+                : item,
             ),
           };
         }),
@@ -199,16 +219,43 @@ export function useList() {
 
   const handleSelectAllItems = useCallback(() => {
     if (!activeList) return;
+
     const allSelected = activeList.items.every((item) => item.isSelected);
+    const novoValor = !allSelected;
+
+    setPendingUpdates((prev) => {
+      const updates = [...prev];
+
+      activeList.items.forEach((currentItem) => {
+        const existingIndex = updates.findIndex(
+          (item) => item.id_item === currentItem.id_item,
+        );
+
+        if (existingIndex >= 0) {
+          updates[existingIndex] = {
+            ...updates[existingIndex],
+            comprado: novoValor,
+          };
+        } else {
+          updates.push({
+            id_item: currentItem.id_item,
+            comprado: novoValor,
+          });
+        }
+      });
+
+      return updates;
+    });
 
     setLists((prevLists) =>
       prevLists.map((list) => {
         if (list.id !== activeListId) return list;
+
         return {
           ...list,
           items: list.items.map((item) => ({
             ...item,
-            isSelected: !allSelected,
+            isSelected: novoValor,
           })),
         };
       }),
@@ -224,6 +271,8 @@ export function useList() {
 
         const idLista = listId || activeListId;
 
+        console.log(idLista);
+
         if (!idLista) return;
 
         const newItem = {
@@ -236,8 +285,6 @@ export function useList() {
 
         const responseItem = await listService.createItems(newItem);
 
-        console.log(responseItem);
-
         if (responseItem.StatusCode !== 201) {
           triggerAlert(
             "Não foi possível adicionar o item... Tente novamente mais tarde!",
@@ -247,7 +294,7 @@ export function useList() {
 
         const formattedItem = {
           ...newItem,
-          id: responseItem.Response.id_item,
+          id_item: responseItem.Response.id_item,
         };
 
         setLists((prevLists) =>
@@ -268,11 +315,35 @@ export function useList() {
   );
 
   const toggleFavorite = useCallback((listId) => {
-    setLists((prev) =>
-      prev.map((list) =>
-        list.id === listId ? { ...list, isFavorite: !list.isFavorite } : list,
-      ),
-    );
+    setLists((prev) => {
+      const targetList = prev.find((list) => list.id === listId);
+
+      if (!targetList) return prev;
+
+      const novoValor = !targetList.favorita;
+
+      setPendingUpdatesFavorite((prevFav) => {
+        const existing = prevFav.find((item) => item.id_lista === listId);
+
+        if (existing) {
+          return prevFav.map((item) =>
+            item.id_lista === listId ? { ...item, favorita: novoValor } : item,
+          );
+        }
+
+        return [
+          ...prevFav,
+          {
+            id_lista: listId,
+            favorita: novoValor,
+          },
+        ];
+      });
+
+      return prev.map((list) =>
+        list.id === listId ? { ...list, favorita: novoValor } : list,
+      );
+    });
   }, []);
 
   //Funcionando
@@ -317,7 +388,9 @@ export function useList() {
           return;
         }
 
-        setPendingUpdates((prev) => prev.filter((item) => item.id !== itemId));
+        setPendingUpdates((prev) =>
+          prev.filter((item) => item.id_item !== itemId),
+        );
 
         setLists((prevLists) =>
           prevLists.map((list) => {
@@ -325,7 +398,7 @@ export function useList() {
 
             return {
               ...list,
-              items: list.items.filter((item) => item.id !== itemId),
+              items: list.items.filter((item) => item.id_item !== itemId),
             };
           }),
         );
@@ -356,7 +429,7 @@ export function useList() {
             id_usuario: user.id,
             id_familia: idFamilia,
             nome: data.nome,
-            isFavorite: false,
+            favorita: false,
             items: data.items || [],
           };
 
@@ -370,14 +443,17 @@ export function useList() {
             return;
           }
 
+          console.log(newList);
+
           if (newList.items > 0) {
+            console.log("Adicionando items à lista recém-criada...");
             const items = await Promise.all(
               newList.items.map((item) =>
                 handleAddItem(item, responseList.Response.lista.id_lista),
               ),
             );
 
-            if (items) {
+            if (!items) {
               triggerAlert(
                 "Lista criada... Porém houveram problemas na criação dos items. Tente novamente mais tarde!",
               );

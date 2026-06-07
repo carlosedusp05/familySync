@@ -66,6 +66,28 @@ const getItems = async function () {
   }
 };
 
+const updateFavoritesBatch = async function (lists) {
+  const formattedLists = lists.map((list) => ({
+    ...list,
+    favorita: list.favorita ? 1 : 2,
+  }));
+
+  console.log(formattedLists);
+
+  const url = "/lista-favorita-lote";
+
+  try {
+    const response = await api.put(url, formattedLists);
+    const dados = response.data;
+
+    console.log(dados);
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 const createItems = async function (data) {
   const url = `/item`;
 
@@ -128,4 +150,5 @@ export const listService = {
   deleteItem,
   updateItem,
   updateItemsBatch,
+  updateFavoritesBatch,
 };
