@@ -24,10 +24,8 @@ function ListContainer({
             className="hover:scale-110 transition-transform active:scale-90 cursor-pointer shrink-0"
           >
             <img
-              src={list.isFavorite ? favoriteIcon : unfavoriteIcon}
-              alt={
-                list.isFavorite ? "Remover dos favoritos" : "Favoritar lista"
-              }
+              src={list.favorita ? favoriteIcon : unfavoriteIcon}
+              alt={list.favorita ? "Remover dos favoritos" : "Favoritar lista"}
               className={"h-10 w-10"}
               draggable={false}
             />
@@ -51,9 +49,21 @@ function ListContainer({
           className="flex items-center gap-6 pl-6 shrink-0"
           onClick={(e) => e.stopPropagation()}
         >
-          {parseMoneyToFloat(list.total_spent) > 0 && (
+          {list.items?.length > 0 && (
             <span className="font-bold text-xl text-[#e67700] min-w-30 text-right whitespace-nowrap">
-              TOTAL: {list.total_spent}
+              TOTAL:{" "}
+              {list.items
+                .reduce(
+                  (total, item) =>
+                    total +
+                    (Number(item.valor_unitario) || 0) *
+                      (Number(item.quantidade) || 1),
+                  0,
+                )
+                .toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                })}
             </span>
           )}
 

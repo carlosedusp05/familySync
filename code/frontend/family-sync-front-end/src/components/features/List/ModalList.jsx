@@ -49,7 +49,6 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
     }
 
     const newItem = {
-      id: Date.now(),
       nome: newItemName,
       price: priceParsed,
       units: unitsParsed,
