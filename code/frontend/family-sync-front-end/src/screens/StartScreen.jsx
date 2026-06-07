@@ -3,14 +3,13 @@ import { imageBackground } from "../assets";
 import DefaultHeader from "../components/layout/DefaultHeader";
 import BackgroundImage from "../components/ui/BackgroundImage";
 import MenuStart from "../components/ui/MenuStart";
-import { useUserData } from "../hooks/useUserData";
 import AddFamilyForm from "../components/features/AddFamiliar/AddFamilyForm";
 import { useAddFamily } from "../hooks/useAddFamily";
 import { useCalendar } from "../hooks/useCalendar";
-import { MenuStartSkeleton } from "../components/ui/MenuStartSkeleton.jsx";
+import { useUser } from "../context/UserContext";
 
 function StartScreen(props) {
-  const { userData, infos, isFamily } = useUserData();
+  const { userProfile, families, infos, isLoadingUser } = useUser();
   const addFamilyProps = useAddFamily();
 
   const { dateEvent } = useCalendar();
@@ -22,35 +21,35 @@ function StartScreen(props) {
     }
   }, []);
 
-  const estaCarregando = !userData || isFamily === null;
+  const estaCarregando = isLoadingUser;
 
   useEffect(() => {
-    if (isFamily && isFamily.length > 0) {
+    if (families && families.length > 0) {
       const activeFamilyId = sessionStorage.getItem("@FamilySync:family:id");
       if (!activeFamilyId) {
-        sessionStorage.setItem("@FamilySync:family:id", isFamily[0].id);
+        sessionStorage.setItem("@FamilySync:family:id", families[0].id);
       }
     }
-  }, [isFamily]);
+  }, [families]);
 
   const userDataSincronizado = useMemo(() => {
-    if (estaCarregando || !isFamily || isFamily.length === 0) {
-      return userData;
+    if (estaCarregando || !Array.isArray(families) || families.length === 0) {
+      return userProfile;
     }
 
     const activeId =
-      sessionStorage.getItem("@FamilySync:family:id") || isFamily[0].id;
-    const familiaAtiva = isFamily.find((f) => f.id === parseInt(activeId));
+      sessionStorage.getItem("@FamilySync:family:id") || families[0].id;
+    const familiaAtiva = families.find((f) => f.id === parseInt(activeId));
 
-    if (familiaAtiva) {
+    if (familiaAtiva && userProfile) {
       return {
-        ...userData,
+        ...userProfile,
         nomeFamilia: familiaAtiva.nome || familiaAtiva.nomeFamilia,
       };
     }
 
-    return userData;
-  }, [userData, isFamily, estaCarregando]);
+    return userProfile;
+  }, [userProfile, families, estaCarregando]);
 
   return (
     <div className="flex flex-col w-full h-screen overflow-hidden">
@@ -62,7 +61,7 @@ function StartScreen(props) {
       <DefaultHeader />
       <div className="w-full flex justify-center items-center h-full">
         <div className="w-full flex justify-center items-center h-full">
-          {estaCarregando ? null : isFamily && isFamily.length > 0 ? (
+          {estaCarregando ? null : families && families.length > 0 ? (
             <MenuStart
               props={props}
               userData={userDataSincronizado}

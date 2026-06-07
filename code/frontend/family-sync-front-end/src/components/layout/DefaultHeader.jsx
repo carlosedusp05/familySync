@@ -5,10 +5,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { notificationsIcon } from "../../assets/index";
 import { useNotifications } from "../../hooks/useNotifications";
-import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
-import { userService } from "../../services/userService";
 import ShowAlert from "../ui/ShowAlert";
+
+import { useUser } from "../../context/UserContext";
 
 function DefaultHeader({ disconnected, warning, showWarning }) {
   const navigate = useNavigate();
@@ -19,33 +18,9 @@ function DefaultHeader({ disconnected, warning, showWarning }) {
 
   const { notifications, newAlert, clearAlert } = useNotifications();
   const [showRedDot, setShowRedDot] = useState(false);
-  const [fotoUsuario, setFotoUsuario] = useState(null);
 
-  useEffect(() => {
-    const buscarDadosUsuario = async () => {
-      if (!disconnected) {
-        const token = Cookies.get("familysync_token");
-        if (token) {
-          try {
-            const decoded = jwtDecode(token);
-            const userData = await userService.getUserById(decoded.id_usuario);
-
-            console.log(userData);
-
-            const urlFoto = userData?.Response?.[0]?.foto;
-
-            if (urlFoto) {
-              setFotoUsuario(urlFoto);
-            }
-          } catch (error) {
-            console.error("Erro ao buscar foto do usuário:", error);
-          }
-        }
-      }
-    };
-
-    buscarDadosUsuario();
-  }, [disconnected]);
+  // 2. Pegamos os dados do usuário direto do contexto global de forma síncrona
+  const { userProfile } = useUser();
 
   const STORAGE_KEY = "@FamilySync:notifications:lastReadId";
 
@@ -115,7 +90,8 @@ function DefaultHeader({ disconnected, warning, showWarning }) {
         another_size={
           "w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 xl:w-16 xl:h-16  2xl:w-23 2xl:h-23"
         }
-        fotoUrl={fotoUsuario}
+        // 3. Substituímos a variável antiga pela do contexto
+        fotoUrl={userProfile?.foto}
       />
 
       <div

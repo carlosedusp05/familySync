@@ -189,7 +189,6 @@ export function useFinancier() {
         return itemDate >= dom && itemDate <= sab;
       });
 
-      const agrupado = {};
       const diasSemana = [
         "Domingo",
         "Segunda",
@@ -200,30 +199,44 @@ export function useFinancier() {
         "Sábado",
       ];
 
+      // 🛠️ Inicializa todos os dias da semana com 0 para manter o layout do gráfico estruturado
+      const agrupado = {};
+      diasSemana.forEach((dia) => {
+        agrupado[dia] = 0;
+      });
+
       filtered.forEach((item) => {
         const itemDate = getLocalDate(item.data_movimentacao);
         const nomeDia = diasSemana[itemDate.getDay()];
-        if (!agrupado[nomeDia]) agrupado[nomeDia] = 0;
         agrupado[nomeDia] += Number(item.valor || item.total || 0);
       });
 
       listData = filtered;
-      chartData = Object.keys(agrupado)
-        .sort((a, b) => (ordemDias[a] || 99) - (ordemDias[b] || 99))
-        .map((diaBr, index) => ({
-          id_financas: `week-${index}`,
-          labelItem: diaBr,
-          valorItem: agrupado[diaBr],
+
+      // 🔄 Mapeia sobre a ordenação padrão de dias da semana para não distorcer o layout
+      const diasOrdenados = [
+        "Segunda",
+        "Terça",
+        "Quarta",
+        "Quinta",
+        "Sexta",
+        "Sábado",
+        "Domingo",
+      ];
+      chartData = diasOrdenados.map((diaBr, index) => ({
+        id_financas: `week-${index}`,
+        labelItem: diaBr,
+        valorItem: agrupado[diaBr],
+        icone: "📅",
+        rawItem: {
+          descricao: diaBr,
           icone: "📅",
-          rawItem: {
-            descricao: diaBr,
-            icone: "📅",
-            valor: agrupado[diaBr],
-            isVirtual: true,
-            domDate: dom, // Guarda a referência da semana ativa
-          },
-          isGroup: true,
-        }));
+          valor: agrupado[diaBr],
+          isVirtual: true,
+          domDate: dom,
+        },
+        isGroup: true,
+      }));
     } else if (periodo === "Mês") {
       const filtered = rawList.filter((item) => {
         if (!item.data_movimentacao) return false;
@@ -302,7 +315,6 @@ export function useFinancier() {
         return (item.data_movimentacao || "").substring(0, 4) === filtroAnoStr;
       });
 
-      const agrupado = {};
       const mesesStr = [
         "Janeiro",
         "Fevereiro",
@@ -318,30 +330,37 @@ export function useFinancier() {
         "Dezembro",
       ];
 
+      // 🛠️ FIX CHAVE: Preenche previamente todos os 12 meses com valor 0 para manter as barras fixas na estrutura
+      const agrupado = {};
+      mesesStr.forEach((mes) => {
+        agrupado[mes] = 0;
+      });
+
       filtered.forEach((item) => {
         const mesIndex =
           parseInt(item.data_movimentacao.substring(5, 7), 10) - 1;
         const nomeMes = mesesStr[mesIndex];
-        if (!agrupado[nomeMes]) agrupado[nomeMes] = 0;
-        agrupado[nomeMes] += Number(item.valor || item.total || 0);
+        if (nomeMes) {
+          agrupado[nomeMes] += Number(item.valor || item.total || 0);
+        }
       });
 
       listData = filtered;
-      chartData = Object.keys(agrupado)
-        .sort((a, b) => mesesStr.indexOf(a) - mesesStr.indexOf(b))
-        .map((mesBr, index) => ({
-          id_financas: `year-${index}`,
-          labelItem: mesBr,
-          valorItem: agrupado[mesBr],
+
+      // 🔄 Mapeia a partir do array fixo de meses para preservar os 12 slots no layout visual do ano
+      chartData = mesesStr.map((mesBr, index) => ({
+        id_financas: `year-${index}`,
+        labelItem: mesBr,
+        valorItem: agrupado[mesBr],
+        icone: "📅",
+        rawItem: {
+          descricao: mesBr,
           icone: "📅",
-          rawItem: {
-            descricao: mesBr,
-            icone: "📅",
-            valor: agrupado[mesBr],
-            isVirtual: true,
-          },
-          isGroup: true,
-        }));
+          valor: agrupado[mesBr],
+          isVirtual: true,
+        },
+        isGroup: true,
+      }));
     }
 
     return { listData, chartData };
@@ -446,7 +465,6 @@ export function useFinancier() {
     (item) => {
       if (item.isGroup) {
         if (periodo === "Ano") {
-          // 🎯 Filtra os gastos reais do mês clicado
           const mesesStr = [
             "Janeiro",
             "Fevereiro",
@@ -479,7 +497,6 @@ export function useFinancier() {
           setSelectedExpenses(gastosDoMes);
           setIsListModalOpen(true);
         } else if (periodo === "Semana") {
-          // 🎯 Filtra os gastos reais do dia da semana clicado
           const diasSemana = [
             "Domingo",
             "Segunda",
@@ -507,12 +524,10 @@ export function useFinancier() {
           setSelectedExpenses(gastosDoDia);
           setIsListModalOpen(true);
         } else {
-          // 🎯 Para a visão de "Mês" (que usa as semanas virtuais no calendário), mantém como estava
           setSelectedExpenses([item.rawItem]);
           setIsListModalOpen(true);
         }
       } else {
-        // 🎯 Clicou em um gasto único direto (na visão de "Dia")
         setExpenseToEdit(item.rawItem);
         setIsFormModalOpen(true);
         setIsListModalOpen(false);
@@ -567,7 +582,6 @@ export function useFinancier() {
         return;
       }
 
-      // 🔄 3. Se clicou em um dia da semana -> Muda para o dia exato
       const mapaDias = {
         Domingo: 0,
         Segunda: 1,
@@ -599,7 +613,6 @@ export function useFinancier() {
   );
 
   const handleOpenFullList = useCallback(() => {
-    // 🎯 Mudança aqui: Mês e Ano agora enviam os dados agrupados (semanas virtuais ou meses virtuais)
     if (periodo === "Mês" || periodo === "Ano") {
       const listFormatted = processedData.chartData.map((c) => c.rawItem);
       setSelectedExpenses(listFormatted);
@@ -625,8 +638,6 @@ export function useFinancier() {
         desc = `${nomeDia} - ${item.descricao || item.tipo}`;
       }
 
-      // O bloco (periodo === "Ano") que ficava aqui foi removido, pois agora é tratado no if acima!
-
       return {
         ...item,
         descricao: desc,
@@ -638,6 +649,7 @@ export function useFinancier() {
     setSelectedExpenses(listFormatted);
     setIsListModalOpen(true);
   }, [processedData.chartData, processedData.listData, periodo]);
+
   const handleOpenAddForm = () => {
     setExpenseToEdit(null);
     setIsFormModalOpen(true);

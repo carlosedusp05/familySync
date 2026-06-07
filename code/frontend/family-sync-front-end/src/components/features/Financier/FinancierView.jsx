@@ -361,139 +361,148 @@ function FinancierView({
               )}
             </div>
 
-            {isScrollable && (
-              <div
-                ref={topScrollRef}
-                onScroll={() => {
-                  if (chartScrollRef.current && topScrollRef.current) {
-                    chartScrollRef.current.scrollLeft =
-                      topScrollRef.current.scrollLeft;
-                  }
-                }}
-                className="w-full overflow-x-auto custom-scrollbar mb-2 h-6"
-                style={{ paddingLeft: "48px" }}
-              >
+            <div className="flex flex-col w-full max-w-[900px]  items-center z-10">
+              {isScrollable && (
                 <div
-                  className="flex gap-20 px-4"
-                  style={{ width: `${chartData.length * 136}px` }}
+                  ref={topScrollRef}
+                  onScroll={(e) => {
+                    if (chartScrollRef.current) {
+                      chartScrollRef.current.scrollLeft =
+                        e.currentTarget.scrollLeft;
+                    }
+                  }}
+                  className="w-full pl-14 overflow-x-auto custom-scrollbar mb-2"
                 >
-                  {chartData.map((item) => (
-                    <div key={item.id_financas} className="w-14 shrink-0" />
-                  ))}
+                  <div className="flex justify-start gap-12 sm:gap-16 pr-8 h-px">
+                    {chartData.map((item) => (
+                      <div
+                        key={`dummy-${item.id_financas}`}
+                        className="w-12 sm:w-16 shrink-0"
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            <div className="relative w-full max-w-300 h-150 mt-2 mb-18 group">
-              <div className="absolute inset-0 flex flex-col justify-between z-0">
-                {yAxisValues.map((val, i) => (
-                  <div key={i} className="flex items-center w-full h-0">
-                    <span className="text-[16px] text-gray-800 font-medium w-12 text-right pr-3 bg-white z-10">
+              <div className="relative w-full h-[340px] flex">
+                <div className="w-14 h-full flex flex-col justify-between pb-12 z-0 border-r border-gray-300">
+                  {yAxisValues.map((val, i) => (
+                    <span
+                      key={`y-${i}`}
+                      className="text-[14px] text-gray-800 font-medium text-right pr-3"
+                    >
                       {val}
                     </span>
-                    <div className="flex-1 border-t border-gray-300"></div>
-                  </div>
-                ))}
-                <div className="absolute top-0 bottom-0 left-12 border-l border-gray-300"></div>
-              </div>
+                  ))}
+                </div>
 
-              <div
-                ref={chartScrollRef}
-                onScroll={() => {
-                  if (topScrollRef.current && chartScrollRef.current) {
-                    topScrollRef.current.scrollLeft =
-                      chartScrollRef.current.scrollLeft;
-                  }
-                }}
-                className={`absolute top-0 -bottom-16 left-12 scroll-smooth right-0 z-10 flex items-end pb-16 overflow-x-auto px-4 ${
-                  isScrollable
-                    ? "justify-start gap-20 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-                    : "justify-evenly w-full"
-                }`}
-              >
-                {chartData.map((item, index) => {
-                  const idFinanca = item.id_financas;
-                  const valorItem = item.valorItem;
-                  let labelItem = item.labelItem;
-
-                  if (labelItem && labelItem.length > 23) {
-                    labelItem = labelItem.substring(0, 23) + "...";
-                  }
-
-                  const alturaBarra =
-                    valorMaximo > 0 ? (valorItem / valorMaximo) * 100 : 0;
-                  const percent =
-                    totalGasto > 0
-                      ? ((valorItem / totalGasto) * 100).toFixed(1)
-                      : 0;
-
-                  return (
+                <div className="absolute top-0 right-0 left-14 bottom-12 flex flex-col justify-between pointer-events-none z-0">
+                  {yAxisValues.map((_, i) => (
                     <div
-                      key={idFinanca}
-                      className="relative w-14 h-full flex flex-col justify-end items-center group shrink-0"
-                      onMouseEnter={() => setHoveredIndex(index)}
-                      onMouseLeave={() => setHoveredIndex(null)}
-                      onClick={() => handleBarClick(item)}
-                    >
-                      <AnimatePresence>
-                        {hoveredIndex === index && (
-                          <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            className="absolute top-full -mt-60 z-50 w-52 bg-white border border-orange-200 shadow-2xl rounded-2xl p-4 flex flex-col items-center"
-                          >
-                            <span className="text-4xl mb-2">
-                              {item.icone || "💰"}
-                            </span>
-                            <p className="text-xl font-black text-brown-dark">
-                              R${" "}
-                              {valorItem.toLocaleString("pt-BR", {
-                                minimumFractionDigits: 2,
-                              })}
-                            </p>
-                            <p className="text-[11px] text-gray-400 font-bold uppercase mt-1">
-                              Adicionado por:
-                            </p>
-                            <p className="text-xs text-center text-gray-700">
-                              {authorName}
-                            </p>
-                            <div className="w-full h-px bg-gray-100 my-2" />
-                            <p className="text-orange font-black text-lg">
-                              {percent}%
-                            </p>
-                            {!item.isGroup && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteExpense(idFinanca);
-                                }}
-                                className="mt-2 text-[12px] text-red-500 hover:underline font-bold uppercase"
-                              >
-                                Excluir
-                              </button>
-                            )}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                      key={`grid-${i}`}
+                      className="w-full border-t border-gray-300"
+                    />
+                  ))}
+                </div>
 
-                      <motion.div
-                        className="w-full bg-gradient-to-b from-[#FFB382] via-[#FF8C42] to-[#DFB3CD] cursor-pointer hover:brightness-110 rounded-t-sm"
-                        initial={{ height: 0 }}
-                        animate={{ height: `${alturaBarra}%` }}
-                        transition={{
-                          duration: 0.6,
-                          type: "spring",
-                          bounce: 0.3,
-                        }}
-                      />
+                <div
+                  ref={chartScrollRef}
+                  onScroll={(e) => {
+                    if (topScrollRef.current) {
+                      topScrollRef.current.scrollLeft =
+                        e.currentTarget.scrollLeft;
+                    }
+                  }}
+                  className={`flex-1 h-full overflow-x-auto overflow-y-visible flex items-end pb-12 z-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
+                    isScrollable
+                      ? "justify-start gap-12 sm:gap-16 pr-8 pl-4"
+                      : "justify-evenly gap-4"
+                  }`}
+                >
+                  {chartData.map((item, index) => {
+                    const idFinanca = item.id_financas;
+                    const valorItem = item.valorItem;
+                    let labelItem = item.labelItem;
 
-                      <span className="absolute top-full mt-3 left-1/2 -translate-x-1/2 text-[16px] font-bold text-[#5B3E31] text-center w-28 break-words leading-tight">
-                        {labelItem}
-                      </span>
-                    </div>
-                  );
-                })}
+                    if (labelItem && labelItem.length > 23) {
+                      labelItem = labelItem.substring(0, 23) + "...";
+                    }
+
+                    const alturaBarra =
+                      valorMaximo > 0 ? (valorItem / valorMaximo) * 100 : 0;
+                    const percent =
+                      totalGasto > 0
+                        ? ((valorItem / totalGasto) * 100).toFixed(1)
+                        : 0;
+
+                    return (
+                      <div
+                        key={idFinanca}
+                        className="relative w-12 sm:w-16 h-full flex flex-col justify-end items-center group shrink-0"
+                        onMouseEnter={() => setHoveredIndex(index)}
+                        onMouseLeave={() => setHoveredIndex(null)}
+                        onClick={() => handleBarClick(item)}
+                      >
+                        <AnimatePresence>
+                          {hoveredIndex === index && (
+                            <motion.div
+                              initial={{ opacity: 0, y: -10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -10 }}
+                              className="absolute bottom-full mb-2 z-50 w-48 bg-white border border-orange-200 shadow-2xl rounded-2xl p-4 flex flex-col items-center pointer-events-none"
+                            >
+                              <span className="text-4xl mb-2">
+                                {item.icone || "💰"}
+                              </span>
+                              <p className="text-xl font-black text-brown-dark">
+                                R${" "}
+                                {valorItem.toLocaleString("pt-BR", {
+                                  minimumFractionDigits: 2,
+                                })}
+                              </p>
+                              <p className="text-[11px] text-gray-400 font-bold uppercase mt-1">
+                                Adicionado por:
+                              </p>
+                              <p className="text-xs text-center text-gray-700">
+                                {authorName}
+                              </p>
+                              <div className="w-full h-px bg-gray-100 my-2" />
+                              <p className="text-orange font-black text-lg">
+                                {percent}%
+                              </p>
+                              {!item.isGroup && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteExpense(idFinanca);
+                                  }}
+                                  className="mt-2 text-[12px] text-red-500 hover:underline font-bold uppercase pointer-events-auto"
+                                >
+                                  Excluir
+                                </button>
+                              )}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+                        <motion.div
+                          className="w-full bg-gradient-to-b from-[#FFB382] via-[#FF8C42] to-[#DFB3CD] cursor-pointer hover:brightness-110 rounded-t-sm"
+                          initial={{ height: 0 }}
+                          animate={{ height: `${alturaBarra}%` }}
+                          transition={{
+                            duration: 0.6,
+                            type: "spring",
+                            bounce: 0.3,
+                          }}
+                        />
+
+                        <span className="absolute top-full mt-3 left-1/2 -translate-x-1/2 text-[14px] font-bold text-[#5B3E31] text-center w-24 break-words leading-tight">
+                          {labelItem}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
@@ -528,7 +537,6 @@ function FinancierView({
               diasComGastos={diasComGastos}
               onClose={() => setIsListModalOpen(false)}
               onDayClick={handleDayClick}
-              // 🚀 ALTERADO AQUI: Passa a data corrigida baseada nos gastos existentes
               dataFiltroDia={dataResponsivaModal}
               onDelete={handleDeleteExpense}
               onEdit={(item) => {
