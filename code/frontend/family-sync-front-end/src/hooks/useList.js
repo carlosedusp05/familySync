@@ -8,7 +8,6 @@ import { useRef } from "react";
 
 export function useList() {
   const location = useLocation();
-  const previousPath = useRef(location.pathname);
   const [lists, setLists] = useState([]);
   const [activeListId, setActiveListId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -72,7 +71,7 @@ export function useList() {
               id: lista.id_lista,
               nome: lista.nome_lista || lista.nome || "Lista sem nome",
               author: usuario.nome_usuario,
-              favorita: false,
+              favorita: lista.favorita,
               items: listItems,
               id_familia: id_familia,
               id_usuario: usuario.id_usuario,
@@ -264,16 +263,14 @@ export function useList() {
 
   // Funcionando
   const handleAddItem = useCallback(
-    async (itemData, listId) => {
+    async (itemData, listId, updateState = true) => {
       try {
         setIsLoading(true);
         setError(null);
 
         const idLista = listId || activeListId;
 
-        console.log(idLista);
-
-        if (!idLista) return;
+        if (!idLista) return null;
 
         const newItem = {
           nome_item: itemData.name || itemData.nome || "Sem nome",
@@ -289,7 +286,7 @@ export function useList() {
           triggerAlert(
             "Não foi possível adicionar o item... Tente novamente mais tarde!",
           );
-          return;
+          return null;
         }
 
         const formattedItem = {
@@ -297,16 +294,20 @@ export function useList() {
           id_item: responseItem.Response.id_item,
         };
 
-        setLists((prevLists) =>
-          prevLists.map((list) => {
-            if (list.id !== activeListId) return list;
+        if (updateState) {
+          setLists((prevLists) =>
+            prevLists.map((list) => {
+              if (list.id !== idLista) return list;
 
-            return {
-              ...list,
-              items: [...(list.items || []), formattedItem],
-            };
-          }),
-        );
+              return {
+                ...list,
+                items: [...(list.items || []), formattedItem],
+              };
+            }),
+          );
+        }
+
+        return formattedItem;
       } finally {
         setIsLoading(false);
       }
@@ -416,59 +417,49 @@ export function useList() {
         setIsLoading(true);
         setError(null);
 
-        if (selectedListToEdit) {
-          setLists((prev) =>
-            prev.map((list) =>
-              list.id === selectedListToEdit.id
-                ? { ...list, nome: data.nome, items: data.items }
-                : list,
+        const newList = {
+          id_usuario: user.id,
+          id_familia: idFamilia,
+          nome: data.nome,
+          favorita: false,
+          items: data.items || [],
+        };
+
+        const responseList = await listService.createList(newList);
+
+        if (responseList.StatusCode !== 201) {
+          triggerAlert(
+            "Não foi possível criar a lista... Tente novamente mais tarde!",
+          );
+          handleCloseModal();
+          return;
+        }
+
+        let items = [];
+
+        if (newList.items) {
+          items = await Promise.all(
+            newList.items.map((item) =>
+              handleAddItem(item, responseList.Response.lista.id_lista, false),
             ),
           );
-        } else {
-          const newList = {
-            id_usuario: user.id,
-            id_familia: idFamilia,
-            nome: data.nome,
-            favorita: false,
-            items: data.items || [],
-          };
 
-          const responseList = await listService.createList(newList);
-
-          if (responseList.StatusCode !== 201) {
+          if (!items.length) {
             triggerAlert(
-              "Não foi possível criar a lista... Tente novamente mais tarde!",
+              "Lista criada... Porém houveram problemas na criação dos items. Tente novamente mais tarde!",
             );
             handleCloseModal();
-            return;
           }
-
-          console.log(newList);
-
-          if (newList.items > 0) {
-            console.log("Adicionando items à lista recém-criada...");
-            const items = await Promise.all(
-              newList.items.map((item) =>
-                handleAddItem(item, responseList.Response.lista.id_lista),
-              ),
-            );
-
-            if (!items) {
-              triggerAlert(
-                "Lista criada... Porém houveram problemas na criação dos items. Tente novamente mais tarde!",
-              );
-              handleCloseModal();
-            }
-          }
-
-          const newItemToState = {
-            ...newList,
-            id: responseList.Response.lista.id_lista,
-            author: user.nome,
-          };
-
-          setLists((prev) => [newItemToState, ...prev]);
         }
+
+        const newItemToState = {
+          ...newList,
+          id: responseList.Response.lista.id_lista,
+          author: user.nome,
+          items,
+        };
+
+        setLists((prev) => [newItemToState, ...prev]);
 
         handleCloseModal();
       } finally {
@@ -477,6 +468,23 @@ export function useList() {
     },
     [selectedListToEdit],
   );
+
+  const handleSaveListEdition = useCallback(async (data) => {
+    try {
+      setLists((prev) =>
+        prev.map((list) =>
+          list.id === selectedListToEdit.id
+            ? { ...list, nome: data.nome, items: data.items }
+            : list,
+        ),
+      );
+
+      setIsLoading(true);
+      setError(null);
+    } finally {
+      setIsLoading(false);
+    }
+  });
 
   const handleOpenModal = useCallback((list = null, isEdit = true) => {
     setSelectedListToEdit(list);
@@ -518,6 +526,7 @@ export function useList() {
     handleCloseModal,
     handleDeleteList,
     handleSaveList,
+    handleSaveListEdition,
     isModalOpen,
     isModeEdition,
     selectedListToEdit,

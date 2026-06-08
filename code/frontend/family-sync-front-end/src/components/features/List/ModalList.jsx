@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import DefaultButton from "../../ui/DefaultButton";
 import { formatMoneyMask, parseMoneyToFloat } from "../../../utils/formatters";
 
-function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
+function ModalList({ isOpen, onClose, onSave, data, isEdit, onDeleteItem }) {
   const [listName, setListName] = useState("");
   const [items, setItems] = useState([]);
   const [newItemName, setNewItemName] = useState("");
@@ -14,6 +14,10 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
     item_nome: false,
     valor: false,
   });
+
+  let itemsDeleted = [];
+
+  console.log(onSave);
 
   useEffect(() => {
     if (data && isEdit) {
@@ -49,9 +53,10 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
     }
 
     const newItem = {
-      nome: newItemName,
-      price: priceParsed,
-      units: unitsParsed,
+      id_map: Date.now(),
+      nome_item: newItemName,
+      valor_unitario: priceParsed,
+      quantidade: unitsParsed,
       isSelected: false,
     };
 
@@ -64,7 +69,9 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
   };
 
   const handleRemoveLocalItem = (itemId) => {
-    setItems((prev) => prev.filter((item) => item.id !== itemId));
+    setItems((prev) => prev.filter((item) => item.id_item !== itemId));
+
+    itemsDeleted = [...itemsDeleted, itemId];
   };
 
   const handleSave = () => {
@@ -74,6 +81,12 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
     }
 
     onSave({ nome: listName, items: items });
+
+    if (itemsDeleted) {
+      itemsDeleted.forEach((id) => {
+        onDeleteItem(id);
+      });
+    }
   };
 
   const totalPurchase = items.reduce(
@@ -82,6 +95,7 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
   );
 
   const formatCurrency = (value) => {
+    if (!value) return;
     return value.toLocaleString("pt-BR", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -260,21 +274,24 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit }) {
               <div className="flex flex-col gap-2">
                 {items.map((item) => (
                   <div
-                    key={item.id}
+                    key={item.id_map || item.id_item}
                     className="bg-[#FF8B40] text-white rounded-xl flex items-center justify-between px-8 py-2.5 shadow-sm transition-all hover:-translate-y-px"
                   >
                     <span className="flex-1 font-semibold truncate pr-3 text-xl">
-                      {item.nome}
+                      {item.nome || item.nome_item}
                     </span>
                     <div className="flex items-center gap-3 shrink-0">
                       <span className="text-white/80 font-medium text-xl">
-                        R$ {formatCurrency(item.price)} × {item.units}
+                        R$ {formatCurrency(item.valor_unitario)} ×{" "}
+                        {item.quantidade}
                       </span>
+
                       <div className="bg-white text-[#E65C00] font-bold px-2.5 py-1 rounded-lg text-xl shadow-inner min-w-20 text-right">
-                        R$ {formatCurrency(item.price * item.units)}
+                        R${" "}
+                        {formatCurrency(item.valor_unitario * item.quantidade)}
                       </div>
                       <button
-                        onClick={() => handleRemoveLocalItem(item.id)}
+                        onClick={() => handleRemoveLocalItem(item.id_item)}
                         className="bg-[#C24100]/20 hover:bg-red-600 hover:text-white transition-colors text-white rounded-full w-7 h-7 flex items-center justify-center font-bold text-sm"
                       >
                         ✕
