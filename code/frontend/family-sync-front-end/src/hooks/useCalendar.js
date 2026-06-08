@@ -5,7 +5,7 @@ import { eventService } from "../services/eventService";
 import { formatDate, formatHour } from "../utils/formatters";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-export function useCalendar() {
+export function useCalendar({ telaInicial = false } = {}) {
   const queryClient = useQueryClient();
   const token = Cookies.get("familysync_token");
 
@@ -29,6 +29,10 @@ export function useCalendar() {
 
   const familiaAtivaSalva = sessionStorage.getItem("@FamilySync:family:id");
 
+  // Regra de ouro: Se for a tela inicial E for mobile, bloqueia a requisição
+  const isMobile = window.innerWidth <= 768;
+  const deveCarregar = !(telaInicial && isMobile);
+
   const { data: dateEvent = [], isLoading } = useQuery({
     queryKey: ["events", familiaAtivaSalva],
     queryFn: async () => {
@@ -39,9 +43,34 @@ export function useCalendar() {
         hora: formatHour(event.hora),
       }));
     },
-    enabled: !!familiaAtivaSalva,
+    enabled: !!familiaAtivaSalva && deveCarregar,
     staleTime: 1000 * 60 * 5,
   });
+
+  const proximosEventos = useMemo(() => {
+    if (!deveCarregar || !dateEvent || dateEvent.length === 0) {
+      return [];
+    }
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    const timestampHoje = hoje.getTime();
+
+    return dateEvent
+      .map((ev) => {
+        let dateObj;
+        if (ev.data && ev.data.includes("/")) {
+          const [dia, mes, ano] = ev.data.split("/");
+          dateObj = new Date(ano, mes - 1, dia);
+        } else {
+          dateObj = new Date(ev.data);
+        }
+        return { ...ev, timestamp: dateObj.getTime(), dateObj };
+      })
+      .filter((ev) => ev.timestamp >= timestampHoje)
+      .sort((a, b) => a.timestamp - b.timestamp)
+      .slice(0, 4);
+  }, [dateEvent, deveCarregar]);
 
   const eventCount = useMemo(() => {
     const grouped = dateEvent.reduce((acc, event) => {
@@ -158,13 +187,14 @@ export function useCalendar() {
   };
 
   const isGlobalLoading =
-    isLoading ||
+    (isLoading && deveCarregar) || // Se não deve carregar, ignora o estado de loading do React Query
     deleteMutation.isPending ||
     createMutation.isPending ||
     updateMutation.isPending;
 
   return {
     dateEvent,
+    proximosEventos, // <-- Novo retorno limpo
     warning,
     showWarning,
     isModalOpen,

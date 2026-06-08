@@ -61,7 +61,10 @@ function DefaultTextField(props) {
   const backgroundColor = props.readOnly ? "bg-gray-100" : "bg-white";
 
   const wrapperBaseClasses = `flex flex-row w-full justify-between items-center ${backgroundColor} transition-colors duration-300`;
-  const wrapperDefaultClasses = `px-4 sm:px-5 h-12 sm:h-14 rounded-full border ${defaultBorderColor}`;
+
+  /* --- ALTERAÇÕES AQUI: Altura reduzida (h-10 / sm:h-12) e padding reduzido (px-3 / sm:px-4) --- */
+  const wrapperDefaultClasses = `px-3 sm:px-4 h-10 sm:h-12 rounded-full border ${defaultBorderColor}`;
+
   const wrapperProfileClasses =
     "px-4 py-3 rounded-lg shadow-sm border border-transparent";
 
@@ -69,18 +72,22 @@ function DefaultTextField(props) {
 
   const inputBaseClasses =
     "flex-1 min-w-0 h-full border-none focus:outline-none focus:ring-0 bg-transparent";
-  const inputDefaultClasses = `text-base sm:text-lg placeholder:text-sm sm:placeholder:text-base ${defaultTextColor}`;
+
+  /* --- ALTERAÇÕES AQUI: Fonte reduzida (text-sm / sm:text-base) --- */
+  const inputDefaultClasses = `text-sm sm:text-base placeholder:text-sm ${defaultTextColor}`;
 
   const inputProfileClasses = props.readOnly
-    ? "text-xl text-gray-400 font-medium placeholder:text-gray-400 cursor-not-allowed"
-    : "text-xl text-[#4a2511] font-bold placeholder:text-[#4a2511] placeholder:font-bold";
+    ? "text-lg text-gray-400 font-medium placeholder:text-gray-400 cursor-not-allowed"
+    : "text-lg text-[#4a2511] font-bold placeholder:text-[#4a2511] placeholder:font-bold";
 
   const inputClasses = `${inputBaseClasses} ${hideDefaultCalendarIcon} ${isProfile ? inputProfileClasses : inputDefaultClasses}`;
 
   const iconBaseClasses =
     "object-contain cursor-pointer transition-all duration-300 shrink-0";
-  const iconDefaultClasses = "w-7 h-7 sm:w-9 sm:h-9";
-  const iconProfileClasses = "w-10 h-10 opacity-90";
+
+  /* --- ALTERAÇÕES AQUI: Tamanho do ícone reduzido (w-5 h-5 / sm:w-6 sm:h-6) --- */
+  const iconDefaultClasses = "w-5 h-5 sm:w-6 sm:h-6";
+  const iconProfileClasses = "w-8 h-8 opacity-90";
 
   const iconClasses = `${iconBaseClasses} ${isProfile ? iconProfileClasses : iconDefaultClasses}`;
 

@@ -112,7 +112,7 @@ function SelectAddFamily({ w, error, value, onChange, onBlur, id, onKeyDown }) {
           onBlur={handleInputBlur}
           onKeyDown={onKeyDown}
           autoComplete="off"
-          className={`flex p-3 text-[20px] border-2 rounded-4xl px-6 w-full text-black  bg-white focus:outline-none transition-all placeholder:text-gray-400 ${
+          className={`flex py-2 px-4 md:py-3 md:px-6 text-sm md:text-[18px] lg:text-[20px]  border md:border-2 rounded-full w-full text-black bg-white focus:outline-none transition-all placeholder:text-gray-400 shadow-sm ${
             error ? "border-red-500" : "border-orange"
           }`}
         />
@@ -124,7 +124,8 @@ function SelectAddFamily({ w, error, value, onChange, onBlur, id, onKeyDown }) {
             rotate: isOpen && (value || "").length < 2 ? 180 : 0,
           }}
           transition={{ duration: 0.2 }}
-          className={`w-5 h-5 absolute right-5  ${
+          // Ícone ajustado para não ficar grande no mobile
+          className={`w-4 h-4 md:w-5 md:h-5 absolute right-3 md:right-5 ${
             (value || "").length >= 2 ? "cursor-default" : "cursor-pointer"
           }`}
         />
@@ -149,13 +150,14 @@ function SelectAddFamily({ w, error, value, onChange, onBlur, id, onKeyDown }) {
                     e.preventDefault();
                     handleSelect(estado.sigla);
                   }}
-                  className="hover:bg-orange/20 cursor-pointer text-xl py-2 px-6 text-brown-dark flex justify-between items-center transition-colors"
+                  // Texto do dropdown menor no mobile para não ocupar muito espaço
+                  className="hover:bg-orange/20 cursor-pointer text-sm md:text-xl py-2 px-4 md:px-6 text-brown-dark flex justify-between items-center transition-colors"
                 >
                   <span className="font-bold">{estado.sigla}</span>
                 </div>
               ))
             ) : (
-              <div className="py-2 px-6 text-gray-400 text-sm">
+              <div className="py-2 px-4 md:px-6 text-gray-400 text-sm md:text-base">
                 Nenhum resultado
               </div>
             )}
@@ -168,7 +170,9 @@ function SelectAddFamily({ w, error, value, onChange, onBlur, id, onKeyDown }) {
           error ? "max-h-10 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <span className="text-red-500 text-sm px-4 block">{error}</span>
+        <span className="text-red-500 text-xs md:text-sm px-4 block">
+          {error}
+        </span>
       </div>
     </div>
   );

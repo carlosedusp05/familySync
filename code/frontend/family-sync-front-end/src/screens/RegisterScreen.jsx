@@ -34,7 +34,7 @@ function RegisterScreen() {
   } = useRegister();
 
   return (
-    <div className="h-screen w-full flex justify-center items-center">
+    <div className="h-dvh w-screen flex justify-center items-center overflow-hidden p-4">
       {isLoading && <LoadingOverlay />}
       <BackgroundImage
         src={imageBackground}

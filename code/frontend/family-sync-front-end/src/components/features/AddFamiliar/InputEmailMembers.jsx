@@ -11,9 +11,9 @@ function InputEmailMembers({
 }) {
   return (
     <div className="flex flex-col w-full">
-      <div className="w-full bg-black/5 border border-orange p-3 rounded-2xl flex items-center h-18 shadow-sm transition-all duration-500 ease-in-out focus-within:bg-white focus-within:ring-2 focus-within:ring-orange/20">
+      <div className="w-full bg-black/5 border border-orange p-2 md:p-3 rounded-2xl flex items-center shadow-sm transition-all duration-500 ease-in-out focus-within:bg-white focus-within:ring-2 focus-within:ring-orange/20">
         <div
-          className="flex-1 flex items-center gap-2 overflow-x-auto overflow-y-hidden pb-1 [&::-webkit-scrollbar]:h-2.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#282828] [&::-webkit-scrollbar-thumb]:rounded-md"
+          className="flex-1 flex items-center gap-2 overflow-x-auto overflow-y-hidden pb-1 [&::-webkit-scrollbar]:h-1.5 md:[&::-webkit-scrollbar]:h-2.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#282828] [&::-webkit-scrollbar-thumb]:rounded-md"
           onWheel={(e) => {
             if (e.deltaY !== 0) {
               e.currentTarget.scrollLeft += e.deltaY;
@@ -23,9 +23,11 @@ function InputEmailMembers({
           {membros.map((email, index) => (
             <div
               key={index}
-              className="bg-orange/10 border border-orange/20 text-orange px-3 py-1.5 rounded-full flex items-center gap-2 shadow-sm shrink-0"
+              className="bg-orange/10 border border-orange/20 text-orange px-2 py-1 md:px-3 md:py-1.5 rounded-full flex items-center gap-2 shadow-sm shrink-0"
             >
-              <span className="text-xl font-semibold">{email}</span>
+              <span className="text-sm md:text-base font-semibold">
+                {email}
+              </span>
               <button
                 type="button"
                 onClick={() => handleRemoveMember(email)}
@@ -34,8 +36,8 @@ function InputEmailMembers({
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
+                  width="14"
+                  height="14"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -74,12 +76,12 @@ function InputEmailMembers({
                 handleAddMember();
               }
             }}
-            className="flex-1 bg-transparent min-w-50 border-none outline-none text-black placeholder:text-black/40 text-lg px-2 shrink-0"
+            className="flex-1 bg-transparent min-w-[200px] border-none outline-none text-black placeholder:text-black/40 text-sm md:text-[18px] lg:text-[20px] px-2 shrink-0"
           />
         </div>
       </div>
       {error && (
-        <span className="text-red-light text-sm mt-1 ml-2 font-medium">
+        <span className="text-red-light text-xs md:text-sm mt-1 ml-2 font-medium">
           {error}
         </span>
       )}

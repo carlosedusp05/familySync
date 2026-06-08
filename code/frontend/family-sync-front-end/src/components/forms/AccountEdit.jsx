@@ -65,8 +65,8 @@ function AccountEdit({
   ];
 
   return (
-    <div className="h-full w-full flex items-center justify-center relative">
-      <div className="absolute top-10 left-10">
+    <div className="h-full w-full flex items-center justify-center relative p-2 sm:p-0">
+      <div className="absolute top-4 left-4 sm:top-10 sm:left-10 z-50">
         <DefaultButton
           text="Sair da conta"
           logout_image={true}
@@ -74,8 +74,8 @@ function AccountEdit({
         />
       </div>
 
-      <div className="bg-white/20 backdrop-blur-md border border-white/40 rounded-[30px] p-6 pb-8 flex flex-col items-center w-142.5 max-w-[90vw] shadow-2xl transition-all duration-300">
-        <div className="w-30 h-30 relative rounded-full border-2 border-orange bg-white mb-6">
+      <div className="bg-white/20 backdrop-blur-md border border-white/40 rounded-[24px] sm:rounded-[30px] p-4 sm:p-6 pb-6 sm:pb-8 flex flex-col items-center w-full max-w-[95vw] md:w-142.5 md:max-w-[90vw] max-h-[92%] sm:max-h-[95%] overflow-y-auto shadow-2xl transition-all duration-300 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="w-24 h-24 sm:w-30 sm:h-30 shrink-0 relative rounded-full border-2 border-orange bg-white mb-4 sm:mb-6 mt-12 sm:mt-0">
           {preview ? (
             <img
               src={preview}
@@ -86,7 +86,7 @@ function AccountEdit({
           ) : (
             <IconPerfil
               is_white_backgroud={true}
-              another_size="h-70%"
+              another_size="h-[70%]"
               onClick={() => isEditing && handleButtonClick()}
               className={isEditing ? "cursor-pointer" : ""}
             />
@@ -98,7 +98,7 @@ function AccountEdit({
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                className="absolute -bottom-3 -right-3"
+                className="absolute -bottom-2 -right-2 sm:-bottom-3 sm:-right-3"
               >
                 <input
                   type="file"
@@ -119,8 +119,8 @@ function AccountEdit({
                     handleButtonClick();
                   }}
                   another_padding={"px-0 pb-1"}
-                  another_size={"h-12 w-12"}
-                  another_text_size={"text-3xl"}
+                  another_size={"h-10 w-10 sm:h-12 sm:w-12"}
+                  another_text_size={"text-2xl sm:text-3xl"}
                   most_radius={true}
                   text={preview ? "×" : "+"}
                 />
@@ -129,13 +129,14 @@ function AccountEdit({
           </AnimatePresence>
         </div>
 
-        <div className="w-full flex items-center justify-between px-[2.5%] mb-4 h-10">
-          <h1 className="text-orange text-3xl font-medium">Eu</h1>
+        {/* Cabeçalho "Eu" */}
+        <div className="w-full flex items-center justify-between px-[2.5%] mb-4 h-auto sm:h-10">
+          <h1 className="text-orange text-2xl sm:text-3xl font-medium">Eu</h1>
 
           <button
             type="button"
             onClick={toggleEditingMode}
-            className={`text-sm font-bold px-5 py-2.5 rounded-xl transition-all duration-300 shadow-sm ${
+            className={`text-xs sm:text-sm font-bold px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl transition-all duration-300 shadow-sm ${
               isEditing
                 ? "bg-gray-500/20 text-gray-700 hover:bg-gray-500 hover:text-white"
                 : "bg-orange/10 text-orange hover:bg-orange hover:text-white"
@@ -145,7 +146,7 @@ function AccountEdit({
           </button>
         </div>
 
-        <div className="w-[95%] flex flex-col gap-3">
+        <div className="w-full sm:w-[95%] flex flex-col gap-3">
           {configCamposPrincipais.map((campo) => (
             <div key={campo.id} className="w-full flex flex-col gap-1">
               <DefaultTextField
@@ -181,9 +182,9 @@ function AccountEdit({
           />
         </div>
 
-        <div className="w-[95%] bg-white rounded-xl mt-6 shadow-sm overflow-hidden flex flex-col">
+        <div className="w-full sm:w-[95%] bg-white rounded-xl mt-6 shadow-sm overflow-hidden flex flex-col shrink-0">
           <div className="p-4 pb-0">
-            <h2 className="text-[#4a2511] font-bold text-2xl mb-2">
+            <h2 className="text-[#4a2511] font-bold text-lg sm:text-2xl mb-2">
               Configurações avançadas
             </h2>
             <hr className="border-t border-[#4a2511] opacity-30" />
@@ -199,10 +200,10 @@ function AccountEdit({
               setIsPasswordModalOpen(true);
             }}
             whileTap={{ scale: 0.98 }}
-            className="flex items-center justify-between cursor-pointer group p-4 border-b border-gray-100 duration-200 ease-out transition-all bg-transparent"
+            className="flex items-center justify-between cursor-pointer group p-3 sm:p-4 border-b border-gray-100 duration-200 ease-out transition-all bg-transparent"
           >
-            <div className="flex items-center px-5">
-              <span className="text-orange font-bold text-xl group-hover:tracking-wide transition-all">
+            <div className="flex items-center px-2 sm:px-5">
+              <span className="text-orange font-bold text-base sm:text-xl group-hover:tracking-wide transition-all">
                 Alterar senha da conta
               </span>
             </div>
@@ -215,13 +216,13 @@ function AccountEdit({
             }}
             onClick={() => setIsDeleteModalOpen(true)}
             whileTap={{ scale: 0.98 }}
-            className="flex items-center justify-between cursor-pointer group p-4 duration-200 ease-out transition-all bg-transparent"
+            className="flex items-center justify-between cursor-pointer group p-3 sm:p-4 duration-200 ease-out transition-all bg-transparent"
           >
             <div className="flex items-center gap-3">
               <motion.img
                 src={deleteRedIcon}
                 alt="Excluir conta"
-                className="w-10 h-10 object-contain"
+                className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
                 variants={{
                   hover: {
                     rotate: [0, -10, 10, -10, 10, 0],
@@ -230,14 +231,14 @@ function AccountEdit({
                 }}
                 whileHover="hover"
               />
-              <span className="text-[#f03e3e] font-bold text-xl group-hover:tracking-wide transition-all">
+              <span className="text-[#f03e3e] font-bold text-base sm:text-xl group-hover:tracking-wide transition-all">
                 Excluir conta
               </span>
             </div>
           </motion.div>
         </div>
 
-        <div className="flex items-center justify-between w-[95%] mt-8 gap-4">
+        <div className="flex flex-col-reverse sm:flex-row items-center justify-between w-full sm:w-[95%] mt-6 sm:mt-8 gap-3 sm:gap-4 shrink-0">
           <DefaultButton
             text="Cancelar"
             theme={false}
@@ -248,6 +249,7 @@ function AccountEdit({
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
+              className="w-full sm:w-auto flex-1"
             >
               <DefaultButton
                 text="Confirmar"

@@ -9,7 +9,7 @@ function RememberPassScreen() {
   const rememberProps = useRememberPass();
 
   return (
-    <div className="h-screen w-screen flex justify-center items-center">
+    <div className="h-dvh w-screen flex justify-center items-center">
       {rememberProps.isLoading && <LoadingOverlay />}
       <BackgroundImage src={imageBackground} alt={"Imagem Fundo"} />
 

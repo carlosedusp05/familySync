@@ -42,6 +42,8 @@ function MemberSelector({ members, activeMemberId, setActiveMemberId }) {
           alt="Expandir"
         />
       </div>
+
+      {/* Dropdown com Altura Máxima Dinâmica Corrigida */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -49,12 +51,16 @@ function MemberSelector({ members, activeMemberId, setActiveMemberId }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -15, scale: 0.95 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden flex flex-col"
+            className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl shadow-xl border border-gray-100 flex flex-col overflow-y-auto max-h-[calc(100vh-290px)] custom-scrollbar
+            [&::-webkit-scrollbar]:w-2
+            [&::-webkit-scrollbar-track]:bg-transparent
+            [&::-webkit-scrollbar-thumb]:bg-[#282828]
+            [&::-webkit-scrollbar-thumb]:rounded-full"
           >
             {members.map((member) => (
               <div
                 key={member.id_usuario}
-                className={`flex items-center gap-3 px-5 py-3 cursor-pointer transition-colors ${
+                className={`flex items-center gap-3 px-5 py-3 cursor-pointer transition-colors shrink-0 ${
                   String(activeMemberId) === String(member.id_usuario)
                     ? "bg-orange/10 border-l-4 border-orange"
                     : "hover:bg-gray-50 border-l-4 border-transparent"

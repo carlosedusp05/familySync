@@ -61,15 +61,17 @@ export function ExpenseListModal({
     let year = dataFiltroDia.getFullYear();
 
     if (expenses.length > 0 && expenses[0].data_movimentacao) {
+      // Usando construtor local consistentemente para evitar bug de fuso horário
       const dataGasto = new Date(expenses[0].data_movimentacao);
-      mesIndex = dataGasto.getUTCMonth();
-      year = dataGasto.getUTCFullYear();
+      mesIndex = dataGasto.getMonth();
+      year = dataGasto.getFullYear();
     }
 
     const nomesDosMeses = Object.keys(MESES_MAP);
     const nomeMes =
       nomesDosMeses.find((k) => MESES_MAP[k] === mesIndex) || "Mês";
 
+    // Todos os cálculos agora usam data local, mantendo alinhamento com a exibição
     const diasNoMes = new Date(year, mesIndex + 1, 0).getDate();
     const primeiroDiaSemana = new Date(year, mesIndex, 1).getDay();
 
@@ -79,7 +81,8 @@ export function ExpenseListModal({
     const diasComGasto = expenses
       .map((exp) => {
         if (!exp.data_movimentacao) return null;
-        return new Date(exp.data_movimentacao).getUTCDate();
+        // Pega a data local correta para marcar na grade
+        return new Date(exp.data_movimentacao).getDate();
       })
       .filter(Boolean);
 

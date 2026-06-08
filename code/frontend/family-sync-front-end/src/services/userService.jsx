@@ -32,7 +32,11 @@ const createUser = async function (data) {
   const url = `/usuario`;
 
   try {
-    const response = await api.post(url, data);
+    const response = await api.post(url, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     const dados = response.data;
 
     return dados;

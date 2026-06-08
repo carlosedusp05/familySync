@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { userService } from "../services/userService";
@@ -10,56 +16,104 @@ export function UserProvider({ children }) {
   const [userProfile, setUserProfile] = useState(null);
   const [families, setFamilies] = useState([]);
   const [infos, setInfos] = useState([]);
+
   const [isLoadingUser, setIsLoadingUser] = useState(true);
 
-  const token = Cookies.get("familysync_token");
+  const [isLoadingInfos, setIsLoadingInfos] = useState(false);
 
-  useEffect(() => {
+  const clearUserData = () => {
+    setUserProfile(null);
+    setFamilies([]);
+    setInfos([]);
+  };
+
+  const refreshUser = useCallback(async () => {
+    setIsLoadingUser(true);
+    const token = Cookies.get("familysync_token");
+
     if (!token) {
       setIsLoadingUser(false);
+      clearUserData();
       return;
     }
 
-    async function loadGlobalUserData() {
-      try {
-        const decoded = jwtDecode(token);
-        const userId = decoded.id_usuario;
+    try {
+      const decoded = jwtDecode(token);
+      const userId = decoded.id_usuario;
 
-        const [userResponse, familiesResponse] = await Promise.all([
-          userService.getUserById(userId),
-          userService.getFamiliesByUser(userId),
-        ]);
+      const dataResponse = await userService.getFamiliesByUser(userId);
 
-        const profileData = userResponse?.Response?.[0] || userResponse;
-        setUserProfile({
-          ...profileData,
-          nome: decoded.nome || profileData.nome,
-          email: decoded.email || profileData.email,
-        });
+      const familiaDados = dataResponse?.family || [];
+      const familiasMapeadas = familiaDados.map((f) => ({
+        ...f,
+        id: f.id_familia || f.id,
+      }));
+      setFamilies(familiasMapeadas);
 
-        // 2. CORREÇÃO DA FAMÍLIA: Garantimos que seja SEMPRE um Array, mesmo que venha vazio
-        const familiaDados = familiesResponse?.family || [];
-        setFamilies(familiaDados);
+      const profileData = dataResponse?.user || {};
+      const nomeUsuario = profileData.nome || decoded.nome || "Usuário";
+      const nomeLimpo = nomeUsuario.trim();
 
-        // 3. Buscar infos apenas se tiver família e garantir que seja um Array
-        if (familiaDados.length > 0) {
-          const infoResponse = await infoService.getInfosById(userId);
-          // Caso sua API de infos também retorne dentro de Response, tratamos aqui:
-          setInfos(
-            Array.isArray(infoResponse)
-              ? infoResponse
-              : infoResponse?.Response || [],
+      const fotoFinal =
+        profileData.foto && profileData.foto !== "null"
+          ? profileData.foto.startsWith("http")
+            ? profileData.foto
+            : `http://localhost:3000/${profileData.foto}`
+          : `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              nomeLimpo,
+            )}&background=FB923C&color=fff`;
+
+      setUserProfile({
+        ...profileData,
+        nome: nomeLimpo,
+        email: decoded.email || profileData.email,
+        foto: fotoFinal,
+      });
+
+      setIsLoadingUser(false);
+      setIsLoadingUser(false);
+
+      const isMobile = window.innerWidth <= 768;
+
+      if (!isMobile) {
+        setIsLoadingInfos(true);
+        try {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          const infoResponse = await infoService.getInfosUser();
+
+          const infosFormatadas = Array.isArray(infoResponse)
+            ? infoResponse
+            : infoResponse?.dados || infoResponse?.Response || [];
+
+          const idsFamiliasDoUsuario = familiasMapeadas.map((f) => f.id);
+          const infosFiltradas = infosFormatadas.filter((info) =>
+            idsFamiliasDoUsuario.includes(info.id_familia),
           );
-        }
-      } catch (error) {
-        console.error("Erro ao carregar dados globais do usuário:", error);
-      } finally {
-        setIsLoadingUser(false);
-      }
-    }
 
-    loadGlobalUserData();
-  }, [token]);
+          setInfos(familiasMapeadas.length > 0 ? infosFiltradas : []);
+        } catch (infoError) {
+          console.error(
+            "Erro ao carregar as informações familiares:",
+            infoError,
+          );
+          setInfos([]);
+        } finally {
+          setIsLoadingInfos(false);
+        }
+      } else {
+        setInfos([]);
+        setIsLoadingInfos(false);
+      }
+    } catch (error) {
+      console.error("Erro crítico ao carregar dados do usuário:", error);
+      clearUserData();
+      setIsLoadingUser(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshUser();
+  }, [refreshUser]);
 
   return (
     <UserContext.Provider
@@ -68,9 +122,12 @@ export function UserProvider({ children }) {
         families,
         infos,
         isLoadingUser,
+        isLoadingInfos,
         setUserProfile,
         setFamilies,
         setInfos,
+        clearUserData,
+        refreshUser,
       }}
     >
       {children}

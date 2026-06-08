@@ -9,13 +9,11 @@ function NotificationsScreen() {
   return (
     <MainLayout>
       {isLoading && <LoadingOverlay />}
-      <div className="w-full h-full pt-8 md:pt-16">
+      <div className="w-full h-full pt-8 md:pt-16 overflow-hidden text-base flex flex-col">
         <div
-          className="w-[95%] sm:w-[85%] md:w-[75%] lg:w-[70%] h-full overflow-y-auto flex flex-col justify-start items-center gap-4 mx-auto px-2 pb-24 md:pb-10
-            [&::-webkit-scrollbar]:w-2.5
-            [&::-webkit-scrollbar-track]:bg-transparent
-            [&::-webkit-scrollbar-thumb]:bg-[#282828]
-            [&::-webkit-scrollbar-thumb]:rounded-md"
+          className="w-[90%] md:w-[80%] max-w-4xl flex-1 min-h-0 mx-auto pb-24 md:pb-12
+        overflow-y-auto overflow-x-hidden overscroll-none flex flex-col justify-start items-center gap-4 px-2
+        [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#282828] [&::-webkit-scrollbar-thumb]:rounded-md"
         >
           {error && (
             <p className="text-red-500 font-bold text-xl md:text-3xl">
@@ -30,7 +28,9 @@ function NotificationsScreen() {
           )}
 
           {!isLoading && !error && notifications.length > 0 && (
-            <MultNotificationField notifications={notifications} />
+            <div className="w-full min-w-0 flex flex-col gap-4">
+              <MultNotificationField notifications={notifications} />
+            </div>
           )}
         </div>
       </div>

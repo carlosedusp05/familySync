@@ -18,8 +18,6 @@ function DefaultHeader({ disconnected, warning, showWarning }) {
 
   const { notifications, newAlert, clearAlert } = useNotifications();
   const [showRedDot, setShowRedDot] = useState(false);
-
-  // 2. Pegamos os dados do usuário direto do contexto global de forma síncrona
   const { userProfile } = useUser();
 
   const STORAGE_KEY = "@FamilySync:notifications:lastReadId";
@@ -90,7 +88,6 @@ function DefaultHeader({ disconnected, warning, showWarning }) {
         another_size={
           "w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 xl:w-16 xl:h-16  2xl:w-23 2xl:h-23"
         }
-        // 3. Substituímos a variável antiga pela do contexto
         fotoUrl={userProfile?.foto}
       />
 
@@ -100,7 +97,7 @@ function DefaultHeader({ disconnected, warning, showWarning }) {
         onClick={handleNotificationClick}
       >
         {showRedDot && (
-          <span className="absolute -top-1 -right-1 flex h-4 w-4 md:h-5 md:w-5">
+          <span className="absolute -top-1 -right-2 flex h-4 w-4 md:h-5 md:w-5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-4 w-4 md:h-4 md:w-4 bg-red-500"></span>
           </span>
@@ -117,7 +114,7 @@ function DefaultHeader({ disconnected, warning, showWarning }) {
   );
 
   return (
-    <>
+    <div className="relative w-full z-50">
       <header className="w-full flex justify-between py-4 px-4 sm:px-8 md:py-5 md:px-12 xl:py-6 2xl:py-9 lg:px-16 items-center bg-white relative z-50">
         <ShowAlert warning={warning} showWarning={showWarning} />
         {disconnected ? (
@@ -135,7 +132,7 @@ function DefaultHeader({ disconnected, warning, showWarning }) {
       {!disconnected && newAlert && (
         <div
           onClick={handleNotificationClick}
-          className="w-full bg-yellow-light text-terracota py-4 px-4 sm:px-8 md:px-16 flex items-center justify-between font-bold cursor-pointer transition-all duration-500 hover:brightness-95 animate-fade-in-down border-t border-orange-dark/10 shadow-md"
+          className="absolute top-full left-0 z-40 w-full bg-yellow-light text-terracota py-4 px-4 sm:px-8 md:px-16 flex items-center justify-between font-bold cursor-pointer transition-all duration-500 hover:brightness-95 animate-fade-in-down border-t border-orange-dark/10 shadow-md"
         >
           <div className="flex items-center gap-3">
             <span className="text-2xl">🔔</span>
@@ -161,7 +158,7 @@ function DefaultHeader({ disconnected, warning, showWarning }) {
           </button>
         </div>
       )}
-    </>
+    </div>
   );
 }
 

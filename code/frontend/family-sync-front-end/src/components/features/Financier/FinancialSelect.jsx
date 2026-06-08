@@ -25,10 +25,13 @@ const FinancialSelect = ({ value, onChange, options }) => {
   };
 
   return (
-    <div className="relative w-58" ref={containerRef}>
-      <div
+    <div className="relative w-[14.5rem]" ref={containerRef}>
+      <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between bg-white border-2 border-orange rounded-4xl px-6 py-2 cursor-pointer shadow-sm hover:shadow-md transition-all"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        className="flex w-full items-center justify-between bg-white border-2 border-orange rounded-full px-6 py-2 cursor-pointer shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-orange/50"
       >
         <div className="flex items-center gap-3">
           <img src={dollarIcon} alt="Moeda" className="w-8 h-8" />
@@ -39,25 +42,31 @@ const FinancialSelect = ({ value, onChange, options }) => {
 
         <motion.img
           src={sortDownIcon}
+          alt=""
+          aria-hidden="true"
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.3 }}
           className="w-5 h-5"
         />
-      </div>
+      </button>
 
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            role="listbox"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 5 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute left-0 top-full w-full bg-white border-2 border-orange rounded-2xl z-50 overflow-hidden shadow-xl"
+            className="absolute left-0 top-full mt-2 w-full bg-white border-2 border-orange rounded-2xl z-50 overflow-hidden shadow-xl flex flex-col"
           >
             {options.map((opt) => (
-              <div
+              <button
                 key={opt}
+                type="button"
+                role="option"
+                aria-selected={value === opt}
                 onClick={() => handleSelect(opt)}
-                className={`px-6 py-3 text-xl font-bold cursor-pointer transition-colors capitalize
+                className={`px-6 py-3 text-xl text-left font-bold cursor-pointer transition-colors capitalize w-full focus:outline-none focus:bg-orange/20
                   ${
                     value === opt
                       ? "bg-orange text-white"
@@ -65,7 +74,7 @@ const FinancialSelect = ({ value, onChange, options }) => {
                   }`}
               >
                 {opt}
-              </div>
+              </button>
             ))}
           </motion.div>
         )}

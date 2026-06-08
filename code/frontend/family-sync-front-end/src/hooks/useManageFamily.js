@@ -26,6 +26,8 @@ export function useManageFamily() {
   const [isLoading, setIsLoading] = useState(false);
   const [currentEmail, setCurrentEmail] = useState("");
   const [errosCampos, setErrosCampos] = useState({});
+  const [isLeaveOpen, setIsLeaveOpen] = useState(false);
+  const [isDeleteFamilyOpen, setIsDeleteFamilyOpen] = useState(false);
 
   const [familiars, setFamiliars] = useState(() => {
     const savedMembers = localStorage.getItem("family_members");
@@ -231,8 +233,6 @@ export function useManageFamily() {
         id_familia: idFamilia,
         email: [currentEmail],
       });
-
-      alert("Convite enviado com sucesso!");
       setCurrentEmail("");
       setErrosCampos({});
 
@@ -267,6 +267,45 @@ export function useManageFamily() {
       return 0;
     });
   }, [familiars, myUserId]);
+
+  const openLeaveModal = () => {
+    setIsLeaveOpen(true);
+  };
+
+  const closeLeaveModal = () => {
+    setIsLeaveOpen(false);
+  };
+
+  const confirmLeaveFamily = async () => {
+    try {
+      // Substitua pela sua chamada real à API
+      alert("Você saiu da família com sucesso.");
+      closeLeaveModal();
+    } catch (error) {
+      console.error("Erro ao sair da família", error);
+    }
+  };
+
+  const openDeleteFamilyModal = () => {
+    setIsDeleteFamilyOpen(true);
+  };
+
+  const closeDeleteFamilyModal = () => {
+    setIsDeleteFamilyOpen(false);
+  };
+
+  const confirmDeleteFamily = async () => {
+    try {
+      setIsLoading(true);
+      alert("Família excluída com sucesso.");
+      closeDeleteFamilyModal();
+    } catch (error) {
+      console.error("Erro ao excluir a família", error);
+      alert("Falha ao excluir a família.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return {
     fileInputRef,
@@ -304,5 +343,13 @@ export function useManageFamily() {
     handleRemoveMember,
     errosCampos,
     setErrosCampos,
+    isLeaveOpen,
+    openLeaveModal,
+    closeLeaveModal,
+    confirmLeaveFamily,
+    isDeleteFamilyOpen,
+    openDeleteFamilyModal,
+    closeDeleteFamilyModal,
+    confirmDeleteFamily,
   };
 }

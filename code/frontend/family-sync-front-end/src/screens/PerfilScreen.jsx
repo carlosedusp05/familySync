@@ -8,7 +8,7 @@ function PerfilScreen() {
   const perfilProps = usePerfil();
 
   return (
-    <div className="h-screen w-screen flex justify-center items-center relative">
+    <div className="fixed inset-0 w-full flex justify-center items-center overflow-hidden">
       {perfilProps.isLoading && <LoadingOverlay />}
       <BackgroundImage
         src={imageBackground}

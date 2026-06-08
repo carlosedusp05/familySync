@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
-
+import { useQueryClient } from "@tanstack/react-query";
+import { useUser } from "../context/UserContext";
 import { userService } from "../services/userService";
 import {
   validateName,
@@ -21,6 +22,8 @@ import {
 export function usePerfil() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const queryClient = useQueryClient();
+  const { clearUserData } = useUser();
 
   const [formData, setFormData] = useState({
     nome: "",
@@ -79,9 +82,20 @@ export function usePerfil() {
           dataNascimento: formatDateForInput(response.user.data_nascimento),
         }));
 
+        const nomeParaAvatar =
+          response.user.nome || decodedUser.nome || "Usuário";
         const fotoUsuario = response.user.foto || response.user.foto_perfil;
-        if (fotoUsuario) {
-          setPreview(fotoUsuario);
+
+        if (fotoUsuario && fotoUsuario !== "null") {
+          const urlFinal = fotoUsuario.startsWith("http")
+            ? fotoUsuario
+            : `http://localhost:3000/${fotoUsuario}`;
+
+          setPreview(urlFinal);
+        } else {
+          setPreview(
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeParaAvatar.trim())}&background=FB923C&color=fff`,
+          );
         }
 
         setFamiliasDisponiveis(response.family);
@@ -114,10 +128,23 @@ export function usePerfil() {
   const handleLogout = () => {
     localStorage.clear();
     sessionStorage.clear();
+
     Object.keys(Cookies.get()).forEach((cookieName) => {
       Cookies.remove(cookieName, { path: "/" });
     });
-    navigate("/");
+
+    queryClient.removeQueries();
+    queryClient.clear();
+
+    if (clearUserData) {
+      clearUserData();
+    }
+
+    setPreview(null);
+    setFormData({ nome: "", email: "", cpf: "", dataNascimento: "" });
+    setFamiliasDisponiveis([]);
+
+    window.location.href = "/auth/start";
   };
 
   const handleSelectFamily = (id) => {
@@ -214,7 +241,6 @@ export function usePerfil() {
 
       await userService.updateUser(userId, formDataEnvio);
 
-      // Limpa e fecha o modal se der certo
       setPasswordData({
         senhaAnterior: "",
         novaSenha: "",
@@ -235,7 +261,11 @@ export function usePerfil() {
   };
 
   const removeImagem = () => {
-    setPreview(null);
+    const nomeAtual = formData.nome || "Usuário";
+    setPreview(
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeAtual)}&background=random`,
+    );
+
     setFotoArquivo(null);
   };
 

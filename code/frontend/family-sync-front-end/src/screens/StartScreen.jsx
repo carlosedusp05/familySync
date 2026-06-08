@@ -7,12 +7,16 @@ import AddFamilyForm from "../components/features/AddFamiliar/AddFamilyForm";
 import { useAddFamily } from "../hooks/useAddFamily";
 import { useCalendar } from "../hooks/useCalendar";
 import { useUser } from "../context/UserContext";
+import LoadingOverlay from "../components/ui/LoadingOverlay";
 
 function StartScreen(props) {
-  const { userProfile, families, infos, isLoadingUser } = useUser();
+  const { userProfile, families, infos, isLoadingUser, isLoadingInfos } =
+    useUser();
   const addFamilyProps = useAddFamily();
 
-  const { dateEvent } = useCalendar();
+  const { proximosEventos, isLoading: isLoadingEvents } = useCalendar({
+    telaInicial: true,
+  });
 
   useEffect(() => {
     const invites_family = sessionStorage.getItem("family_invite_token");
@@ -33,44 +37,50 @@ function StartScreen(props) {
   }, [families]);
 
   const userDataSincronizado = useMemo(() => {
-    if (estaCarregando || !Array.isArray(families) || families.length === 0) {
-      return userProfile;
-    }
+    if (isLoadingUser || !userProfile) return null;
 
-    const activeId =
-      sessionStorage.getItem("@FamilySync:family:id") || families[0].id;
-    const familiaAtiva = families.find((f) => f.id === parseInt(activeId));
+    const activeFamilyId = sessionStorage.getItem("@FamilySync:family:id");
 
-    if (familiaAtiva && userProfile) {
-      return {
-        ...userProfile,
-        nomeFamilia: familiaAtiva.nome || familiaAtiva.nomeFamilia,
-      };
-    }
+    const activeFamily = families.find(
+      (f) =>
+        String(f.id) === activeFamilyId ||
+        String(f.id_familia) === activeFamilyId,
+    );
 
-    return userProfile;
-  }, [userProfile, families, estaCarregando]);
+    return {
+      nome: userProfile.nome || "Usuário",
+      email: userProfile.email || "",
+      nomeFamilia: activeFamily ? activeFamily.nome : "Sua Família",
+      hasFamily: families.length > 0,
+      activeFamilyId: activeFamilyId,
+    };
+  }, [userProfile, families, isLoadingUser]);
 
   return (
-    <div className="flex flex-col w-full h-screen overflow-hidden">
+    <div className="fixed inset-0 flex flex-col w-full h-dvh overflow-hidden overscroll-none">
+      {estaCarregando && <LoadingOverlay />}
       <BackgroundImage
         src={imageBackground}
         alt={"Imagem Fundo"}
         blur_or_glass={"blur"}
       />
       <DefaultHeader />
-      <div className="w-full flex justify-center items-center h-full">
-        <div className="w-full flex justify-center items-center h-full">
-          {estaCarregando ? null : families && families.length > 0 ? (
-            <MenuStart
-              props={props}
-              userData={userDataSincronizado}
-              infos={infos}
-              events={dateEvent}
-            />
-          ) : (
-            <AddFamilyForm {...addFamilyProps} />
-          )}
+
+      <div className="w-full flex-1 flex justify-center items-center overflow-hidden p-2">
+        <div className="w-full h-full flex justify-center items-center">
+          {!estaCarregando &&
+            (families && families.length > 0 ? (
+              <MenuStart
+                props={props}
+                userData={userDataSincronizado}
+                infos={infos}
+                events={proximosEventos}
+                isLoadingInfos={isLoadingInfos}
+                isLoadingEvents={isLoadingEvents}
+              />
+            ) : (
+              <AddFamilyForm {...addFamilyProps} />
+            ))}
         </div>
       </div>
     </div>

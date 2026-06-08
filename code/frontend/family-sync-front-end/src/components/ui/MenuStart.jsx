@@ -42,13 +42,16 @@ function MenuStart(props) {
     const timestampHoje = hoje.getTime();
 
     const sortedEvents = props.events
+      .filter((ev) => ev !== null && ev !== undefined)
       .map((ev) => {
         let dateObj;
-        if (ev.data && ev.data.includes("/")) {
+        if (ev?.data && ev.data.includes("/")) {
           const [dia, mes, ano] = ev.data.split("/");
           dateObj = new Date(ano, mes - 1, dia);
-        } else {
+        } else if (ev?.data) {
           dateObj = new Date(ev.data);
+        } else {
+          dateObj = new Date(0);
         }
         return { ...ev, timestamp: dateObj.getTime(), dateObj };
       })
@@ -93,29 +96,49 @@ function MenuStart(props) {
       onClick={() => navigate("/dashboard/calendar")}
     >
       <div className="hidden md:flex w-full rounded-2xl overflow-hidden bg-white relative">
-        {upcomingEvents.map((ev, i) => {
-          const tituloLimitado = ev
-            ? ev.titulo.length > 8
-              ? `${ev.titulo.substring(0, 8)}...`
-              : ev.titulo
-            : "Livre";
+        {props.isLoadingEvents ? (
+          <div className="flex w-full">
+            {[1, 2, 3, 4].map((_, i) => (
+              <div key={i} className="flex flex-col w-full min-w-0">
+                <div className="bg-brown-dark py-1.5 md:py-1.5 2xl:py-2 px-1 flex justify-center border-r border-white/20">
+                  <div className="h-3 md:h-2 lg:h-3 w-3/4 bg-white/30 rounded animate-pulse"></div>
+                </div>
+                <div
+                  className={`flex justify-between items-center p-1.5 md:p-1.5 lg:p-2 xl:p-2.5 2xl:p-3 bg-white ${
+                    i !== 3 ? "border-r-2 border-brown-dark/20" : ""
+                  }`}
+                >
+                  <div className="h-2 md:h-1.5 lg:h-2 w-[40%] bg-gray-300 rounded animate-pulse"></div>
+                  <div className="h-2 md:h-1.5 lg:h-2 w-[40%] bg-gray-300 rounded animate-pulse"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          upcomingEvents.map((ev, i) => {
+            const tituloLimitado = ev?.titulo
+              ? ev.titulo.length > 8
+                ? `${ev.titulo.substring(0, 8)}...`
+                : ev.titulo
+              : "Livre";
 
-          return (
-            <div key={i} className="flex flex-col w-full min-w-0">
-              <div className="bg-brown-dark text-white font-bold text-[12px] md:text-[10px] lg:text-[14px] xl:text-[14px] 2xl:text-[15px] text-center py-1 md:py-1.5 2xl:py-2 whitespace-nowrap overflow-hidden text-ellipsis px-1">
-                {tituloLimitado}
+            return (
+              <div key={i} className="flex flex-col w-full min-w-0">
+                <div className="bg-brown-dark text-white font-bold text-[12px] md:text-[10px] lg:text-[14px] xl:text-[14px] 2xl:text-[15px] text-center py-1 md:py-1.5 2xl:py-2 whitespace-nowrap overflow-hidden text-ellipsis px-1">
+                  {tituloLimitado}
+                </div>
+                <div
+                  className={`flex justify-between p-1.5 md:p-1.5 lg:p-2 xl:p-2.5 2xl:p-3 text-terracota text-[10px] md:text-[8px] lg:text-[11px] xl:text-[8px] 2xl:text-[12px] font-medium ${
+                    i !== 3 ? "border-r-2 border-brown-dark" : ""
+                  }`}
+                >
+                  <p>{ev?.hora ? ev.hora : "--:--"}</p>
+                  <p>{ev?.data ? ev.data.substring(0, 5) : "--/--"}</p>
+                </div>
               </div>
-              <div
-                className={`flex justify-between p-1.5 md:p-1.5 lg:p-2 xl:p-2.5 2xl:p-3 text-terracota text-[10px] md:text-[8px] lg:text-[11px] xl:text-[8px] 2xl:text-[12px] font-medium ${
-                  i !== 3 ? "border-r-2 border-brown-dark" : ""
-                }`}
-              >
-                <p>{ev ? ev.hora : "--:--"}</p>
-                <p>{ev ? ev.data.substring(0, 5) : "--/--"}</p>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
 
       <div className="flex items-center gap-2 text-orange-dark text-xl md:text-lg lg:text-2xl xl:text-3xl 2xl:text-4xl font-bold">
@@ -152,7 +175,6 @@ function MenuStart(props) {
       onMouseEnter={prefetchRoutes.financier}
       onClick={() => navigate("/dashboard/finance")}
     >
-      {/* ALTURA DO GRÁFICO AUMENTADA PARA 55% */}
       <div
         className="hidden md:flex gap-[4%] bg-default w-full items-end rounded-2xl relative"
         style={{ height: "55%" }}
@@ -204,55 +226,64 @@ function MenuStart(props) {
 
   const cardInfo = (
     <div
-      className={`w-full h-full flex flex-col items-center justify-center bg-brown-dark rounded-2xl gap-2 md:gap-3 xl:gap-4 2xl:gap-5 ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
+      className={`w-full h-full flex flex-col items-center justify-center bg-brown-dark rounded-2xl gap-2 md:gap-2 xl:gap-4 2xl:gap-5 ${hover} ajuste-desfoque duration-300 ease-out hover:-translate-y-0.5 transition-all active:scale-90 active:brightness-90 cursor-pointer`}
       onMouseEnter={prefetchRoutes.infoFamiliar}
       onClick={() => navigate("/dashboard/family/info")}
     >
-      <div className="flex items-center justify-center md:justify-start md:pl-4 lg:pl-6 xl:pl-8 w-full gap-2 mt-2">
+      <div className="flex items-center justify-center md:justify-start md:pl-3 lg:pl-6 xl:pl-8 w-full gap-2 md:gap-1.5 lg:gap-2 mt-2 md:mt-1 lg:mt-2">
         <img
-          className="h-15 sm:h-24 md:h-10 lg:h-12 xl:h-14 2xl:h-16 object-contain"
+          className="h-15 sm:h-24 md:h-7 lg:h-12 xl:h-14 2xl:h-16 object-contain"
           src={infoIcon}
           alt="Info Icon"
         />
-        <h2 className="hidden md:block text-white text-lg md:text-[0.9rem] lg:text-[1.1rem] xl:text-[1.2rem] 2xl:text-xl font-bold">
+        <h2 className="hidden md:block text-white text-lg md:text-[0.7rem] lg:text-[1.1rem] xl:text-[1.2rem] 2xl:text-xl font-bold leading-tight">
           Informações <br /> Familiar
         </h2>
       </div>
 
-      <div className="w-[82%] h-auto min-h-[50%] md:w-[90%] lg:w-[82%] bg-terracota rounded-2xl hidden md:flex flex-col px-3 lg:px-4 py-3 mb-3 relative">
-        <h3 className="font-bold text-brown-dark text-[15px] md:text-[13px] lg:text-[15px] xl:text-[16px] 2xl:text-[18px]">
+      <div className="w-[82%] h-auto min-h-[50%] md:w-[94%] lg:w-[82%] bg-terracota rounded-2xl md:rounded-lg lg:rounded-2xl hidden md:flex flex-col px-3 md:px-2 lg:px-4 py-3 md:py-1.5 lg:py-3 mb-3 md:mb-1.5 lg:mb-3 relative">
+        <h3 className="font-bold text-brown-dark text-[15px] md:text-[10px] lg:text-[15px] xl:text-[16px] 2xl:text-[18px] leading-tight">
           Principais informações:
         </h3>
-        <ul className="font-bold text-white text-[11px] md:text-[10px] lg:text-[12px] xl:text-[13px] 2xl:text-[15px]">
-          {recentInfos.length > 0 ? (
-            recentInfos.map((info, index) => (
-              <li key={index} className="truncate">
-                {info.descricao || info.titulo || info}
-              </li>
-            ))
+
+        <div className="mt-1 font-bold text-white text-[11px] md:text-[9px] lg:text-[12px] xl:text-[13px] 2xl:text-[15px] leading-tight">
+          {props.isLoadingInfos ? (
+            <div className="flex flex-col gap-1.5 md:gap-1 w-full mt-1">
+              <div className="h-3 md:h-2 lg:h-3 bg-white/30 rounded w-full animate-pulse"></div>
+              <div className="h-3 md:h-2 lg:h-3 bg-white/30 rounded w-5/6 animate-pulse"></div>
+              <div className="h-3 md:h-2 lg:h-3 bg-white/30 rounded w-4/6 animate-pulse"></div>
+            </div>
           ) : (
-            <li>Você ainda não tem informações cadastradas!</li>
+            <ul>
+              {recentInfos.length > 0 ? (
+                recentInfos.map((info, index) => (
+                  <li key={index} className="truncate">
+                    {info?.descricao || info?.titulo || info}
+                  </li>
+                ))
+              ) : (
+                <li>Você ainda não tem informações cadastradas!</li>
+              )}
+            </ul>
           )}
-        </ul>
+        </div>
       </div>
     </div>
   );
 
   return (
     <LargeCard
-      key={props.userData.nome}
+      key={props.userData?.nome}
       color={"bg-yellow-light"}
-      p={
-        "py-6 pb-22 px-10 md:py-8 md:px-12 xl:pt-10 xl:pb-6 xl:px-20 2xl:pt-12 2xl:pb-10 2xl:px-28 bg-orange"
-      }
+      p={"p-0 bg-orange overflow-hidden"}
       size={
         "h-[98%] w-full md:h-[88%] md:w-[85%] xl:h-[82%] xl:w-[76%] 2xl:h-[80%] 2xl:w-[72%]"
       }
       data-aos="fade-up"
     >
-      <div className="flex flex-col justify-center items-start lg:items-stretch gap-2 md:gap-3 xl:gap-4 2xl:gap-5 h-full relative">
+      <div className="pt-6 pb-8 px-6 sm:px-10 md:py-8 md:px-12 xl:pt-10 xl:pb-6 xl:px-20 2xl:pt-12 2xl:pb-10 2xl:px-28 flex flex-col justify-start items-start lg:items-stretch gap-2 md:gap-3 xl:gap-4 2xl:gap-5 h-full w-full relative overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {/* Cabeçalho */}
-        <div className="flex flex-col justify-center items-start xl:justify-between xl:flex-row xl:items-end md:gap-4 2xl:gap-8">
+        <div className="flex flex-col justify-center items-start xl:justify-between xl:flex-row xl:items-end md:gap-4 2xl:gap-8 shrink-0 w-full">
           <div className="flex flex-col justify-center items-start">
             <h2
               className="text-xl font-bold text-orange md:text-2xl xl:text-3xl 2xl:text-4xl"
@@ -260,7 +291,7 @@ function MenuStart(props) {
               data-aos-delay="400"
             >
               <span className="ajuste-desfoque">
-                Olá, {props.userData.nome}
+                Olá, {props.userData?.nome}
               </span>
             </h2>
             <p
@@ -268,7 +299,7 @@ function MenuStart(props) {
               data-aos="fade-down"
               data-aos-delay="450"
             >
-              <span className="ajuste-desfoque">{props.userData.email}</span>
+              <span className="ajuste-desfoque">{props.userData?.email}</span>
             </p>
           </div>
           <h2
@@ -277,17 +308,13 @@ function MenuStart(props) {
             data-aos-delay="450"
           >
             <span className="ajuste-desfoque">
-              {props.userData.nomeFamilia}
+              {props.userData?.nomeFamilia}
             </span>
           </h2>
         </div>
 
-        {/* ============================== */}
-        {/* LAYOUT DESKTOP (Com Gap Aumentado) */}
-        {/* ============================== */}
-
-        <div className="hidden lg:flex flex-col h-full gap-4 relative">
-          {/* Grid Div 1 */}
+        {/* Layout Desktop */}
+        <div className="hidden lg:flex flex-col h-full gap-4 relative mt-2 w-full">
           <div className="grid grid-cols-10 gap-2 md:gap-3 xl:gap-4 xl:flex-[0.48] 2xl:gap-5 2xl:flex-[0.48] flex-[0.85]">
             <div
               className="col-span-4"
@@ -312,7 +339,6 @@ function MenuStart(props) {
             </div>
           </div>
 
-          {/* Grid Div 2 */}
           <div className="grid grid-cols-11 gap-2 md:gap-3 xl:flex-[0.52] 2xl:gap-5 2xl:flex-[0.52] flex-[1.1]">
             <div
               className="col-span-4"
@@ -334,10 +360,8 @@ function MenuStart(props) {
           </div>
         </div>
 
-        {/* ============================== */}
         {/* LAYOUT MOBILE & TABLET */}
-        {/* ============================== */}
-        <div className="grid grid-cols-2 grid-rows-4 md:grid-rows-3 flex-1 gap-2 md:gap-4 mt-2 lg:hidden w-full relative min-h-100 md:min-h-125">
+        <div className="grid grid-cols-2 grid-rows-4 md:grid-rows-3 flex-1 gap-2 md:gap-4 mt-2 lg:hidden w-full relative min-h-[400px] md:min-h-125 pb-4">
           <div
             className="col-span-1 order-1 md:order-1"
             data-aos="fade-right"

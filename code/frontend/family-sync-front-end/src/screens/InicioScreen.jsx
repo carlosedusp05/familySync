@@ -25,7 +25,7 @@ function InicioScreen() {
   const token = Cookies.get("familysync_token");
 
   return (
-    <div className="h-screen w-full flex flex-col overflow-hidden">
+    <div className="relative h-dvh w-full flex flex-col overflow-hidden">
       <BackgroundImage
         src={imageBackground2}
         alt={"Imagem Fundo"}
@@ -34,7 +34,7 @@ function InicioScreen() {
 
       <DefaultHeader disconnected={true} />
 
-      <main className="flex-1 flex flex-col lg:flex-row px-6 sm:px-12 md:px-20 lg:px-32 xl:px-40 w-full justify-center lg:justify-between items-center gap-8 lg:gap-0">
+      <main className="relative z-10 flex-1 min-h-0 flex flex-col lg:flex-row px-6 sm:px-12 md:px-20 lg:px-32 xl:px-40 w-full justify-center lg:justify-between items-center gap-8 lg:gap-0">
         <p className="hidden lg:block text-white font-bold text-xl xl:text-2xl lg:w-[30%] xl:w-[22%] leading-relaxed">
           Brio é a quantidade de energia que se disponibiliza ao agir para fazer
           o melhor e sentir contentamento com a própria prática.

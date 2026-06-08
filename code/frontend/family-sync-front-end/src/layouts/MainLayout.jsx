@@ -5,19 +5,23 @@ import { imageBackground } from "../assets";
 
 function MainLayout({ children, warning, showWarning }) {
   return (
-    <div className="flex flex-col w-full h-screen overflow-hidden">
-      <DefaultHeader warning={warning} showWarning={warning} />
+    <div className="fixed inset-0 flex flex-col w-full h-[100dvh] overflow-hidden bg-black">
+      <div className="shrink-0 z-50">
+        <DefaultHeader warning={warning} showWarning={showWarning} />
+      </div>
 
-      <div className="flex flex-1 w-full overflow-hidden">
+      <div className="flex flex-1 min-h-0 w-full overflow-hidden relative">
         <SidebarNavigation />
 
-        <main className="flex-1 h-full overflow-y-auto relative max-md:pb-28">
+        <main className="flex-1 min-h-0 h-full w-full relative overflow-hidden max-md:pb-24">
           <BackgroundImage
             src={imageBackground}
             alt={"Imagem Fundo"}
             blur_or_glass={"glass"}
           />
-          <div className="relative z-10 h-full">{children}</div>
+          <div className="relative h-full w-full z-10 flex flex-col">
+            {children}
+          </div>
         </main>
       </div>
     </div>

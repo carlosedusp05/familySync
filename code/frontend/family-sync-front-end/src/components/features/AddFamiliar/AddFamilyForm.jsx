@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { familyIcon } from "../../../assets";
 import DefaultButton from "../../ui/DefaultButton";
 import InputAddFamily from "./InputAddFamily.jsx";
@@ -6,7 +7,6 @@ import InputEmailMembers from "./InputEmailMembers.jsx";
 import LargeCard from "../../ui/LargeCard.jsx";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { useEffect } from "react";
 
 function AddFamilyForm({
   fileInputRef,
@@ -40,43 +40,63 @@ function AddFamilyForm({
   return (
     <LargeCard
       color={"bg-yellow-light"}
-      p={"px-50"}
-      size={"h-[85%] w-[65%]"}
+      p={"p-0"}
+      size={
+        "h-[95%] md:h-[90%] w-[95%] md:w-[85%] lg:w-[70%] max-h-[850px] overflow-hidden flex flex-col min-h-0"
+      }
       data-aos="fade-up"
     >
-      <div className="h-full w-full flex items-center justify-between ajuste-desfoque">
-        <div className="w-110 h-110 relative rounded-full border-2 border-orange flex items-center justify-center bg-white shrink-0 ajuste-desfoque">
-          {preview ? (
-            <img
-              src={preview}
-              alt="Preview"
-              className="w-full h-full rounded-full object-cover"
-            />
-          ) : (
-            <img className="h-[60%]" src={familyIcon} alt="Family" />
-          )}
-          <div className="absolute bottom-3 right-1">
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-            />
+      <div className="flex-1 w-full overflow-y-auto overflow-x-hidden p-4 sm:p-6 md:p-8 lg:px-12 lg:py-8 flex flex-col md:flex-row items-center md:items-start justify-start md:justify-between gap-6 md:gap-8 pb-10 xl:pt-25 [&::-webkit-scrollbar]:hidden overscroll-none min-h-0">
+        <div className="relative shrink-0 mt-4 md:mt-0 w-32 h-32 sm:w-40 sm:h-40 md:w-56 md:h-56 lg:w-[350px] lg:h-[350px] flex items-center justify-center">
+          <div
+            className="w-full h-full rounded-full border-2 border-orange flex items-center justify-center bg-white cursor-pointer overflow-hidden relative shadow-sm transition-all duration-300 hover:scale-[1.02] hover:border-[#E8592A] hover:shadow-lg hover:shadow-orange/30"
+            onClick={() => fileInputRef.current.click()}
+            title="Clique para escolher uma foto"
+          >
+            {preview ? (
+              <img
+                src={preview}
+                alt="Preview"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <img
+                className="h-[60%] object-contain"
+                src={familyIcon}
+                alt="Family"
+              />
+            )}
+          </div>
+
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+          />
+
+          <div className="absolute bottom-0 right-0 md:bottom-[6%] md:right-[6%] xl:right-4 xl:bottom-4 z-10">
             <DefaultButton
-              onClick={
-                preview ? removeImagem : () => fileInputRef.current.click()
+              onClick={(e) => {
+                e.stopPropagation();
+                preview ? removeImagem() : fileInputRef.current.click();
+              }}
+              another_padding={"p-0"}
+              another_size={
+                "h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 lg:h-20 lg:w-20"
               }
-              another_padding={"px-0 pb-2"}
-              another_size={"h-25 w-25"}
-              another_text_size={"text-7xl"}
+              another_text_size={
+                "text-3xl sm:text-4xl md:text-5xl lg:text-6xl flex items-center justify-center leading-none mt-[-3px]"
+              }
               most_radius={true}
               text={preview ? "×" : "+"}
             />
           </div>
         </div>
-        <div className="flex flex-col gap-6 w-[55%] ajuste-desfoque">
-          <div className="flex flex-col gap-3">
+
+        <div className="flex flex-col gap-3 md:gap-5 w-full md:flex-1 ajuste-desfoque pb-4 md:pb-0 overflow-hidden shrink-0">
+          <div className="flex flex-col gap-2 md:gap-3 w-full">
             <InputAddFamily
               id="nomeFamilia"
               placeholder="Nome da Família"
@@ -102,10 +122,10 @@ function AddFamilyForm({
               error={errosCampos.telefone}
             />
 
-            <div className="flex gap-3">
+            <div className="flex flex-row gap-2 md:gap-3 w-full">
               <SelectAddFamily
                 id="uf"
-                w="w-[30%]"
+                w="w-[30%] sm:w-[25%] min-w-0"
                 value={formData.uf}
                 onChange={(e) => handleChange("uf", e.target.value)}
                 onBlur={() => validarCampo("uf", formData.uf)}
@@ -115,7 +135,7 @@ function AddFamilyForm({
               <InputAddFamily
                 id="cep"
                 placeholder="CEP"
-                w="w-[70%]"
+                w="flex-1 min-w-0"
                 value={formData.cep}
                 onChange={(e) => {
                   const formatado = formatCEP(e.target.value);
@@ -130,11 +150,11 @@ function AddFamilyForm({
               />
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-row gap-2 md:gap-3 w-full">
               <InputAddFamily
                 id="cidade"
                 placeholder="Cidade"
-                w="w-[60%]"
+                w="flex-[3] min-w-0"
                 value={formData.cidade}
                 onChange={(e) => handleChange("cidade", e.target.value)}
                 onBlur={() => validarCampo("cidade", formData.cidade)}
@@ -144,7 +164,7 @@ function AddFamilyForm({
               <InputAddFamily
                 id="bairro"
                 placeholder="Bairro"
-                w="w-[40%]"
+                w="flex-[2] min-w-0"
                 value={formData.bairro}
                 onChange={(e) => handleChange("bairro", e.target.value)}
                 onBlur={() => validarCampo("bairro", formData.bairro)}
@@ -164,11 +184,11 @@ function AddFamilyForm({
               error={errosCampos.logradouro}
             />
 
-            <div className="flex gap-3">
+            <div className="flex flex-row gap-2 md:gap-3 w-full">
               <InputAddFamily
                 id="numero"
                 placeholder="Número"
-                w="w-[40%]"
+                w="flex-[2] min-w-0"
                 value={formData.numero}
                 onChange={(e) => handleChange("numero", e.target.value)}
                 onBlur={() => validarCampo("numero", formData.numero)}
@@ -178,7 +198,7 @@ function AddFamilyForm({
               <InputAddFamily
                 id="complemento"
                 placeholder="Complemento"
-                w="w-[60%]"
+                w="flex-[3] min-w-0"
                 value={formData.complemento}
                 onChange={(e) => handleChange("complemento", e.target.value)}
                 onKeyDown={(e) => handleKeyDown(e, "complemento")}
@@ -186,7 +206,7 @@ function AddFamilyForm({
             </div>
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2 md:gap-3 mt-1 w-full">
             <InputEmailMembers
               membros={formData.membros}
               currentEmail={currentEmail}
@@ -197,19 +217,19 @@ function AddFamilyForm({
               setErrosCampos={setErrosCampos}
             />
 
-            <div className="w-full flex justify-between mt-2">
+            <div className="w-full flex justify-between gap-3 mt-4">
               <DefaultButton
                 text="Cancelar"
                 theme={false}
-                another_size={"w-[45%]"}
-                another_text_size={"text-2xl"}
+                another_size={"flex-1"}
+                another_text_size={"text-lg md:text-xl lg:text-2xl"}
                 onClick={handleCancelar}
               />
               <DefaultButton
                 text="Confirmar"
                 theme={true}
-                another_size={"w-[45%]"}
-                another_text_size={"text-2xl"}
+                another_size={"flex-1"}
+                another_text_size={"text-lg md:text-xl lg:text-2xl"}
                 onClick={handleConfirmar}
               />
             </div>

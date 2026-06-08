@@ -27,9 +27,17 @@ function DefaultButton({
   const IsExistBorder = border ? "border border-orange" : "";
   const HaveLogout = logout_image ? (
     logout_red ? (
-      <img src={logoutIconRed} alt="sair" className="w-12.5 h-15" />
+      <img
+        src={logoutIconRed}
+        alt="sair"
+        className="w-6 h-6 md:h-8 md:w-8 object-contain"
+      />
     ) : (
-      <img src={logoutIcon} alt="sair" className="w-12.5 h-15" />
+      <img
+        src={logoutIcon}
+        alt="sair"
+        className="w-6 h-6 md:h-8 md:w-8 object-contain"
+      />
     )
   ) : null;
   const border_radius = most_radius ? "rounded-[50%]" : "rounded-[15px]";

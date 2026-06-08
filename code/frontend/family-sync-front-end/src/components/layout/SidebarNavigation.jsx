@@ -46,8 +46,9 @@ function SideBarNavegation() {
 
   return (
     <div
+      // Substituímos os max-md: por max-lg: para manter a barra inferior até o tamanho desktop
       className="p-4 gap-10 xl:gap-2 bg-orange flex flex-col items-center justify-center relative transform-gpu
-      max-md:flex-row max-md:fixed max-md:bottom-6 max-md:left-4 max-md:right-4 max-md:h-auto max-md:py-3 max-md:px-4 max-md:gap-1 max-md:justify-between max-md:rounded-[1.5rem] max-md:z-[100] max-md:shadow-xl"
+      max-lg:flex-row max-lg:fixed max-lg:bottom-6 max-lg:left-4 max-lg:right-4 max-lg:h-auto max-lg:py-3 max-lg:px-4 max-lg:gap-1 max-lg:justify-between max-lg:rounded-[1.5rem] max-lg:z-[100] max-lg:shadow-xl"
     >
       <LayoutGroup>
         {navLinks.map((link) => {
@@ -57,13 +58,13 @@ function SideBarNavegation() {
             <Link
               key={link.path}
               to={link.path}
-              className="relative p-2 hover:scale-110 transition-transform duration-300 ease-in-out flex justify-center items-center max-md:flex-1"
+              className="relative p-2 hover:scale-110 transition-transform duration-300 ease-in-out flex justify-center items-center max-lg:flex-1"
             >
               {isActive && (
                 <motion.div
                   layoutId="activeBackground"
                   initial={false}
-                  className="absolute inset-0 bg-black/20 rounded-2xl max-md:bg-white max-md:rounded-[1.2rem] max-md:shadow-sm"
+                  className="absolute inset-0 bg-black/20 rounded-2xl max-lg:bg-white max-lg:rounded-[1.2rem] max-lg:shadow-sm"
                   style={{ willChange: "transform" }}
                   transition={{
                     type: "spring",

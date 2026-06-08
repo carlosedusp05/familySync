@@ -70,17 +70,19 @@ function InfoFamiliarContent({
   return (
     <>
       {isLoading && <LoadingOverlay />}
-
-      <div className="flex flex-col lg:flex-row gap-4 items-center justify-center py-4 lg:py-12 h-full w-full">
-        <div className="w-full flex lg:hidden z-50">
-          <MemberSelector
-            members={members}
-            activeMemberId={activeMemberId}
-            setActiveMemberId={setActiveMemberId}
-          />
+      <div className="fixed lg:relative inset-x-0 top-16 bottom-24 lg:top-0 lg:bottom-0 flex flex-col lg:flex-row gap-4 items-center justify-center p-4 lg:py-12 lg:px-8 h-auto lg:h-full w-full overscroll-none overflow-hidden">
+        <div className="w-full block lg:hidden h-14 relative z-[110] shrink-0 touch-none">
+          <div className="absolute top-0 left-0 w-full z-[110]">
+            <MemberSelector
+              members={members}
+              activeMemberId={activeMemberId}
+              setActiveMemberId={setActiveMemberId}
+            />
+          </div>
         </div>
 
-        <div className="h-[60vh] lg:h-full w-full lg:w-[60%] bg-black/20 backdrop-blur-md border border-white/10 shadow-lg rounded-[2rem] p-4 md:p-8 overflow-hidden flex flex-col relative transform-gpu z-10">
+        {/* Card de Conteúdo Principal */}
+        <div className="flex-1 lg:flex-none lg:h-full w-full lg:w-[60%] bg-black/20 backdrop-blur-md border border-white/10 shadow-lg rounded-[2rem] p-4 md:p-8 overflow-hidden flex flex-col relative transform-gpu z-10 min-h-0 mt-2 lg:mt-0">
           <div className="w-full pb-4 lg:pb-0 lg:p-5 flex justify-center lg:justify-end relative lg:absolute top-0 lg:top-3 right-0 lg:right-3 z-10">
             <DefaultButton
               text="Adicionar informação familiar"
@@ -94,7 +96,7 @@ function InfoFamiliarContent({
 
           <div className="flex-1 flex items-center justify-center min-h-0 w-full mt-2 lg:mt-0">
             {infos.length > 0 ? (
-              <div className="w-full h-full lg:pt-24 pt-4">
+              <div className="w-full h-full lg:pt-24 pt-4 flex flex-col min-h-0">
                 <MultInfos
                   infos={infos}
                   onEditItem={(item) => handleOpenModal(item, false)}
@@ -132,13 +134,14 @@ function InfoFamiliarContent({
           </div>
         </div>
 
-        <div className="hidden lg:flex w-full lg:w-50 2xl:w-60 h-auto lg:h-full bg-[#EED9CE]/40 backdrop-blur-lg border border-white/10 p-4 lg:p-6 flex-col items-center gap-4 shadow-[-10px_0_30px_0_rgba(0,0,0,0.1)] rounded-[2rem] lg:rounded-[40px] transform-gpu">
+        {/* Sidebar Lateral (Desktop) */}
+        <div className="hidden lg:flex w-full lg:w-50 2xl:w-60 h-auto lg:h-full bg-[#EED9CE]/40 backdrop-blur-lg border border-white/10 p-4 lg:p-6 flex-col items-center gap-4 shadow-[-10px_0_30px_0_rgba(0,0,0,0.1)] rounded-[2rem] lg:rounded-[40px] transform-gpu min-h-0">
           <div
             className="flex flex-col items-center gap-6 w-full overflow-y-auto custom-scrollbar 
             [&::-webkit-scrollbar]:w-2.5 [&::-webkit-scrollbar]:h-2.5
             [&::-webkit-scrollbar-track]:bg-transparent
             [&::-webkit-scrollbar-thumb]:bg-[#282828]
-            [&::-webkit-scrollbar-thumb]:rounded-md pb-2 lg:pb-0 pt-2"
+            [&::-webkit-scrollbar-thumb]:rounded-md pb-2 lg:pb-0 pt-2 min-h-0"
           >
             {renderedMembers}
           </div>

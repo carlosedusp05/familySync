@@ -95,7 +95,7 @@ function AccountRegister({
     },
     {
       id: "dataNascimento",
-      placeholder: "Data Nascimento",
+      placeholder: "dd/mm/aaaa",
       type: "date",
       alt: "Input Data de Nascimento",
       setFunc: setDataNascimento,
@@ -145,117 +145,118 @@ function AccountRegister({
   };
 
   return (
-    <DefaultCard h={"pb-20 max-sm:pb-10 max-sm:px-5 max-sm:py-5"}>
-      <div className="w-30 h-30 max-sm:w-25 relative rounded-full border-2 border-orange flex items-center justify-center bg-white">
-        {preview ? (
-          <img
-            src={preview}
-            alt="Preview"
-            className="w-full h-full rounded-full object-cover"
-          />
-        ) : (
-          <IconPerfil
-            is_white_backgroud={true}
-            another_size={"h-70%"}
-            onClickNew={preview ? removeImagem : handleButtonClick}
-          />
-        )}
-        <div className="absolute -bottom-3 -right-3 flex items-center justify-center rounded-[50%] cursor-pointer">
-          <input
-            className="hidden"
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-          />
-          <DefaultButton
-            onClick={preview ? removeImagem : handleButtonClick}
-            another_padding={"px-0 pb-1"}
-            another_size={"w-12 h-12 max-sm:h-10 max-sm:w-10"}
-            another_text_size={"text-3xl"}
-            most_radius={true}
-            text={preview ? "×" : "+"}
-          />
-        </div>
-      </div>
-
-      <h1 className="text-orange text-3xl -mt-6 max-sm:text-2xl">Eu</h1>
-
-      <div className="w-[90%] flex flex-col justify-center items-center gap-5 max-sm:gap-4">
-        {camposInput.map((campo, index) => (
-          <div key={campo.id} className="w-full flex flex-col gap-1">
-            <DefaultTextField
-              id={campo.id}
-              placeholder={campo.placeholder}
-              type={campo.type}
-              alt={campo.alt}
-              src={campo.src}
-              value={campo.value}
-              isPassword={campo.isPassword}
-              iconClass={campo.iconClass}
-              onClickIcon={campo.onClickIcon}
-              hasError={!!errosCampos?.[campo.id]}
-              maxLength={campo.id === "cpf" ? 14 : undefined}
-              max={campo.max}
-              min={campo.min}
-              onKeyDown={(e) => handleKeyDown(e, index)}
-              onBlur={(e) =>
-                onBlurField && onBlurField(campo.id, e.target.value)
-              }
-              onChange={(e) => {
-                let valor = e.target.value;
-                if (campo.id === "cpf") valor = formatCPF(valor);
-                if (campo.id === "dataNascimento") {
-                  if (campo.max && valor > campo.max) return;
-                  if (campo.min && valor) {
-                    const parts = valor.split("-");
-                    const year = parts[0];
-                    const minYear = campo.min.split("-")[0];
-                    if (
-                      year.length === 4 &&
-                      year[0] !== "0" &&
-                      year < minYear
-                    ) {
-                      valor = `${minYear}-${parts[1]}-${parts[2]}`;
-                    }
-                  }
-                }
-                campo.setFunc(valor);
-                if (errosCampos?.[campo.id]) {
-                  setErrosCampos((prev) => ({ ...prev, [campo.id]: "" }));
-                }
-              }}
+    <DefaultCard
+      h={"h-[85%] max-h-[95vh] md:h-fit overflow-hidden flex flex-col p-0"}
+    >
+      <div className="w-full h-full overflow-y-auto md:overflow-y-hidden [&::-webkit-scrollbar]:hidden flex flex-col py-2 sm:py-8 md:py-0 ">
+        <div className="flex flex-col items-center gap-4 sm:gap-6 w-full my-auto">
+          <div className="relative w-24 h-24 sm:w-28 sm:h-28 shrink-0">
+            <IconPerfil
+              is_white_backgroud={true}
+              another_size={"w-full h-full"}
+              fotoUrl={preview}
+              onClickNew={preview ? removeImagem : handleButtonClick}
             />
-            <div
-              className={`overflow-hidden transition-all duration-300 ease-in-out w-full flex ${
-                errosCampos?.[campo.id]
-                  ? "max-h-5 opacity-100 mt-1"
-                  : "max-h-0 opacity-0"
-              }`}
-            >
-              <span className="text-red-500 text-sm px-2 block">
-                {errosCampos[campo.id]}
-              </span>
+            <div className="absolute -bottom-2 -right-2 flex items-center justify-center rounded-full cursor-pointer z-10">
+              <input
+                className="hidden"
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+              />
+              <DefaultButton
+                onClick={preview ? removeImagem : handleButtonClick}
+                another_padding={"px-0 pb-1"}
+                another_size={"w-10 h-10 sm:w-12 sm:h-12"}
+                another_text_size={"text-2xl sm:text-3xl leading-none"}
+                most_radius={true}
+                text={preview ? "×" : "+"}
+              />
             </div>
           </div>
-        ))}
-      </div>
 
-      <div className="flex items-center justify-center flex-col h-14 pt-15 max-sm:p-0 gap-3 w-[90%]">
-        <div className="flex h-14 gap-15 items-center justify-center w-full">
-          <DefaultButton
-            text="Cancelar"
-            theme={false}
-            border={true}
-            onMouseEnter={prefetchLogin}
-            onClick={() => navigate("/auth/login")}
-          />
-          <button type="submit" className="hidden" />
-          <DefaultButton
-            text="Cadastrar"
-            theme={true}
-            onMouseEnter={prefetchLogin}
-            onClick={handleSubmit}
-          />
+          <h1 className="text-orange-dark font-bold text-2xl sm:text-3xl md:text-4xl shrink-0">
+            Eu
+          </h1>
+
+          <div className="w-full sm:w-[90%] md:w-[97%] flex flex-col justify-center items-center gap-3 sm:gap-4 shrink-0">
+            {camposInput.map((campo, index) => (
+              <div key={campo.id} className="w-full flex flex-col gap-1">
+                <DefaultTextField
+                  id={campo.id}
+                  placeholder={campo.placeholder}
+                  type={campo.type}
+                  alt={campo.alt}
+                  src={campo.src}
+                  value={campo.value}
+                  isPassword={campo.isPassword}
+                  iconClass={campo.iconClass}
+                  onClickIcon={campo.onClickIcon}
+                  hasError={!!errosCampos?.[campo.id]}
+                  maxLength={campo.id === "cpf" ? 14 : undefined}
+                  max={campo.max}
+                  min={campo.min}
+                  onKeyDown={(e) => handleKeyDown(e, index)}
+                  onBlur={(e) =>
+                    onBlurField && onBlurField(campo.id, e.target.value)
+                  }
+                  onChange={(e) => {
+                    let valor = e.target.value;
+                    if (campo.id === "cpf") valor = formatCPF(valor);
+                    if (campo.id === "dataNascimento") {
+                      if (campo.max && valor > campo.max) return;
+                      if (campo.min && valor) {
+                        const parts = valor.split("-");
+                        const year = parts[0];
+                        const minYear = campo.min.split("-")[0];
+                        if (
+                          year.length === 4 &&
+                          year[0] !== "0" &&
+                          year < minYear
+                        ) {
+                          valor = `${minYear}-${parts[1]}-${parts[2]}`;
+                        }
+                      }
+                    }
+                    campo.setFunc(valor);
+                    if (errosCampos?.[campo.id]) {
+                      setErrosCampos((prev) => ({ ...prev, [campo.id]: "" }));
+                    }
+                  }}
+                />
+                <div
+                  className={`overflow-hidden transition-all duration-300 ease-in-out w-full flex ${
+                    errosCampos?.[campo.id]
+                      ? "max-h-10 opacity-100 mt-1"
+                      : "max-h-0 opacity-0"
+                  }`}
+                >
+                  <span className="text-red-500 text-sm px-2 block">
+                    {errosCampos[campo.id]}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="w-full sm:w-[90%] md:w-[88%] flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 shrink-0">
+            <DefaultButton
+              text="Cancelar"
+              theme={false}
+              border={true}
+              another_size={"w-full sm:flex-1"}
+              onMouseEnter={prefetchLogin}
+              onClick={() => navigate("/auth/login")}
+            />
+            <button type="submit" className="hidden" />
+            <DefaultButton
+              text="Cadastrar"
+              theme={true}
+              another_size={"w-full sm:flex-1"}
+              onMouseEnter={prefetchLogin}
+              onClick={handleSubmit}
+            />
+          </div>
         </div>
       </div>
     </DefaultCard>

@@ -3,7 +3,7 @@ import { isTokenExpired } from "../utils/auth";
 import Cookies from "js-cookie";
 
 const api = axios.create({
-  baseURL: "https://tcc-back-q3kw.onrender.com/v1/familysync/",
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
 api.interceptors.request.use(
@@ -22,7 +22,7 @@ api.interceptors.request.use(
 
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 export default api;

@@ -66,7 +66,7 @@ export function useLogin() {
           sessionStorage.removeItem("@FamilySync:splashRodou");
           window.dispatchEvent(new Event("startSplash"));
           setIsLoading(false);
-          navigate("/dashboard");
+          window.location.href = "/dashboard";
           return;
         }
 

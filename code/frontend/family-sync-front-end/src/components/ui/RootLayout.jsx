@@ -16,7 +16,7 @@ function RootLayout() {
   });
 
   const [splashOpacity, setSplashOpacity] = useState(
-    showSplash ? "opacity-100" : "opacity-0"
+    showSplash ? "opacity-100" : "opacity-0",
   );
   const [revealText, setRevealText] = useState(false);
 
@@ -64,13 +64,13 @@ function RootLayout() {
               <img
                 src={familySyncTextIcon}
                 alt="FamilySync Text"
-                className="h-70 w-auto max-w-none object-left max-lg:h-50 max-sm:h-30"
+                className="h-70 w-auto max-w-none object-left max-lg:h-50 max-sm:h-22"
               />
             </div>
             <img
               src={familySyncSmallIcon}
               alt="FamilySync Icon"
-              className="h-70 w-auto z-10 max-lg:h-50 max-sm:h-30"
+              className="h-70 w-auto z-10 max-lg:h-50 max-sm:h-22"
             />
           </div>
         </div>
