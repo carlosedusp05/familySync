@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import DefaultButton from "../../ui/DefaultButton.jsx";
-import { pencilTerracotaIcon, trashIconRed } from "../../../assets/index.jsx";
+import { pencilTerracotaIcon, trashIconRed } from "../../../assets";
 
 const DIAS_DA_SEMANA = [
   "Segunda",
@@ -57,21 +57,13 @@ export function ExpenseListModal({
   const isGastosPorMes = title === "Gastos por Mês";
 
   const renderCalendarView = () => {
-    let mesIndex = dataFiltroDia.getMonth();
-    let year = dataFiltroDia.getFullYear();
-
-    if (expenses.length > 0 && expenses[0].data_movimentacao) {
-      // Usando construtor local consistentemente para evitar bug de fuso horário
-      const dataGasto = new Date(expenses[0].data_movimentacao);
-      mesIndex = dataGasto.getMonth();
-      year = dataGasto.getFullYear();
-    }
+    const mesIndex = dataFiltroDia.getMonth();
+    const year = dataFiltroDia.getFullYear();
 
     const nomesDosMeses = Object.keys(MESES_MAP);
     const nomeMes =
       nomesDosMeses.find((k) => MESES_MAP[k] === mesIndex) || "Mês";
 
-    // Todos os cálculos agora usam data local, mantendo alinhamento com a exibição
     const diasNoMes = new Date(year, mesIndex + 1, 0).getDate();
     const primeiroDiaSemana = new Date(year, mesIndex, 1).getDay();
 
@@ -81,8 +73,29 @@ export function ExpenseListModal({
     const diasComGasto = expenses
       .map((exp) => {
         if (!exp.data_movimentacao) return null;
-        // Pega a data local correta para marcar na grade
-        return new Date(exp.data_movimentacao).getDate();
+
+        console.log(exp);
+        const dateStr = exp.data_movimentacao.split("T")[0];
+        const [anoStr, mesStr, diaStr] = dateStr.split("-");
+
+        if (anoStr && mesStr && diaStr) {
+          const expYear = parseInt(anoStr, 10);
+          const expMonth = parseInt(mesStr, 10) - 1; // No JS, os meses vão de 0 a 11
+          const expDay = parseInt(diaStr, 10);
+
+          if (expYear === year && expMonth === mesIndex) {
+            return expDay;
+          }
+        } else {
+          const expDate = new Date(exp.data_movimentacao);
+          if (
+            expDate.getFullYear() === year &&
+            expDate.getMonth() === mesIndex
+          ) {
+            return expDate.getDate();
+          }
+        }
+        return null;
       })
       .filter(Boolean);
 
@@ -145,7 +158,7 @@ export function ExpenseListModal({
               Total Gasto
             </span>
             <span className="text-orange font-bold text-sm bg-orange/10 px-3 py-1 rounded-full">
-              R${" "}
+              R$ $
               {localTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
             </span>
           </div>
@@ -156,7 +169,7 @@ export function ExpenseListModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white rounded-[2rem] shadow-2xl w-11/12 max-w-[650px] p-8 relative flex flex-col max-h-[55vh] overflow-hidden">
+      <div className="bg-white rounded-[2rem] shadow-2xl w-11/12 max-w-[650px] p-8 relative flex flex-col max-h-[85vh] overflow-hidden">
         {itemToDelete && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/95 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
             <div className="p-8 flex flex-col items-center max-w-sm text-center">
@@ -221,7 +234,7 @@ export function ExpenseListModal({
             {title}
           </h2>
           <p className="text-brown-dark font-extrabold text-[36px] leading-none mt-2 break-words">
-            R${" "}
+            R$ $
             {localTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
           </p>
         </div>
@@ -239,7 +252,7 @@ export function ExpenseListModal({
                 const nomeSemana =
                   semana.tipo || semana.semana_mes || `Semana ${index + 1}`;
                 const totalSemana = Number(semana.valor || semana.total || 0);
-                const diasComGasto = semana.dias_com_gasto || [];
+                const diasComGastoSemana = semana.dias_com_gasto || [];
 
                 return (
                   <div
@@ -251,7 +264,7 @@ export function ExpenseListModal({
                         {nomeSemana}
                       </span>
                       <span className="text-orange font-bold text-sm bg-orange/10 px-3 py-1 rounded-full whitespace-nowrap shrink-0">
-                        R${" "}
+                        R$ $
                         {totalSemana.toLocaleString("pt-BR", {
                           minimumFractionDigits: 2,
                         })}
@@ -268,7 +281,7 @@ export function ExpenseListModal({
                         { nome: "Sexta", sigla: "SEX" },
                         { nome: "Sábado", sigla: "SAB" },
                       ].map((dia) => {
-                        const temGastoNesteDia = diasComGasto.includes(
+                        const temGastoNesteDia = diasComGastoSemana.includes(
                           dia.nome,
                         );
 
@@ -320,14 +333,14 @@ export function ExpenseListModal({
                     key={item.id_financas || index}
                     title={nomeOriginal}
                     onClick={() => {
-                      if (isDiaDaSemana && onDayClick) {
+                      if ((isDiaDaSemana || isMes) && onDayClick) {
                         onDayClick(item);
                       }
                     }}
-                    className={`flex items-center justify-between p-4 rounded-2xl border transition-colors cursor-pointer gap-2 ${
+                    className={`flex items-center justify-between p-4 rounded-2xl border transition-colors gap-2 ${
                       isDiaDaSemana || isMes
-                        ? "bg-orange-50/50 border-orange-100 hover:bg-orange-100/70"
-                        : "bg-gray-50 border-gray-100 hover:border-orange-200"
+                        ? "bg-orange-50/50 border-orange-100 hover:bg-orange-100/70 cursor-pointer"
+                        : "bg-gray-50 border-gray-100 cursor-default"
                     }`}
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -348,7 +361,7 @@ export function ExpenseListModal({
 
                     <div className="flex items-center justify-end gap-4 shrink-0">
                       <span className="font-extrabold text-lg text-brown-dark whitespace-nowrap">
-                        R${" "}
+                        R$ $
                         {valorExibicao.toLocaleString("pt-BR", {
                           minimumFractionDigits: 2,
                         })}
@@ -361,7 +374,7 @@ export function ExpenseListModal({
                               e.stopPropagation();
                               if (onEdit) onEdit(item);
                             }}
-                            className="bg-blue-50 hover:bg-blue-100 p-2 rounded-xl transition-colors shrink-0"
+                            className="bg-blue-50 hover:bg-blue-100 p-2 rounded-xl transition-colors shrink-0 cursor-pointer"
                             title="Editar"
                           >
                             <img
@@ -375,7 +388,7 @@ export function ExpenseListModal({
                               e.stopPropagation();
                               setItemToDelete(item);
                             }}
-                            className="bg-red-50 hover:bg-red-100 p-2 rounded-xl transition-colors shrink-0"
+                            className="bg-red-50 hover:bg-red-100 p-2 rounded-xl transition-colors shrink-0 cursor-pointer"
                             title="Excluir"
                           >
                             <img

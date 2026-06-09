@@ -80,14 +80,16 @@ export function UserProvider({ children }) {
         try {
           await new Promise((resolve) => setTimeout(resolve, 2000));
           const infoResponse = await infoService.getInfosUser();
-
           const infosFormatadas = Array.isArray(infoResponse)
             ? infoResponse
             : infoResponse?.dados || infoResponse?.Response || [];
 
           const idsFamiliasDoUsuario = familiasMapeadas.map((f) => f.id);
-          const infosFiltradas = infosFormatadas.filter((info) =>
-            idsFamiliasDoUsuario.includes(info.id_familia),
+
+          const infosFiltradas = infosFormatadas.filter(
+            (info) =>
+              idsFamiliasDoUsuario.includes(info.id_familia) &&
+              info.id_usuario_informacao !== null,
           );
 
           setInfos(familiasMapeadas.length > 0 ? infosFiltradas : []);

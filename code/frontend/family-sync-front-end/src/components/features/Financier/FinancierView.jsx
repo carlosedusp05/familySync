@@ -77,7 +77,8 @@ const ChartPopup = memo(
         transform: "translate(-50%, -110%)",
       };
     } else {
-      containerClasses += " absolute bottom-full mb-1";
+      containerClasses +=
+        " absolute bottom-full left-1/2 -translate-x-1/2 -mb-70";
     }
 
     return (
@@ -169,13 +170,17 @@ const BarChartItem = memo(
         onBlur={() => setHoveredIndex(null)}
         onClick={() => onClick(item)}
       >
-        <AnimatePresence>{isHovered && popupNode}</AnimatePresence>
+        {/* 👇 A mágica acontece aqui: A motion.div agora recebe 'relative' e abriga o popupNode. 
+               Assim, o pop-up sabe exatamente qual é a altura da barra colorida e flutua acima dela! */}
         <motion.div
-          className="w-full bg-gradient-to-b from-[#FFB382] via-[#FF8C42] to-[#DFB3CD] cursor-pointer group-hover:brightness-110 rounded-t-sm shadow-md"
+          className="relative w-full bg-gradient-to-b from-[#FFB382] via-[#FF8C42] to-[#DFB3CD] cursor-pointer group-hover:brightness-110 rounded-t-sm shadow-md"
           initial={{ height: 0 }}
           animate={{ height: `${alturaBarra}%` }}
           transition={{ duration: 0.6, type: "spring", bounce: 0.3 }}
-        />
+        >
+          <AnimatePresence>{isHovered && popupNode}</AnimatePresence>
+        </motion.div>
+
         <span className="absolute top-full mt-2 left-1/2 -translate-x-1/2 text-[10px] md:text-[12px] lg:text-[14px] font-bold text-[#5B3E31] text-center w-16 md:w-20 lg:w-24 break-words leading-tight">
           {labelItem}
         </span>
@@ -404,15 +409,15 @@ function FinancierView({
       {isLoading && <LoadingOverlay />}
       <div className="flex flex-col items-center justify-center py-4 md:py-8 lg:py-12 h-full px-2 md:px-4 lg:px-0">
         <LargeCard
-          size="h-full 2xl:h-[87%] w-full sm:w-11/12 md:w-10/12 lg:w-[65%] xl:w-[57%]"
+          size="h-full sm:h-[80%] xl:h-[100%] 2xl:h-[87%] w-full md:w-10/12 lg:w-[65%] xl:w-[57%]"
           display="flex justify-center"
         >
-          <div className="w-full h-full flex flex-col items-center bg-white p-4 sm:p-6 md:p-8 lg:p-10 rounded-3xl relative custom-scrollbar lg:pb-10">
+          <div className="w-full h-full flex flex-col items-center bg-white p-4 sm:p-6 md:p-8 lg:p-10 xl:p-6  2xl:p-10 rounded-3xl relative custom-scrollbar lg:pb-10">
             <div className="flex flex-col items-center mb-4 md:mb-5 lg:mb-6 shrink-0">
               <span className="text-orange font-bold uppercase tracking-wider text-sm md:text-base lg:text-[18px] mb-1 text-center">
                 Gastos do {periodo}
               </span>
-              <h2 className="text-brown-dark font-extrabold text-2xl md:text-3xl lg:text-[40px] text-center">
+              <h2 className="text-brown-dark font-extrabold text-2xl md:text-3xl lg:text-[40px] xl:text-[30px] 2xl:text-[40px]  text-center">
                 R${" "}
                 {totalGasto.toLocaleString("pt-BR", {
                   minimumFractionDigits: 2,
@@ -420,7 +425,7 @@ function FinancierView({
               </h2>
             </div>
 
-            <div className="w-full flex items-center justify-center gap-4 sm:gap-6 md:gap-10 lg:gap-[50px] mt-2 md:mt-3 lg:mt-4 px-2 md:px-6 lg:px-10 shrink-0">
+            <div className="w-full flex items-center justify-center gap-4 sm:gap-6 md:gap-10 lg:gap-[50px] mt-2 md:mt-3 lg:mt-4 px-2 md:px-6 lg:px-10 xl:px-0 xl:mt-0 2xl:mt-4 2xl:px-10 shrink-0">
               {PERIODOS.map((item) => (
                 <button
                   key={item}
@@ -434,7 +439,7 @@ function FinancierView({
                   }}
                 >
                   <span
-                    className={`text-lg md:text-xl lg:text-2xl pb-1 md:pb-2 transition-colors rounded-sm ${periodo === item ? "text-orange font-bold" : "text-orange font-medium"}`}
+                    className={`text-lg md:text-xl lg:text-2xl xl:text-[20px] 2xl:text-2xl pb-1 md:pb-2 transition-colors rounded-sm ${periodo === item ? "text-orange font-bold" : "text-orange font-medium"}`}
                   >
                     {item}
                   </span>
@@ -453,11 +458,11 @@ function FinancierView({
               ))}
             </div>
 
-            <div className="text-orange font-semibold mt-4 md:mt-5 lg:mt-6 mb-4 md:mb-5 text-sm md:text-base lg:text-xl relative flex justify-center w-full z-30 shrink-0">
+            <div className="text-orange font-semibold mt-4 md:mt-5 lg:mt-6 mb-4 md:mb-5 text-sm md:text-base lg:text-xl xl:text-[15px] xl:mt-2 xl:mb-2 2xl:mb-4 2xl:mt-6 2xl:text-xl relative flex justify-center w-full z-30 shrink-0">
               {periodo === "Dia" || periodo === "Semana" ? (
                 <button
                   onClick={() => setIsCalendarOpen(true)}
-                  className="flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 bg-orange-50 border border-orange/30 rounded-full hover:bg-orange hover:text-white transition-all shadow-sm active:scale-95 group focus:outline-none"
+                  className="flex items-center gap-2 px-4 md:px-5 xl:py-1 2xl:px-2.5 py-2 md:py-2.5 bg-orange-50 border border-orange/30 rounded-full hover:bg-orange hover:text-white transition-all shadow-sm active:scale-95 group focus:outline-none"
                 >
                   <span>{labelsData[periodo]}</span>
                   <span className="text-lg md:text-xl group-hover:scale-110 transition-transform">
@@ -634,7 +639,10 @@ function FinancierView({
                         chartScrollRef.current.scrollLeft =
                           e.currentTarget.scrollLeft;
                     }}
-                    className="w-full pl-12 md:pl-14 overflow-x-auto custom-scrollbar mb-2"
+                    className="w-full pl-12 md:pl-14 overflow-x-auto custom-scrollbar  [&::-webkit-scrollbar]:w-2.5 [&::-webkit-scrollbar]:h-2.5
+            [&::-webkit-scrollbar-track]:bg-transparent
+          [&::-webkit-scrollbar-thumb]:bg-[#282828]
+            [&::-webkit-scrollbar-thumb]:rounded-md mb-2"
                   >
                     <div className="flex justify-start gap-10 md:gap-12 lg:gap-16 pr-8 h-px">
                       {chartData.map((item) => (
@@ -647,7 +655,7 @@ function FinancierView({
                   </div>
                 )}
 
-                <div className="relative w-full h-[300px] md:h-[320px] lg:h-[340px] flex">
+                <div className="relative w-full h-[300px] md:h-[320px] lg:h-[340px] xl:h-[250px] 2xl:h-[340px] flex">
                   <div className="w-12 md:w-14 h-full flex flex-col justify-between pb-12 z-0 border-r border-gray-300">
                     {yAxisValues.map((val, i) => (
                       <span
@@ -854,7 +862,7 @@ function FinancierView({
               diasComGastos={diasComGastos}
               onClose={() => setIsListModalOpen(false)}
               onDayClick={handleDayClick}
-              dataFiltroDia={dataResponsivaModal}
+              dataFiltroDia={dataFiltroDia}
               onDelete={handleDeleteExpense}
               onEdit={(item) => {
                 setExpenseToEdit(item);

@@ -1,15 +1,39 @@
 import { useRef, useState, useEffect, useMemo } from "react";
 import { familyService } from "../services/familyService";
+import { permissaoService } from "../services/permissaoService"; // 👈 Importamos o serviço de permissões aqui
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import { validateEmail } from "../utils/validators";
-import { enderecoService } from "../services/enderecoService";
 
 const INITIAL_FAMILIARS = [
-  { id: 3, name: "Lucas Gabriel", degree_of_relatives: "Filho", isMe: false },
-  { id: 1, name: "João Pedro Silva", degree_of_relatives: "Pai", isMe: false },
-  { id: 2, name: "Maria Alice", degree_of_relatives: "Mãe", isMe: false },
-  { id: 4, name: "Ana Beatriz", degree_of_relatives: "Filha", isMe: false },
+  {
+    id: 3,
+    name: "Lucas Gabriel",
+    degree_of_relatives: "Filho",
+    isMe: false,
+    isAdmin: false,
+  },
+  {
+    id: 1,
+    name: "João Pedro Silva",
+    degree_of_relatives: "Pai",
+    isMe: false,
+    isAdmin: true,
+  },
+  {
+    id: 2,
+    name: "Maria Alice",
+    degree_of_relatives: "Mãe",
+    isMe: false,
+    isAdmin: false,
+  },
+  {
+    id: 4,
+    name: "Ana Beatriz",
+    degree_of_relatives: "Filha",
+    isMe: false,
+    isAdmin: false,
+  },
 ];
 
 export function useManageFamily() {
@@ -29,12 +53,16 @@ export function useManageFamily() {
   const [isLeaveOpen, setIsLeaveOpen] = useState(false);
   const [isDeleteFamilyOpen, setIsDeleteFamilyOpen] = useState(false);
 
-  const [familiars, setFamiliars] = useState(() => {
-    const savedMembers = localStorage.getItem("family_members");
-    return savedMembers ? JSON.parse(savedMembers) : INITIAL_FAMILIARS;
-  });
-
+  const [familiars, setFamiliars] = useState(INITIAL_FAMILIARS);
   const [isEditing, setIsEditing] = useState(false);
+
+  // 🔥 ESTADO NOVO: Guarda as permissões detalhadas do utilizador logado
+  const [minhasPermissoes, setMinhasPermissoes] = useState({
+    editar_calendario: false,
+    gerenciar_listas: false,
+    controlar_despesas: false,
+    alterar_informacoes: false, // Usaremos esta para ocultar o botão "Editar Informações"
+  });
 
   const [familyData, setFamilyData] = useState({
     nome: "",
@@ -47,6 +75,7 @@ export function useManageFamily() {
     numero: "",
     complemento: "",
     membros: [],
+    foto: null,
   });
   const [formData, setFormData] = useState(familyData);
 
@@ -59,7 +88,7 @@ export function useManageFamily() {
         const decoded = jwtDecode(token);
         return String(decoded.id_usuario || decoded.id);
       } catch (error) {
-        console.error("Erro ao decodificar token:", error);
+        console.error("Erro ao descodificar token:", error);
       }
     }
     return null;
@@ -69,23 +98,66 @@ export function useManageFamily() {
     if (!idFamilia) return;
     try {
       setIsLoading(true);
+
+      // 1. Busca os dados da família
       const response = await familyService.getFamilyComplete(idFamilia);
 
+      // 2. Busca as PERMISSÕES do utilizador logado na base de dados
+      if (myUserId) {
+        try {
+          const permData = await permissaoService.getPermissaoUsuario(
+            myUserId,
+            idFamilia,
+          );
+          if (permData?.Response?.usuarios?.[0]?.permissoes) {
+            setMinhasPermissoes(permData.Response.usuarios[0].permissoes);
+          }
+        } catch (permError) {
+          console.warn(
+            "Utilizador sem permissões específicas registadas ainda ou erro ao buscar.",
+            permError,
+          );
+        }
+      }
+
+      const responseData = response?.Response || response || {};
+
+      const familiaInfo = Array.isArray(responseData.familia)
+        ? responseData.familia[0]
+        : responseData.familia || {};
+
+      const enderecoInfo = Array.isArray(responseData.endereco)
+        ? responseData.endereco[0]
+        : responseData.endereco || {};
+
       const dadosDaAPI = {
-        nome: response.Response.familia[0].nome,
-        telefone: response.Response.familia[0].telefone_residencial || "",
-        cep: response.Response.endereco[0].cep,
-        cidade: response.Response.endereco[0].cidade,
-        estado: response.Response.endereco[0].estado,
-        bairro: response.Response.endereco[0].bairro,
-        logradouro: response.Response.endereco[0].logradouro,
-        numero: response.Response.endereco[0].numero,
-        complemento: response.Response.endereco[0].complemento,
+        nome: familiaInfo?.nome || "",
+        telefone:
+          familiaInfo?.telefone_residencial &&
+          familiaInfo?.telefone_residencial !== "null"
+            ? familiaInfo.telefone_residencial
+            : "",
+        cep: enderecoInfo?.cep || "",
+        cidade: enderecoInfo?.cidade || "",
+        estado: enderecoInfo?.estado || "",
+        bairro: enderecoInfo?.bairro || "",
+        logradouro: enderecoInfo?.logradouro || "",
+        numero: enderecoInfo?.numero || "",
+        complemento: enderecoInfo?.complemento || "",
         membros: formData.membros || [],
+        foto:
+          familiaInfo?.foto ||
+          familiaInfo?.foto_perfil ||
+          familiaInfo?.avatar ||
+          null,
       };
 
       setFamilyData(dadosDaAPI);
       setFormData(dadosDaAPI);
+
+      if (dadosDaAPI.foto) {
+        setPreview(dadosDaAPI.foto);
+      }
 
       if (response.Response.usuarios) {
         const membrosFormatados = response.Response.usuarios.map((user) => ({
@@ -93,6 +165,14 @@ export function useManageFamily() {
           name: user.nome,
           degree_of_relatives: user.parentesco || "Membro",
           foto: user.foto_perfil || user.foto || user.avatar || null,
+          isAdmin:
+            user.tipo_permissao === "admin" ||
+            user.permissao === "admin" ||
+            user.is_admin === true ||
+            Number(user.is_admin) === 1 ||
+            user.admin === true ||
+            Number(user.admin) === 1 ||
+            String(user.nivel_acesso).toLowerCase() === "admin",
         }));
 
         setFamiliars(membrosFormatados);
@@ -107,10 +187,6 @@ export function useManageFamily() {
   useEffect(() => {
     fetchApiData();
   }, [idFamilia]);
-
-  useEffect(() => {
-    localStorage.setItem("family_members", JSON.stringify(familiars));
-  }, [familiars]);
 
   const toggleMenu = (id) => {
     setActiveMenuId(activeMenuId === id ? null : id);
@@ -140,10 +216,18 @@ export function useManageFamily() {
     setSelectedMember(null);
   };
 
-  const confirmDeleteMember = () => {
-    if (selectedMember) {
+  const confirmDeleteMember = async () => {
+    if (!selectedMember || !idFamilia) return;
+    try {
+      setIsLoading(true);
+      await familyService.outUserFamily(idFamilia, selectedMember.id);
       setFamiliars((prev) => prev.filter((m) => m.id !== selectedMember.id));
       closeDeleteModal();
+    } catch (error) {
+      console.error("Erro ao remover o membro da família:", error);
+      alert("Falha ao remover o membro. Tente novamente.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -157,6 +241,17 @@ export function useManageFamily() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    const formatosPermitidos = ["image/png", "image/jpeg", "image/jpg"];
+    if (!formatosPermitidos.includes(file.type)) {
+      alert(
+        "Formato inválido! Por favor, selecione apenas imagens em formato PNG ou JPG.",
+      );
+      e.target.value = "";
+      setFileSelecionado(null);
+      setPreview(familyData.foto);
+      return;
+    }
 
     setFileSelecionado(file);
     const reader = new FileReader();
@@ -178,6 +273,8 @@ export function useManageFamily() {
   const toggleEditMode = () => {
     if (isEditing) {
       setFormData(familyData);
+      setPreview(familyData.foto);
+      setFileSelecionado(null);
     }
     setIsEditing(!isEditing);
   };
@@ -189,19 +286,38 @@ export function useManageFamily() {
 
   const saveFamilyData = async () => {
     try {
-      const familyDataPayload = {
-        nome: formData.nome,
-        telefone_residencial: formData.telefone,
-      };
+      setIsLoading(true);
+      const formPayload = new FormData();
+      formPayload.append("nome", formData.nome);
 
-      await familyService.updateFamily(idFamilia, familyDataPayload);
+      const telefoneLimpo = formData.telefone.replace(/\D/g, "");
+      formPayload.append("telefone", telefoneLimpo);
 
+      const cepLimpo = formData.cep.replace(/\D/g, "");
+      formPayload.append("cep", cepLimpo);
+
+      formPayload.append("cidade", formData.cidade);
+      formPayload.append("estado", formData.estado);
+      formPayload.append("bairro", formData.bairro);
+      formPayload.append("logradouro", formData.logradouro);
+      formPayload.append("numero", formData.numero);
+      formPayload.append("complemento", formData.complemento || "");
+
+      if (fileSelecionado) {
+        formPayload.append("foto", fileSelecionado);
+      }
+
+      await familyService.updateFamilyEndereco(idFamilia, formPayload);
       setFamilyData(formData);
+      setFileSelecionado(null);
       setIsEditing(false);
       alert("Informações salvas com sucesso!");
+      fetchApiData();
     } catch (error) {
       console.error("Erro ao salvar dados", error);
       alert("Falha ao salvar as alterações.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -211,7 +327,7 @@ export function useManageFamily() {
     );
     if (confirm) {
       try {
-        alert("Você saiu da família com sucesso.");
+        await confirmLeaveFamily();
       } catch (error) {
         console.error("Erro ao sair da família", error);
       }
@@ -235,7 +351,6 @@ export function useManageFamily() {
       });
       setCurrentEmail("");
       setErrosCampos({});
-
       fetchApiData();
     } catch (error) {
       console.error("Erro ao convidar membro:", error);
@@ -255,18 +370,39 @@ export function useManageFamily() {
     }));
   };
 
-  const sortedFamiliars = useMemo(() => {
-    const familiarsWithIsMe = familiars.map((member) => ({
+  const familiarsWithIsMe = useMemo(() => {
+    return familiars.map((member) => ({
       ...member,
       isMe: myUserId ? String(member.id) === myUserId : false,
     }));
+  }, [familiars, myUserId]);
 
-    return familiarsWithIsMe.sort((a, b) => {
+  const isCurrentUserAdmin = useMemo(() => {
+    const me = familiarsWithIsMe.find((m) => m.isMe);
+    return me ? me.isAdmin : false;
+  }, [familiarsWithIsMe]);
+
+  // Se o utilizador é Admin, forçamos as permissões para true para evitar que ele próprio se bloqueie
+  const permissoesFinais = isCurrentUserAdmin
+    ? {
+        editar_calendario: true,
+        gerenciar_listas: true,
+        controlar_despesas: true,
+        alterar_informacoes: true,
+      }
+    : minhasPermissoes;
+
+  const sortedFamiliars = useMemo(() => {
+    return [...familiarsWithIsMe].sort((a, b) => {
       if (a.isMe) return -1;
       if (b.isMe) return 1;
-      return 0;
+
+      if (a.isAdmin && !b.isAdmin) return -1;
+      if (!a.isAdmin && b.isAdmin) return 1;
+
+      return a.name.localeCompare(b.name);
     });
-  }, [familiars, myUserId]);
+  }, [familiarsWithIsMe]);
 
   const openLeaveModal = () => {
     setIsLeaveOpen(true);
@@ -278,11 +414,16 @@ export function useManageFamily() {
 
   const confirmLeaveFamily = async () => {
     try {
-      // Substitua pela sua chamada real à API
-      alert("Você saiu da família com sucesso.");
+      if (idFamilia && myUserId) {
+        sessionStorage.setItem("@FamilySync:family:lastId", idFamilia);
+        await familyService.outUserFamily(idFamilia, myUserId);
+        sessionStorage.removeItem("@FamilySync:family:id");
+      }
       closeLeaveModal();
+      window.location.href = "/dashboard";
     } catch (error) {
       console.error("Erro ao sair da família", error);
+      alert("Erro ao tentar sair da família.");
     }
   };
 
@@ -297,7 +438,7 @@ export function useManageFamily() {
   const confirmDeleteFamily = async () => {
     try {
       setIsLoading(true);
-      alert("Família excluída com sucesso.");
+      await familyService.deleteFamilyEndereco(idFamilia);
       closeDeleteFamilyModal();
     } catch (error) {
       console.error("Erro ao excluir a família", error);
@@ -317,6 +458,8 @@ export function useManageFamily() {
     isHoveredView,
     setIsHoveredView,
     familiars: sortedFamiliars,
+    isCurrentUserAdmin,
+    minhasPermissoes: permissoesFinais, // 🔥 Exportamos para o FrontEnd as permissões validadas!
     isPermissionsOpen,
     isDeleteOpen,
     selectedMember,

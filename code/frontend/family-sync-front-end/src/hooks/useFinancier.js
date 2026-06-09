@@ -3,14 +3,13 @@ import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import { financeService } from "../services/financeService";
 
-const PERIODOS = ["Dia", "Semana", "Mês", "Ano"];
+import {
+  DIAS_DA_SEMANA_MAP,
+  getSemanaDoMes,
+  getLocalDate,
+} from "../utils/financeUtils";
 
-// 🛠️ Função utilitária global para evitar problemas com fuso horário local ao quebrar a string de data
-const getLocalDate = (dateStr) => {
-  if (!dateStr) return new Date();
-  const [y, m, dStr] = dateStr.substring(0, 10).split("-");
-  return new Date(Number(y), Number(m) - 1, Number(dStr));
-};
+const PERIODOS = ["Dia", "Semana", "Mês", "Ano"];
 
 export function useFinancier() {
   const [periodo, setPeriodoState] = useState("Mês");
@@ -84,19 +83,32 @@ export function useFinancier() {
     const rawList = Array.isArray(gastosAtuais) ? gastosAtuais : [];
     const meses = rawList
       .filter((item) => item.data_movimentacao)
-      .map((item) => item.data_movimentacao.substring(0, 7));
+      .map((item) => {
+        const itemDate = getLocalDate(item.data_movimentacao);
+        const y = itemDate.getFullYear();
+        const m = String(itemDate.getMonth() + 1).padStart(2, "0");
+        return `${y}-${m}`;
+      });
 
-    const filtroMesStr = dataFiltroDia.toISOString().substring(0, 7);
-    if (!meses.includes(filtroMesStr)) {
-      meses.push(filtroMesStr);
+    const anoLocal = dataFiltroDia.getFullYear();
+    const mesLocal = String(dataFiltroDia.getMonth() + 1).padStart(2, "0");
+    const filtroMesStr = `${anoLocal}-${mesLocal}`;
+
+    const listaFinal = [...meses];
+    if (!listaFinal.includes(filtroMesStr)) {
+      listaFinal.push(filtroMesStr);
     }
-    return [...new Set(meses)].sort();
+    return [...new Set(listaFinal)].sort();
   }, [gastosAtuais, dataFiltroDia]);
 
   const handlePeriodLabelClick = useCallback(() => {
     if (periodo === "Mês") {
       if (mesesDisponiveis.length <= 1) return;
-      const currentMesStr = dataFiltroDia.toISOString().substring(0, 7);
+
+      const anoLocal = dataFiltroDia.getFullYear();
+      const mesLocal = String(dataFiltroDia.getMonth() + 1).padStart(2, "0");
+      const currentMesStr = `${anoLocal}-${mesLocal}`;
+
       const currentIndex = mesesDisponiveis.indexOf(currentMesStr);
 
       let nextIndex = currentIndex + 1;
@@ -106,12 +118,12 @@ export function useFinancier() {
 
       const [anoStr, mesStr] = mesesDisponiveis[nextIndex].split("-");
       setDataFiltroDia(
-        new Date(parseInt(anoStr, 10), parseInt(mesStr, 10) - 1, 1),
+        new Date(parseInt(anoStr, 10), parseInt(mesStr, 10) - 1, 1, 12, 0, 0),
       );
     }
   }, [periodo, mesesDisponiveis, dataFiltroDia]);
 
-  // 📊 Processamento Principal: Gráfico de Barras (Desktop) e Lista
+  // 📊 Processamento Principal corrigido para usar getLocalDate em todos os períodos
   const processedData = useMemo(() => {
     const rawList = Array.isArray(gastosAtuais) ? gastosAtuais : [];
     let chartData = [];
@@ -119,12 +131,8 @@ export function useFinancier() {
 
     const d = new Date(dataFiltroDia);
     const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const date = String(d.getDate()).padStart(2, "0");
-
-    const filtroDiaStr = `${year}-${month}-${date}`;
-    const filtroMesStr = `${year}-${month}`;
-    const filtroAnoStr = `${year}`;
+    const localMonth = d.getMonth();
+    const localDateDay = d.getDate();
 
     const dom = new Date(d);
     dom.setDate(d.getDate() - d.getDay());
@@ -135,10 +143,15 @@ export function useFinancier() {
     sab.setHours(23, 59, 59, 999);
 
     if (periodo === "Dia") {
-      listData = rawList.filter(
-        (item) =>
-          (item.data_movimentacao || "").substring(0, 10) === filtroDiaStr,
-      );
+      listData = rawList.filter((item) => {
+        if (!item.data_movimentacao) return false;
+        const itemDate = getLocalDate(item.data_movimentacao);
+        return (
+          itemDate.getFullYear() === year &&
+          itemDate.getMonth() === localMonth &&
+          itemDate.getDate() === localDateDay
+        );
+      });
       chartData = listData.map((item) => ({
         id_financas: item.id_financas,
         labelItem: item.tipo || item.descricao,
@@ -198,57 +211,44 @@ export function useFinancier() {
     } else if (periodo === "Mês") {
       listData = rawList.filter((item) => {
         if (!item.data_movimentacao) return false;
-        return (item.data_movimentacao || "").substring(0, 7) === filtroMesStr;
+        const itemDate = getLocalDate(item.data_movimentacao);
+        return (
+          itemDate.getFullYear() === year && itemDate.getMonth() === localMonth
+        );
       });
 
-      const weeksMap = {};
-      const diasSemana = [
-        "Domingo",
-        "Segunda",
-        "Terça",
-        "Quarta",
-        "Quinta",
-        "Sexta",
-        "Sábado",
-      ];
+      const semanasMap = {};
 
       listData.forEach((item) => {
         const itemDate = getLocalDate(item.data_movimentacao);
-        const startOfWeek = new Date(itemDate);
-        startOfWeek.setDate(itemDate.getDate() - itemDate.getDay());
-        const endOfWeek = new Date(itemDate);
-        endOfWeek.setDate(itemDate.getDate() + (6 - itemDate.getDay()));
+        const numeroSemana = getSemanaDoMes(itemDate);
+        const nomeSemana = `Semana ${numeroSemana}`;
+        const nomeDia = DIAS_DA_SEMANA_MAP[itemDate.getDay()];
 
-        const keyStr = startOfWeek.toISOString().substring(0, 10);
-        if (!weeksMap[keyStr]) {
-          const fmt = (dateObj) =>
-            dateObj.toLocaleDateString("pt-BR", {
-              day: "2-digit",
-              month: "2-digit",
-            });
-          weeksMap[keyStr] = {
-            descricao: `Semana de ${fmt(startOfWeek)} a ${fmt(endOfWeek)}`,
-            semana_mes: `Semana de ${fmt(startOfWeek)} a ${fmt(endOfWeek)}`,
+        if (!semanasMap[nomeSemana]) {
+          semanasMap[nomeSemana] = {
+            descricao: nomeSemana,
+            semana_mes: nomeSemana,
             valor: 0,
             dias_com_gasto: new Set(),
             icone: "📅",
             isVirtual: true,
-            domDate: startOfWeek,
+            domDate: itemDate,
           };
         }
-        weeksMap[keyStr].valor += Number(item.valor || item.total || 0);
-        weeksMap[keyStr].dias_com_gasto.add(diasSemana[itemDate.getDay()]);
+        semanasMap[nomeSemana].valor += Number(item.valor || item.total || 0);
+        semanasMap[nomeSemana].dias_com_gasto.add(nomeDia);
       });
 
-      chartData = Object.keys(weeksMap)
-        .sort()
+      chartData = Object.keys(semanasMap)
+        .sort((a, b) => a.localeCompare(b))
         .map((key, index) => {
-          const w = weeksMap[key];
+          const w = semanasMap[key];
           return {
             id_financas: `month-week-${index}`,
             labelItem: w.descricao,
             valorItem: w.valor,
-            icone: "📅",
+            icone: w.icone,
             isGroup: true,
             rawItem: {
               ...w,
@@ -261,7 +261,8 @@ export function useFinancier() {
     } else if (periodo === "Ano") {
       listData = rawList.filter((item) => {
         if (!item.data_movimentacao) return false;
-        return (item.data_movimentacao || "").substring(0, 4) === filtroAnoStr;
+        const itemDate = getLocalDate(item.data_movimentacao);
+        return itemDate.getFullYear() === year;
       });
 
       const mesesStr = [
@@ -281,8 +282,8 @@ export function useFinancier() {
       const agrupado = Object.fromEntries(mesesStr.map((mes) => [mes, 0]));
 
       listData.forEach((item) => {
-        const mesIndex =
-          parseInt(item.data_movimentacao.substring(5, 7), 10) - 1;
+        const itemDate = getLocalDate(item.data_movimentacao);
+        const mesIndex = itemDate.getMonth();
         if (mesesStr[mesIndex]) {
           agrupado[mesesStr[mesIndex]] += Number(item.valor || item.total || 0);
         }
@@ -306,7 +307,6 @@ export function useFinancier() {
     return { listData, chartData };
   }, [gastosAtuais, periodo, dataFiltroDia]);
 
-  // 🍕 Processamento Exclusivo: Gráfico de Pizza (Mobile) - Agrupamento por Categoria
   const pieChartData = useMemo(() => {
     if (!processedData.listData || processedData.listData.length === 0)
       return [];
@@ -325,7 +325,6 @@ export function useFinancier() {
       agrupado[categoria].valorItem += Number(item.valor || item.total || 0);
     });
 
-    // Remove categorias zeradas e ordena da maior despesa para a menor
     return Object.values(agrupado)
       .filter((item) => item.valorItem > 0)
       .sort((a, b) => b.valorItem - a.valorItem);
@@ -423,6 +422,8 @@ export function useFinancier() {
   const handleBarClick = useCallback(
     (item) => {
       if (item.isGroup) {
+        if (item.valorItem === 0) return;
+
         if (periodo === "Ano") {
           const mesesStr = [
             "Janeiro",
@@ -440,18 +441,37 @@ export function useFinancier() {
           ];
           const mesIndex = mesesStr.indexOf(item.labelItem);
 
+          // 🔴 CORREÇÃO 1: Atualiza a data de referência para o mês clicado!
+          // Isso garante que o modal abra com o cabeçalho e grade do mês correto.
+          const novaDataFiltro = new Date(
+            dataFiltroDia.getFullYear(),
+            mesIndex,
+            1,
+            12,
+            0,
+            0,
+          );
+          setDataFiltroDia(novaDataFiltro);
+
           const gastosDoMes = processedData.listData
             .filter((g) => {
               if (!g.data_movimentacao) return false;
               const gDate = getLocalDate(g.data_movimentacao);
               return gDate.getMonth() === mesIndex;
             })
-            .map((g) => ({
-              ...g,
-              descricao: `${item.labelItem} - ${g.descricao || g.tipo}`,
-              icone: g.icone || "📅",
-              valor: g.valor || g.total || 0,
-            }));
+            .map((g) => {
+              const gDate = getLocalDate(g.data_movimentacao);
+
+              const safeDateStr = `${gDate.getFullYear()}-${String(gDate.getMonth() + 1).padStart(2, "0")}-${String(gDate.getDate()).padStart(2, "0")}`;
+
+              return {
+                ...g,
+                data_movimentacao: safeDateStr,
+                descricao: `${item.labelItem} - ${g.descricao || g.tipo}`,
+                icone: g.icone || "📅",
+                valor: g.valor || g.total || 0,
+              };
+            });
 
           setSelectedExpenses(gastosDoMes);
           setIsListModalOpen(true);
@@ -534,7 +554,15 @@ export function useFinancier() {
       ];
       const mesIndex = mesesStr.indexOf(nomeDiaBr);
       if (mesIndex !== -1) {
-        const novaData = new Date(dataFiltroDia.getFullYear(), mesIndex, 1);
+        const novaData = new Date(
+          dataFiltroDia.getFullYear(),
+          mesIndex,
+          1,
+          12,
+          0,
+          0,
+          0,
+        );
         setDataFiltroDia(novaData);
         setPeriodoState("Mês");
         setIsListModalOpen(false);
@@ -618,7 +646,14 @@ export function useFinancier() {
     const rawList = Array.isArray(gastosAtuais) ? gastosAtuais : [];
     const datas = rawList
       .filter((item) => item.data_movimentacao)
-      .map((item) => item.data_movimentacao.substring(0, 10));
+      .map((item) => {
+        const localDate = getLocalDate(item.data_movimentacao);
+        const y = localDate.getFullYear();
+        const m = String(localDate.getMonth() + 1).padStart(2, "0");
+        const d = String(localDate.getDate()).padStart(2, "0");
+
+        return `${y}-${m}-${d}`;
+      });
 
     return [...new Set(datas)].sort();
   }, [gastosAtuais]);

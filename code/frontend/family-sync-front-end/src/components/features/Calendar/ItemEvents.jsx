@@ -3,48 +3,39 @@ import { pencilTerracotaIcon } from "../../../assets";
 function ItemEvents(props) {
   return (
     <div
-      className="w-[90%] flex flex-col gap-2 rounded-2xl bg-white-yellow relative
-    pb-10 overflow-hidden transition-all duration-400 hover:scale-[1.03]"
+      className="w-full flex flex-col justify-between rounded-2xl bg-[#FFFDF9] shadow-md relative
+      pb-8 pt-0 overflow-hidden transition-all duration-300 hover:scale-[1.01]
+      min-h-[80px] sm:min-h-[130px]"
     >
-      <div className="flex justify-between items-start gap-3">
-        <div
-          className="bg-terracota py-2 pl-6 pr-4 rounded-tl-2xl
-        min-w-0 flex-1 max-w-[50%]"
-        >
-          <h3
-            className="text-white text-[16px] font-medium
-          break-words line-clamp-3 w-[90%]"
-          >
-            {props.title}
-          </h3>
+      <div>
+        <div className="flex justify-between items-center w-full gap-2">
+          <div className="bg-terracota py-1.5 sm:py-2 px-4 sm:px-6 rounded-tl-2xl rounded-br-2xl sm:rounded-br-none max-w-[50%] sm:max-w-[60%] shrink-0 shadow-sm">
+            <h3 className="text-white text-[12px] sm:text-[15px] md:text-[16px] font-bold break-words line-clamp-1">
+              {props.title}
+            </h3>
+          </div>
+
+          <div className="flex items-center gap-2 sm:gap-4 pr-3 sm:pr-4 text-[11px] xl:text-[16px] sm:text-xs md:text-sm font-semibold text-terracota shrink-0">
+            <img
+              src={pencilTerracotaIcon}
+              alt="Editar"
+              className="cursor-pointer transition-transform duration-200 hover:scale-120 w-3.5 h-3.5 sm:w-5 sm:h-5 md:w-7 md:h-7 md:hover:scale-110"
+              onClick={props.onEdit}
+            />
+            <span className="whitespace-nowrap">{props.hours}</span>
+            <span className="whitespace-nowrap">{props.date}</span>
+          </div>
         </div>
 
-        <div
-          className="flex items-center justify-end gap-6
-        shrink-0 pr-4 pt-2"
-        >
-          <img
-            src={pencilTerracotaIcon}
-            alt="PencilIcon"
-            className="cursor-pointer transition-all duration-400 hover:scale-120"
-            onClick={props.onEdit}
-          />
-
-          <span className="text-terracota text-[16px] font-medium whitespace-nowrap">
-            {props.hours}
-          </span>
-
-          <span className="text-terracota text-[16px] font-medium whitespace-nowrap">
-            {props.date}
-          </span>
+        <div className="px-4 sm:px-6 pt-2 sm:pt-3 pb-2">
+          <p className="text-terracota/90 font-medium text-[12px] sm:text-[14px] md:text-[15px] break-words leading-relaxed line-clamp-2 sm:line-clamp-none">
+            {props.desc}
+          </p>
         </div>
       </div>
 
-      <p className="w-[90%] pl-10 text-terracota font-bold text-[18px] wrap-break-words">
-        {props.desc}
-      </p>
-
-      <span className="text-red text-[16px] font-bold absolute right-4 bottom-2">
+      {/* Rodapé de Criação */}
+      <span className="text-red-500 text-[10px] sm:text-[11px] md:text-[12px] xl:text-[16px] font-bold absolute right-3 bottom-1.5 bg-[#FFFDF9]/90 pl-1">
         Criado por {props.creator}
       </span>
     </div>

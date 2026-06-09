@@ -91,6 +91,32 @@ const createMemberByEmailFamily = async function (data) {
   }
 };
 
+const outUserFamily = async function (idFamily, idUsuario) {
+  const url = `/usuario-familia/?id_familia=${idFamily}&id_usuario=${idUsuario}`;
+
+  try {
+    const response = await api.delete(url);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
+const deleteFamilyEndereco = async function (id) {
+  const url = `/familia/${id}`;
+
+  try {
+    const response = await api.delete(url);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 export const familyService = {
   getFamilies,
   getFamily,
@@ -99,4 +125,6 @@ export const familyService = {
   getFamilyComplete,
   createMemberByEmailFamily,
   updateFamily,
+  outUserFamily,
+  deleteFamilyEndereco,
 };

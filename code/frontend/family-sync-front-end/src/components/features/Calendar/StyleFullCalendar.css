@@ -1,114 +1,203 @@
-/* Calendário Estilização */
+/* ==========================================================
+   ESTILIZAÇÃO GLOBAL E SUPORTE A ALTURA MÁXIMA (DESKTOP)
+   ========================================================== */
 
 .fc {
   background: transparent !important;
   border: none !important;
-  overflow-y: block;
 }
 
-/* quadrado do dia */
+/* Garante que o calendário ocupe 100% da altura do contêiner pai no desktop */
+@media (min-width: 769px) {
+  .fc {
+    height: 100% !important;
+    min-height: 680px !important; /* Evita que o calendário fique esmagado */
+  }
+
+  .fc-view-harness {
+    height: 100% !important;
+    flex-grow: 1 !important;
+  }
+
+  .fc-scrollgrid,
+  .fc-scrollgrid-sync-table,
+  .fc-daygrid-body {
+    height: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Faz com que cada linha da tabela se estenda igualmente para ocupar o espaço */
+  .fc-daygrid-row {
+    height: 1fr !important;
+  }
+
+  .fc-daygrid-day-frame {
+    height: 100% !important;
+    min-height: 90px !important;
+  }
+}
+
+/* Bordas nítidas e quadradas perfeitas para a grade */
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border: 1px solid #e5e7eb !important;
+}
+
+/* Estrutura interna das Células */
 .fc-daygrid-day-frame {
-  min-height: 120px;
   display: flex !important;
-  flex-direction: column;
-  align-items: center;
-  padding: 10px 4px;
-  position: relative;
-  transition: all 0.2s ease;
-  overflow-y: block;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  padding: 6px 4px !important;
+  position: relative !important;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+  box-sizing: border-box !important;
 }
 
+/* CORREÇÃO DO BUG DO HOVER: Substituição do scale por box-shadow interno */
 .fc-daygrid-day-frame:hover {
-  background: #ffe2ba;
-  transform: scale(1.05);
+  background: #ffe2ba !important;
+  box-shadow: inset 0 0 0 2px var(--color-orange, #f97316) !important; /* Linha guia perfeita por dentro */
   cursor: pointer;
 }
 
-/* container do número */
+/* Alinhamento dos Números */
 .fc-daygrid-day-top {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-/* número */
-.fc-daygrid-day-number {
-  padding: 0 !important;
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-/* área dos eventos */
-.fc-daygrid-day-events {
-  width: 100%;
-  overflow-y: block;
-  padding: 0 3px;
-}
-
-/* evento */
-.fc-event {
-  background: var(--color-orange) !important;
-  border: none !important;
-  border-radius: 8px !important;
-
   width: 100% !important;
-  max-width: 110px;
-
-  font-size: 0.72rem;
-  text-align: center;
-
-  padding: 4px 6px !important;
-  margin: 3px auto !important;
-
-  white-space: normal;
-  overflow-wrap: break-word;
-}
-
-.fc-daygrid-day-top {
-  width: 100%;
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
-  overflow-y: block;
+  margin-bottom: 4px !important;
 }
 
 .fc-daygrid-day-number {
   position: static !important;
   padding: 0 !important;
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  color: #374151;
 }
 
+/* Área dos Eventos */
+.fc-daygrid-day-events {
+  width: 100% !important;
+  padding: 0 2px !important;
+  box-sizing: border-box !important;
+}
+
+/* Elemento do Evento Interno - Desktop */
+.fc-event {
+  background: var(--color-orange, #f97316) !important;
+  border: none !important;
+  border-radius: 6px !important;
+  width: 100% !important;
+  max-width: 95px !important;
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  padding: 3px 4px !important;
+  margin: 2px auto !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  box-sizing: border-box !important;
+  display: block !important;
+}
+
+/* Topo do Menu (Título e Botões) */
 .fc-toolbar-title {
-  color: var(--color-terracota) !important;
+  color: var(--color-terracota, #5d2a11) !important;
   font-weight: bold !important;
-  overflow-y: block;
+  text-transform: capitalize !important;
 }
 
 .fc-button {
   background-color: #f97316 !important;
   border: none !important;
-  transition: all 0.2s ease;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
 }
 
 .fc-button:hover {
-  transform: scale(1.1) !important;
+  background-color: #ea580c !important;
 }
 
 .fc-day-today {
-  background-color: var(--color-yellow-light) !important;
+  background-color: var(--color-yellow-light, #fef6e4) !important;
 }
 
 .fc-col-header-cell {
-  font-weight: 600;
-  font-size: 1.1rem;
-  color: var(--color-terracota);
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  color: var(--color-terracota, #5d2a11) !important;
+  padding: 8px 0 !important;
+  background: rgba(255, 255, 255, 0.5) !important;
 }
 
 .fc-scroller {
   overflow: hidden !important;
 }
 
-.fc-toolbar-title {
-  text-transform: capitalize;
+/* ==========================================================
+   RESPONSIVIDADE EXTREMA PARA MOBILE (Telas até 768px)
+   ========================================================== */
+@media (max-width: 768px) {
+  /* Mantém as proporções quadradas e compactas no mobile */
+  .fc-daygrid-day-frame {
+    min-height: 48px !important;
+    height: 48px !important;
+    padding: 2px 1px !important;
+    justify-content: flex-start !important;
+  }
+
+  .fc-daygrid-day-number {
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 2px !important;
+  }
+
+  .fc-col-header-cell {
+    font-size: 0.72rem !important;
+    padding: 4px 0 !important;
+  }
+
+  .fc-daygrid-day-events {
+    padding: 0 !important;
+  }
+
+  /* O Evento Compactado (Tamanho Micro para caber sem quebras) */
+  .fc-event {
+    font-size: 8px !important;
+    line-height: 1 !important;
+    padding: 2px 1px !important;
+    margin: 1px auto !important;
+    width: 98% !important;
+    max-width: 100% !important;
+    border-radius: 4px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  .fc-toolbar {
+    margin-bottom: 0.5rem !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  .fc-toolbar-title {
+    font-size: 0.95rem !important;
+  }
+
+  .fc-button {
+    padding: 3px 6px !important;
+    font-size: 0.68rem !important;
+  }
 }

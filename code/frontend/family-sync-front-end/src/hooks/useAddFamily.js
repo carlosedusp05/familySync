@@ -48,6 +48,7 @@ export const useAddFamily = () => {
     "numero",
     "complemento",
   ];
+
   useEffect(() => {
     const verificarFamiliaUsuario = async () => {
       const token = Cookies.get("familysync_token");
@@ -79,10 +80,23 @@ export const useAddFamily = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setFotoUpload(file);
-      setPreview(URL.createObjectURL(file));
+    if (!file) return;
+
+    // 🛑 Validação estrita de formato de imagem
+    const formatosPermitidos = ["image/png", "image/jpeg", "image/jpg"];
+
+    if (!formatosPermitidos.includes(file.type)) {
+      alert(
+        "Formato inválido! Por favor, selecione apenas imagens em formato PNG ou JPG.",
+      );
+      e.target.value = "";
+      setFotoUpload(null);
+      setPreview(null);
+      return;
     }
+
+    setFotoUpload(file);
+    setPreview(URL.createObjectURL(file));
   };
 
   const removeImagem = () => {
@@ -229,8 +243,11 @@ export const useAddFamily = () => {
 
       const formDataEnvio = new FormData();
       formDataEnvio.append("nome", formData.nomeFamilia.trim());
-      formDataEnvio.append("telefone", formatPhone(formData.telefone));
-      formDataEnvio.append("cep", formData.cep);
+      const telefoneLimpo = formData.telefone.replace(/\D/g, "");
+      formDataEnvio.append("telefone", telefoneLimpo);
+
+      formDataEnvio.append("cep", cleanCEP(formData.cep));
+
       formDataEnvio.append("logradouro", formData.logradouro);
       formDataEnvio.append("bairro", formData.bairro);
       formDataEnvio.append("complemento", formData.complemento || "");
@@ -241,6 +258,11 @@ export const useAddFamily = () => {
       if (fotoUpload) {
         formDataEnvio.append("foto", fotoUpload);
       }
+
+      console.log(
+        "Dados exatos do FormData (Tratados):",
+        Object.fromEntries(formDataEnvio.entries()),
+      );
 
       const responseFamilyCreation =
         await familyService.createFamilyEndereco(formDataEnvio);

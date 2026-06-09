@@ -17,6 +17,9 @@ function FamilyDetails({
   leaveFamily,
   openLeaveModal,
   openDeleteFamilyModal,
+  // 👇 Novas propriedades recebidas do useManageFamily
+  isCurrentUserAdmin,
+  minhasPermissoes,
 }) {
   return (
     <div className="flex-1 bg-[#fdf8ed] rounded-[2rem] shadow-sm p-5 sm:p-7 flex flex-col gap-4 relative">
@@ -36,12 +39,15 @@ function FamilyDetails({
           </h1>
         )}
         <div className="flex gap-3 items-center shrink-0">
-          <img
-            src={trashIconRed}
-            alt="Deletar Família"
-            onClick={openDeleteFamilyModal}
-            className="w-6 h-6 sm:w-7 sm:h-7 opacity-70 cursor-pointer hover:opacity-100 transition-opacity"
-          />
+          {/* 👇 SÓ ADMINS PODEM VER A OPÇÃO DE EXCLUIR A FAMÍLIA */}
+          {isCurrentUserAdmin && (
+            <img
+              src={trashIconRed}
+              alt="Deletar Família"
+              onClick={openDeleteFamilyModal}
+              className="w-6 h-6 sm:w-7 sm:h-7 opacity-70 cursor-pointer hover:opacity-100 transition-opacity"
+            />
+          )}
         </div>
       </div>
 
@@ -196,13 +202,16 @@ function FamilyDetails({
             />
           </div>
         ) : (
-          <DefaultButton
-            text="Editar Informações"
-            another_size="w-full"
-            another_padding="py-2.5"
-            another_text_size="text-base"
-            onClick={toggleEditMode}
-          />
+          /* 👇 SÓ MOSTRA O BOTÃO DE EDIÇÃO SE TIVER PERMISSÃO DE ALTERAR INFORMAÇÕES */
+          minhasPermissoes?.alterar_informacoes && (
+            <DefaultButton
+              text="Editar Informações"
+              another_size="w-full"
+              another_padding="py-2.5"
+              another_text_size="text-base"
+              onClick={toggleEditMode}
+            />
+          )
         )}
 
         <button

@@ -15,6 +15,7 @@ export function useInfoFamiliar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedInfo, setSelectedInfo] = useState(null);
   const [isModeEdition, setIsModeEdition] = useState(false);
+  const idFamilia = sessionStorage.getItem("@FamilySync:family:id");
 
   const decodedUser = useMemo(() => {
     let user = { nome: "Você", id_usuario: "me" };
@@ -33,7 +34,6 @@ export function useInfoFamiliar() {
     const fetchInitialData = async () => {
       setIsLoading(true);
       try {
-        const idFamilia = sessionStorage.getItem("@FamilySync:family:id");
         if (!idFamilia) {
           console.warn("ID da família não encontrado no sessionStorage");
           return;
@@ -41,6 +41,7 @@ export function useInfoFamiliar() {
 
         const responseMembers =
           await familyService.getFamilyComplete(idFamilia);
+
         const fetchedMembers = responseMembers.Response?.usuarios || [];
         const myUserId = String(decodedUser.id_usuario);
 
@@ -61,8 +62,6 @@ export function useInfoFamiliar() {
         }
 
         const responseInfos = await infoService.getInfosByFamily(idFamilia);
-
-        console.log(responseInfos);
 
         const payload = responseInfos.data?.dados || responseInfos.dados || {};
         const usuariosComInfos = payload.usuarios || [];
@@ -153,8 +152,6 @@ export function useInfoFamiliar() {
             titulo: title,
             descricao: description,
           };
-          console.log(selectedInfo.id_info);
-          console.log(infoAtualizada);
 
           await infoService.updateInfo(selectedInfo.id_info, infoAtualizada);
 
@@ -167,6 +164,10 @@ export function useInfoFamiliar() {
           );
         } else {
           const newInfoPayload = {
+            id_familia: idFamilia ? Number(idFamilia) : null,
+            id_usuario: decodedUser.id_usuario
+              ? Number(decodedUser.id_usuario)
+              : null,
             titulo: title,
             descricao: description,
           };
@@ -186,24 +187,12 @@ export function useInfoFamiliar() {
           const targetId =
             activeMemberId === "me" ? decodedUser.id_usuario : activeMemberId;
 
-          try {
-            await infoService.createInfoWithUser({
-              id_info: idGerado,
-              id_usuario: targetId,
-            });
-          } catch (vinculoError) {
-            console.error(
-              "Aviso: Informação criada, mas erro ao vincular ao usuário:",
-              vinculoError,
-            );
-          }
-
           const novaInfoNormalizada = {
             ...infoCriada,
             titulo: title,
             descricao: description,
             id_usuario: targetId,
-            id_usuario_informacao: targetId,
+            id_usuario_informacao: idGerado,
           };
 
           setAllFamilyInfos((prev) => [novaInfoNormalizada, ...prev]);

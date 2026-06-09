@@ -87,197 +87,163 @@ function ModalEvents({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-9999 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          style={{ willChange: "opacity" }}
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm transform-gpu"
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           onClick={onClose}
         />
 
+        {/* Largura máxima escalável e barra de rolagem se o conteúdo exceder a tela do mobile */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          style={{ willChange: "transform, opacity" }}
-          className="relative bg-[#FEF6E4] w-full max-w-7xl rounded-[40px]  flex flex-col gap-6 z-10 transform-gpu"
+          exit={{ opacity: 0, scale: 0.95 }}
+          className="relative bg-[#FEF6E4] w-full max-w-sm sm:max-w-xl md:max-w-3xl lg:max-w-5xl rounded-[24px] md:rounded-[40px] flex flex-col z-10 max-h-[90vh] overflow-y-auto"
         >
           <LargeCard
             color={"bg-yellow-light"}
-            p={"p-18"}
-            size={" w-full max-w-7xl relative"}
+            p={"p-4 sm:p-6 md:p-10"}
+            size={"w-full relative"}
           >
-            <div className="flex flex-col gap-2">
-              <h2 className="text-brown-dark text-3xl font-bold">
+            <div className="flex flex-col gap-1">
+              <h2 className="text-brown-dark text-xl md:text-3xl font-bold">
                 {isGlobalEditFlow
                   ? isEdit
                     ? "Editar Evento"
                     : "Adicionar Evento familiar"
                   : "Visualizar Evento"}
               </h2>
-              <p className="text-[#5D2A11]/60">
+              <p className="text-[#5D2A11]/60 text-xs md:text-sm">
                 {isGlobalEditFlow
-                  ? "Clique no ícone de lápis para liberar a edição dos campos."
-                  : "Visualize os detalhes registrados abaixo."}
+                  ? "Clique no ícone de lápis para liberar a edição."
+                  : "Detalhes registrados abaixo."}
               </p>
             </div>
 
-            <div className="flex justify-between items-center py-10">
-              <div className="font-bold text-2xl">
-                {console.log(data)}
+            {/* Cabeçalho de data e hora responsivo (empilha se necessário) */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 md:py-6 gap-4 border-b border-brown-dark/10 mb-4">
+              <div className="font-bold text-lg md:text-2xl text-brown-dark">
                 {data ? <p>DIA: {data.data}</p> : <p>DIA: {selectedDate}</p>}
               </div>
-              <div className="flex items-center justify-center text-center flex-col">
-                <div className="flex gap-3 items-center justify-center">
+
+              <div className="flex items-center flex-col w-full sm:w-auto">
+                <div className="flex gap-3 items-center justify-end w-full">
                   {editableFields.hours ? (
                     <input
                       ref={hoursRef}
                       type="time"
                       value={hours}
-                      readOnly={!editableFields.hours}
                       onChange={(e) => {
                         setHours(e.target.value);
                         if (errors.hours && e.target.value.trim() !== "")
                           setErrors((prev) => ({ ...prev, hours: false }));
                       }}
-                      className={`focus:border-[#5D2A11] bg-terracota text-white w-30 h-12 p-3 text-center font-bold rounded-2xl outline-none border-transparent
-                   ${
-                     errors.hours
-                       ? "border-b-2 border-red-500"
-                       : editableFields.hours
-                         ? "border-b-2 border-[#5D2A11]/30"
-                         : "border-b-2 border-transparent"
-                   }`}
-                      style={{ textIndent: "5px" }}
+                      className={`focus:border-[#5D2A11] bg-terracota text-white w-28 md:w-30 h-10 md:h-12 p-2 text-center font-bold rounded-xl outline-none border-b-2 ${
+                        errors.hours ? "border-red-500" : "border-transparent"
+                      }`}
                     />
                   ) : (
-                    <div className="focus:border-[#5D2A11] w-30 h-12 bg-terracota text-white  px-5 font-bold rounded-2xl p-3 text-center">
+                    <div className="w-28 md:w-30 h-10 md:h-12 bg-terracota text-white px-4 font-bold rounded-xl p-2 text-center flex items-center justify-center">
                       {hours}
                     </div>
                   )}
                   {isGlobalEditFlow && isEdit && (
-                    <button
-                      onClick={() => toggleEdit("hours", hoursRef)}
-                      className="transition-transform"
-                    >
+                    <button onClick={() => toggleEdit("hours", hoursRef)}>
                       <img
                         src={pencilTerracotaIcon}
                         alt="Editar"
-                        className={`w-7 h-7 transition-all ${
-                          editableFields.hours ? "opacity-100" : "opacity-40"
-                        }`}
+                        className={`w-6 h-6 md:w-7 md:h-7 ${editableFields.hours ? "opacity-100" : "opacity-40"}`}
                       />
                     </button>
                   )}
                 </div>
-                <div className="h-5">
-                  {errors.hours && (
-                    <span className="text-red-500 text-xs mt-1 block px-1">
-                      O horário é obrigatório.
-                    </span>
-                  )}
-                </div>
+                {errors.hours && (
+                  <span className="text-red-500 text-xs mt-1">
+                    O horário é obrigatório.
+                  </span>
+                )}
               </div>
             </div>
 
+            {/* Campos de Input */}
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 px-1">
-                  <label className="text-[#5D2A11] text-[18px] font-semibold">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <label className="text-[#5D2A11] text-[16px] md:text-[18px] font-semibold">
                     Título do Evento
                   </label>
                   {isGlobalEditFlow && isEdit && (
                     <button
                       onClick={() => toggleEdit("title", titleRef)}
-                      className="transition-transform hover:scale-110"
+                      className="hover:scale-110 transition-transform"
                     >
                       <img
                         src={pencilTerracotaIcon}
                         alt="Editar"
-                        className={`w-7 h-7 transition-all ${
-                          editableFields.title ? "opacity-100" : "opacity-40"
-                        }`}
+                        className={`w-6 h-6 ${editableFields.title ? "opacity-100" : "opacity-40"}`}
                       />
                     </button>
                   )}
                 </div>
-                <div className="relative flex items-center w-full">
-                  <div className="inline-grid items-center w-full max-w-full overflow-hidden">
-                    <span className="invisible col-start-1 row-start-1 px-1 text-[18px] font-medium whitespace-pre-wrap wrap-break-word border-b-2 border-transparent">
-                      {title || "Título (ex: Formatura do Pedro)"}
-                    </span>
-
-                    {isGlobalEditFlow ? (
-                      <input
-                        ref={titleRef}
-                        type="text"
-                        value={title}
-                        maxLength={50}
-                        readOnly={!editableFields.title}
-                        onChange={(e) => {
-                          setTitle(e.target.value);
-                          if (errors.title && e.target.value.trim() !== "")
-                            setErrors((prev) => ({ ...prev, title: false }));
-                        }}
-                        placeholder="Título (ex: Formatura do Pedro)"
-                        className={`col-start-1 row-start-1 w-full py-2 px-1 outline-none transition-all bg-transparent text-[#5D2A11] text-[18px] font-medium
-                    ${
+                {isGlobalEditFlow ? (
+                  <input
+                    ref={titleRef}
+                    type="text"
+                    value={title}
+                    maxLength={50}
+                    readOnly={!editableFields.title}
+                    onChange={(e) => {
+                      setTitle(e.target.value);
+                      if (errors.title && e.target.value.trim() !== "")
+                        setErrors((prev) => ({ ...prev, title: false }));
+                    }}
+                    placeholder="Título (ex: Formatura do Pedro)"
+                    className={`w-full py-2 px-1 bg-transparent text-[#5D2A11] text-[16px] md:text-[18px] font-medium border-b-2 outline-none ${
                       errors.title
-                        ? "border-b-2 border-red-500"
+                        ? "border-red-500"
                         : editableFields.title
-                          ? "border-b-2 border-[#5D2A11]/30"
-                          : "border-b-2 border-transparent"
+                          ? "border-[#5D2A11]/30"
+                          : "border-transparent"
                     }`}
-                        style={{ textIndent: "5px" }}
-                      />
-                    ) : (
-                      <h1 className="col-start-1 row-start-1 text-[#5D2A11] text-[18px] font-medium px-1 whitespace-pre-wrap wrap-break-word leading-normal w-full border-b-2 border-transparent">
-                        {title}
-                      </h1>
-                    )}
-                  </div>
-                </div>
+                  />
+                ) : (
+                  <h1 className="text-[#5D2A11] text-[16px] md:text-[18px] font-medium py-2">
+                    {title}
+                  </h1>
+                )}
                 {errors.title && (
-                  <span className="text-red-500 text-xs mt-1 block px-1">
+                  <span className="text-red-500 text-xs">
                     O título é obrigatório.
                   </span>
                 )}
               </div>
 
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between px-1">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <label className="text-[#5D2A11] text-[18px] font-semibold">
+                    <label className="text-[#5D2A11] text-[16px] md:text-[18px] font-semibold">
                       Detalhes
                     </label>
                     {isGlobalEditFlow && isEdit && (
                       <button
                         onClick={() => toggleEdit("description", descRef)}
-                        className="transition-transform hover:scale-110"
+                        className="hover:scale-110 transition-transform"
                       >
                         <img
                           src={pencilTerracotaIcon}
                           alt="Editar"
-                          className={`w-7 h-7 transition-all ${
-                            editableFields.description
-                              ? "opacity-100"
-                              : "opacity-40"
-                          }`}
+                          className={`w-6 h-6 ${editableFields.description ? "opacity-100" : "opacity-40"}`}
                         />
                       </button>
                     )}
                   </div>
                   {editableFields.description && isGlobalEditFlow && (
                     <span
-                      className={`text-xs ${
-                        description.length >= 950
-                          ? "text-red-500 font-bold"
-                          : "text-[#5D2A11]/50"
-                      }`}
+                      className={`text-xs ${description.length >= 950 ? "text-red-500 font-bold" : "text-[#5D2A11]/50"}`}
                     >
                       {description.length} / 1000
                     </span>
@@ -295,48 +261,48 @@ function ModalEvents({
                         setErrors((prev) => ({ ...prev, description: false }));
                     }}
                     placeholder="Descrição detalhada..."
-                    rows="5"
-                    style={{ textIndent: "5px" }}
-                    className={`w-full p-4 rounded-2xl outline-none transition-colors resize-none text-[#5D2A11] text-[18px]
-                ${
-                  errors.description
-                    ? "border-2 border-red-500"
-                    : editableFields.description
-                      ? "border border-[#5D2A11]/10 bg-white/50"
-                      : "bg-[#E0E0E0]/50"
-                }`}
+                    rows="4"
+                    className={`w-full p-3 rounded-xl outline-none text-[16px] md:text-[18px] text-[#5D2A11] resize-none ${
+                      errors.description
+                        ? "border-2 border-red-500"
+                        : editableFields.description
+                          ? "border border-[#5D2A11]/10 bg-white/50"
+                          : "bg-[#E0E0E0]/50"
+                    }`}
                   />
                 ) : (
-                  <div className="bg-[#5D2A11]/5 p-6 rounded-2xl min-h-37.5 w-full">
-                    <p className="text-[#5D2A11] text-[20px] leading-relaxed whitespace-pre-wrap wrap-break-word">
+                  <div className="bg-[#5D2A11]/5 p-4 rounded-xl min-h-[100px] w-full">
+                    <p className="text-[#5D2A11] text-[16px] md:text-[18px] leading-relaxed whitespace-pre-wrap break-words">
                       {description}
                     </p>
                   </div>
                 )}
                 {errors.description && (
-                  <span className="text-red-500 text-xs mt-1 px-1">
+                  <span className="text-red-500 text-xs">
                     A descrição é obrigatória.
                   </span>
                 )}
               </div>
             </div>
-            <div className="flex w-full gap-3 mt-4 justify-end items-center h-14">
+
+            {/* Área de botões responsiva (empilha em telas muito pequenas) */}
+            <div className="flex flex-wrap sm:flex-nowrap w-full gap-2 md:gap-3 mt-6 justify-end items-center">
               {!isConfirmingDelete ? (
                 <>
                   <DefaultButton
                     another_color="bg-terracota"
-                    another_text_size="text-[20px]"
-                    another_size="h-14 w-50"
+                    another_text_size="text-[16px] md:text-[18px]"
+                    another_size="h-11 md:h-14 flex-1 sm:flex-none sm:w-40"
                     text={isGlobalEditFlow ? "Cancelar" : "Fechar"}
                     onClick={onClose}
                   />
                   {isGlobalEditFlow && (
                     <>
                       <DefaultButton
-                        text={isEdit ? "Salvar Edição" : "Salvar Evento"}
+                        text={isEdit ? "Salvar" : "Salvar Evento"}
                         another_color="bg-default"
-                        another_text_size="text-[20px]"
-                        another_size="h-14 w-50"
+                        another_text_size="text-[16px] md:text-[18px]"
+                        another_size="h-11 md:h-14 flex-1 sm:flex-none sm:w-40"
                         onClick={handleSave}
                         disabled={isLoading}
                       />
@@ -344,8 +310,8 @@ function ModalEvents({
                         <DefaultButton
                           text="Excluir"
                           another_color="bg-red-light"
-                          another_text_size="text-[20px]"
-                          another_size="h-14 w-50"
+                          another_text_size="text-[16px] md:text-[18px]"
+                          another_size="h-11 md:h-14 w-full sm:w-32"
                           onClick={() => setIsConfirmingDelete(true)}
                         />
                       )}
@@ -353,26 +319,28 @@ function ModalEvents({
                   )}
                 </>
               ) : (
-                <div className="flex items-center gap-4 bg-white/40 px-6 rounded-2xl border border-brown-dark/20 h-14">
-                  <span className="text-brown-dark font-bold text-[18px]">
+                <div className="flex flex-col sm:flex-row items-center gap-3 bg-white/40 p-3 rounded-xl border border-brown-dark/20 w-full justify-end">
+                  <span className="text-brown-dark font-bold text-sm md:text-base text-center sm:text-left">
                     Deseja excluir permanentemente?
                   </span>
-                  <DefaultButton
-                    onClick={() => setIsConfirmingDelete(false)}
-                    another_color="bg-[#BDC3C7]"
-                    another_text_color="text-zinc-700"
-                    another_size="h-10 w-24"
-                    text="Não"
-                  />
-                  <DefaultButton
-                    onClick={() => {
-                      onDelete(data.id_eventos);
-                      onClose();
-                    }}
-                    another_color="bg-red-light"
-                    another_size="h-10 w-40"
-                    text="Sim, Excluir"
-                  />
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <DefaultButton
+                      onClick={() => setIsConfirmingDelete(false)}
+                      another_color="bg-[#BDC3C7]"
+                      another_text_color="text-zinc-700"
+                      another_size="h-9 w-20 flex-1 sm:flex-none"
+                      text="Não"
+                    />
+                    <DefaultButton
+                      onClick={() => {
+                        onDelete(data.id_eventos);
+                        onClose();
+                      }}
+                      another_color="bg-red-light"
+                      another_size="h-9 w-28 flex-1 sm:flex-none"
+                      text="Sim, Excluir"
+                    />
+                  </div>
                 </div>
               )}
             </div>
