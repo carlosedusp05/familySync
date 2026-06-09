@@ -96,11 +96,11 @@ const updateInfo = async function (id, data) {
 };
 
 // DELETE - Deletar Informação
-const deleteInfo = async function (data) {
-  const url = `/usuario-informacao/`;
+const deleteInfo = async function (id) {
+  const url = `/usuario-informacao/${id}`;
 
   try {
-    const response = await api.delete(url, data);
+    const response = await api.delete(url);
     const dados = response.data;
 
     return dados;

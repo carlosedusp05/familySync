@@ -2,14 +2,12 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { infoService } from "../services/infoService";
-import { familyService } from "../services/familyService";
 
 export function useInfoFamiliar() {
   const [members, setMembers] = useState([]);
   const [activeMemberId, setActiveMemberId] = useState(null);
   const [allFamilyInfos, setAllFamilyInfos] = useState([]);
   const [infos, setInfos] = useState([]);
-  const [userinfo, setUserInfo] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,66 +28,68 @@ export function useInfoFamiliar() {
     return user;
   }, []);
 
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      setIsLoading(true);
-      try {
-        if (!idFamilia) {
-          console.warn("ID da família não encontrado no sessionStorage");
-          return;
-        }
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      if (!idFamilia) {
+        console.warn("ID da família não encontrado no sessionStorage");
+        return;
+      }
 
-        const responseMembers =
-          await familyService.getFamilyComplete(idFamilia);
+      const responseInfos = await infoService.getInfosByFamily(idFamilia);
+      const payload = responseInfos.data?.dados || responseInfos.dados || {};
+      const usuariosComInfos = payload.usuarios || [];
 
-        const fetchedMembers = responseMembers.Response?.usuarios || [];
-        const myUserId = String(decodedUser.id_usuario);
+      const myUserId = String(decodedUser.id_usuario);
+      const mappedMembers = usuariosComInfos.map((member) => ({
+        ...member,
+        isMe: String(member.id_usuario) === myUserId,
+      }));
 
-        const mappedMembers = fetchedMembers.map((member) => ({
-          ...member,
-          isMe: String(member.id_usuario) === myUserId,
-        }));
+      const currentUser = mappedMembers.find((m) => m.isMe);
+      const otherUsers = mappedMembers.filter((m) => !m.isMe);
+      const sortedMembers = currentUser
+        ? [currentUser, ...otherUsers]
+        : mappedMembers;
 
-        const sortedMembers = mappedMembers.sort((a, b) => {
-          if (a.isMe) return -1;
-          if (b.isMe) return 1;
-          return 0;
-        });
+      setMembers(sortedMembers);
 
-        setMembers(sortedMembers);
-        if (sortedMembers.length > 0) {
-          setActiveMemberId(sortedMembers[0].id_usuario);
-        }
+      if (sortedMembers.length > 0) {
+        const savedActiveId = sessionStorage.getItem(
+          "@FamilySync:activeMemberId",
+        );
+        setActiveMemberId(
+          (prevId) =>
+            prevId ||
+            (savedActiveId
+              ? Number(savedActiveId)
+              : sortedMembers[0].id_usuario),
+        );
+      }
 
-        const responseInfos = await infoService.getInfosByFamily(idFamilia);
-
-        const payload = responseInfos.data?.dados || responseInfos.dados || {};
-        const usuariosComInfos = payload.usuarios || [];
-
-        let allInfosFlattened = [];
-
-        usuariosComInfos.forEach((usuario) => {
-          const infosDoUsuario = usuario.informacoes || [];
-
-          infosDoUsuario.forEach((info) => {
-            allInfosFlattened.push({
-              ...info,
-              id_usuario: usuario.id_usuario,
-              descricao: info.descricao_informacao || info.descricao,
-            });
+      let allInfosFlattened = [];
+      usuariosComInfos.forEach((usuario) => {
+        const infosDoUsuario = usuario.informacoes || [];
+        infosDoUsuario.forEach((info) => {
+          allInfosFlattened.push({
+            ...info,
+            id_usuario: usuario.id_usuario,
+            descricao: info.descricao_informacao || info.descricao,
           });
         });
+      });
 
-        setAllFamilyInfos(allInfosFlattened);
-      } catch (error) {
-        console.error("Erro ao buscar dados iniciais:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      setAllFamilyInfos(allInfosFlattened);
+    } catch (error) {
+      console.error("❌ Erro ao buscar dados:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [idFamilia, decodedUser.id_usuario]);
 
-    fetchInitialData();
-  }, [decodedUser.id_usuario]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   useEffect(() => {
     if (!activeMemberId) return;
@@ -121,25 +121,23 @@ export function useInfoFamiliar() {
   }, []);
 
   const handleDelete = useCallback(async () => {
-    if (!selectedInfo || !selectedInfo.id_usuario_informacao) {
-      console.warn("Nenhuma informação selecionada para deletar.");
-      return;
-    }
+    if (!selectedInfo || !selectedInfo.id_usuario_informacao) return;
+
+    const idParaDeletar = selectedInfo.id_usuario_informacao;
+
+    handleCloseModal();
+
+    setAllFamilyInfos((prev) =>
+      prev.filter((info) => info.id_usuario_informacao !== idParaDeletar),
+    );
 
     try {
-      await infoService.deleteInfo(selectedInfo.id_usuario_informacao);
-
-      setAllFamilyInfos((prevInfos) =>
-        prevInfos.filter(
-          (info) => info.id_usuario_informacao !== id_usuario_informacao,
-        ),
-      );
-
-      handleCloseModal();
+      await infoService.deleteInfo(idParaDeletar);
     } catch (error) {
-      console.error("Erro ao deletar:", error);
+      console.log("Erro ignorado ao deletar:", error);
+      fetchData();
     }
-  }, [selectedInfo, handleCloseModal, activeMemberId]);
+  }, [selectedInfo, handleCloseModal, fetchData]);
 
   const handleSave = useCallback(
     async (data) => {
@@ -152,22 +150,9 @@ export function useInfoFamiliar() {
             titulo: title,
             descricao: description,
           };
-
           await infoService.updateInfo(selectedInfo.id_info, infoAtualizada);
-
-          setAllFamilyInfos((prev) =>
-            prev.map((info) =>
-              info.id_info === selectedInfo.id_info
-                ? { ...info, titulo: title, descricao: description }
-                : info,
-            ),
-          );
         } else {
           const newInfoPayload = {
-            id_familia: idFamilia ? Number(idFamilia) : null,
-            id_usuario: decodedUser.id_usuario
-              ? Number(decodedUser.id_usuario)
-              : null,
             titulo: title,
             descricao: description,
           };
@@ -176,36 +161,34 @@ export function useInfoFamiliar() {
 
           const infoCriada =
             responseCreate.dados || responseCreate.data || responseCreate;
-          const idGerado = infoCriada.Response.id_info;
-
-          if (!idGerado) {
-            throw new Error(
-              "Não foi possível recuperar o ID da informação recém-criada.",
-            );
-          }
+          const idGerado = infoCriada?.Response?.id_info || infoCriada?.id_info;
 
           const targetId =
             activeMemberId === "me" ? decodedUser.id_usuario : activeMemberId;
 
-          const novaInfoNormalizada = {
-            ...infoCriada,
-            titulo: title,
-            descricao: description,
-            id_usuario: targetId,
-            id_usuario_informacao: idGerado,
+          const payloadRelacionamento = {
+            id_usuario: Number(targetId),
+            id_familia: Number(idFamilia),
+            id_info: Number(idGerado),
           };
 
-          setAllFamilyInfos((prev) => [novaInfoNormalizada, ...prev]);
+          await infoService.createInfoWithUser(payloadRelacionamento);
         }
-
-        handleCloseModal();
       } catch (error) {
-        console.error("Erro geral ao salvar/criar a informação:", error);
+        console.warn("Erro ignorado propositalmente:", error);
       } finally {
-        setIsLoading(false);
+        await fetchData();
+        handleCloseModal();
       }
     },
-    [selectedInfo, handleCloseModal, activeMemberId, decodedUser.id_usuario],
+    [
+      selectedInfo,
+      activeMemberId,
+      decodedUser.id_usuario,
+      idFamilia,
+      handleCloseModal,
+      fetchData,
+    ],
   );
 
   useEffect(() => {

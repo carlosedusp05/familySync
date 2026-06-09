@@ -78,6 +78,19 @@ const getFamilyComplete = async function (id) {
   }
 };
 
+const getFamilyInfosUser = async function (id) {
+  const url = `/usuario-informacao/familia/${id}`;
+
+  try {
+    const response = await api.get(url);
+    const dados = response.data;
+
+    return dados;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 const createMemberByEmailFamily = async function (data) {
   const url = "/usuario-familia/email/";
 
@@ -127,4 +140,5 @@ export const familyService = {
   updateFamily,
   outUserFamily,
   deleteFamilyEndereco,
+  getFamilyInfosUser,
 };
