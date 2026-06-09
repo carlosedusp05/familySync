@@ -588,7 +588,7 @@ function FinancierView({
                               <button
                                 key={ano}
                                 type="button"
-                                className="flex items-center w-full gap-2 cursor-pointer p-2 hover:bg-orange-50 rounded-xl transition-colors focus:outline-none"
+                                className="flex items-center w-full gap-2 cursor-pointer p-2  hover:bg-orange-50 rounded-xl transition-colors focus:outline-none"
                                 onClick={() => {
                                   const novaData = new Date(
                                     parseInt(ano, 10),
@@ -655,7 +655,7 @@ function FinancierView({
                   </div>
                 )}
 
-                <div className="relative w-full h-[300px] md:h-[320px] lg:h-[340px] xl:h-[250px] 2xl:h-[340px] flex">
+                <div className="relative w-full h-[200px] md:h-[220px] lg:h-[240px] 2xl:h-[240px] flex">
                   <div className="w-12 md:w-14 h-full flex flex-col justify-between pb-12 z-0 border-r border-gray-300">
                     {yAxisValues.map((val, i) => (
                       <span
@@ -834,7 +834,7 @@ function FinancierView({
             </div>
 
             {/* Botões do Rodapé */}
-            <div className="flex flex-wrap justify-center gap-3 md:gap-6 lg:gap-10 mt-auto md:pt-8 z-10 w-full shrink-0">
+            <div className="flex flex-wrap justify-center gap-3 md:gap-6 lg:gap-10 mt-auto md:pt-8 xl:pt-0 z-10 w-full shrink-0">
               {periodo !== "Ano" && (
                 <DefaultButton
                   text="Editar"
