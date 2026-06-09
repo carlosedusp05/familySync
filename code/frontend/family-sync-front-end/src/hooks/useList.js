@@ -69,7 +69,7 @@ export function useList() {
 
             allMappedLists.push({
               id: lista.id_lista,
-              nome: lista.nome_lista || lista.nome || "Lista sem nome",
+              nome: lista.nome || lista.nome_lista || "Lista sem nome",
               author: usuario.nome_usuario,
               favorita: lista.favorita,
               items: listItems,
@@ -264,6 +264,7 @@ export function useList() {
   // Funcionando
   const handleAddItem = useCallback(
     async (itemData, listId, updateState = true) => {
+      console.log(itemData, listId);
       try {
         setIsLoading(true);
         setError(null);
@@ -273,9 +274,13 @@ export function useList() {
         if (!idLista) return null;
 
         const newItem = {
-          nome_item: itemData.name || itemData.nome || "Sem nome",
-          valor_unitario: parseFloat(itemData.price) || 0,
-          quantidade: parseInt(itemData.units) || 1,
+          nome_item: itemData.nome_item || itemData.name || "Sem nome",
+          valor_unitario:
+            parseFloat(itemData.valor_unitario) ||
+            parseFloat(itemData.price) ||
+            0,
+          quantidade:
+            parseInt(itemData.quantidade) || parseInt(itemData.quantity) || 1,
           comprado: false,
           id_lista: idLista,
         };
@@ -413,6 +418,7 @@ export function useList() {
   //Funcionando
   const handleSaveList = useCallback(
     async (data) => {
+      console.log(data);
       try {
         setIsLoading(true);
         setError(null);
@@ -469,22 +475,62 @@ export function useList() {
     [selectedListToEdit],
   );
 
-  const handleSaveListEdition = useCallback(async (data) => {
-    try {
-      setLists((prev) =>
-        prev.map((list) =>
-          list.id === selectedListToEdit.id
-            ? { ...list, nome: data.nome, items: data.items }
-            : list,
-        ),
-      );
+  const handleSaveListEdition = useCallback(
+    async (data) => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      setIsLoading(true);
-      setError(null);
-    } finally {
-      setIsLoading(false);
-    }
-  });
+        const listId = selectedListToEdit.id;
+
+        if (data.nome !== undefined) {
+          const updatedList = await listService.updateList(listId, {
+            nome: data.nome,
+          });
+
+          if (updatedList.StatusCode !== 200) {
+            triggerAlert(
+              "Não foi possível atualizar a lista... Tente novamente mais tarde!",
+            );
+            handleCloseModal();
+            return;
+          }
+        }
+
+        // Cria os novos itens e atualiza o estado automaticamente
+        if (data.items?.length) {
+          await Promise.all(
+            data.items.map((item) => handleAddItem(item, listId)),
+          );
+        }
+
+        // Atualiza apenas o nome da lista, se ele mudou
+        if (data.nome !== undefined) {
+          setLists((prev) =>
+            prev.map((list) =>
+              list.id === listId
+                ? {
+                    ...list,
+                    nome: data.nome,
+                  }
+                : list,
+            ),
+          );
+        }
+
+        handleCloseModal();
+      } catch (error) {
+        console.error(error);
+
+        triggerAlert(
+          "Não foi possível atualizar a lista... Tente novamente mais tarde!",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [selectedListToEdit],
+  );
 
   const handleOpenModal = useCallback((list = null, isEdit = true) => {
     setSelectedListToEdit(list);

@@ -2,7 +2,15 @@ import { useState, useEffect } from "react";
 import DefaultButton from "../../ui/DefaultButton";
 import { formatMoneyMask, parseMoneyToFloat } from "../../../utils/formatters";
 
-function ModalList({ isOpen, onClose, onSave, data, isEdit, onDeleteItem }) {
+function ModalList({
+  isOpen,
+  onClose,
+  onSave,
+  onSaveEdit,
+  data,
+  isEdit,
+  onDeleteItem,
+}) {
   const [listName, setListName] = useState("");
   const [items, setItems] = useState([]);
   const [newItemName, setNewItemName] = useState("");
@@ -14,10 +22,8 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit, onDeleteItem }) {
     item_nome: false,
     valor: false,
   });
-
-  let itemsDeleted = [];
-
-  console.log(onSave);
+  const [itemsDeleted, setItemsDeleted] = useState([]);
+  const [itemsCreated, setItemsCreated] = useState([]);
 
   useEffect(() => {
     if (data && isEdit) {
@@ -61,6 +67,7 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit, onDeleteItem }) {
     };
 
     setItems((prev) => [...prev, newItem]);
+    setItemsCreated((prev) => [...prev, newItem]);
 
     setNewItemName("");
     setNewItemPrice("");
@@ -71,7 +78,7 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit, onDeleteItem }) {
   const handleRemoveLocalItem = (itemId) => {
     setItems((prev) => prev.filter((item) => item.id_item !== itemId));
 
-    itemsDeleted = [...itemsDeleted, itemId];
+    setItemsDeleted((prev) => [...prev, itemId]);
   };
 
   const handleSave = () => {
@@ -80,13 +87,40 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit, onDeleteItem }) {
       return;
     }
 
-    onSave({ nome: listName, items: items });
+    onSave({ nome: listName, items });
+  };
 
-    if (itemsDeleted) {
-      itemsDeleted.forEach((id) => {
-        onDeleteItem(id);
-      });
+  const handleSaveEditions = () => {
+    if (!listName.trim()) {
+      setErrors((prev) => ({ ...prev, tema_nome: true }));
+      return;
     }
+
+    if (
+      itemsCreated.length === 0 &&
+      itemsDeleted.length === 0 &&
+      listName === data.nome
+    ) {
+      return onClose();
+    }
+
+    const payload = {};
+
+    if (listName !== data.nome) {
+      payload.nome = listName;
+    }
+
+    if (itemsCreated.length > 0) {
+      payload.items = itemsCreated;
+    }
+
+    console.log(payload);
+
+    onSaveEdit(payload);
+
+    itemsDeleted.forEach((id) => {
+      onDeleteItem(id);
+    });
   };
 
   const totalPurchase = items.reduce(
@@ -323,7 +357,13 @@ function ModalList({ isOpen, onClose, onSave, data, isEdit, onDeleteItem }) {
                 another_text_size={"text-xl font-semibold"}
               />
               <DefaultButton
-                onClick={handleSave}
+                onClick={function () {
+                  if (isEdit) {
+                    handleSaveEditions();
+                  } else {
+                    handleSave();
+                  }
+                }}
                 text={isEdit ? "Salvar Alterações" : "Criar Lista"}
                 another_padding={"px-15 py-2.5"}
                 another_text_size={"text-xl font-semibold"}

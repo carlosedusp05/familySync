@@ -27,11 +27,15 @@ const createList = async function (data) {
 };
 
 const updateList = async function (id, data) {
+  console.log("ID DA LISTA:", id);
+  console.log("DADOS PARA ATUALIZAR:", data);
   const url = `/lista/${id}`;
 
   try {
     const response = await api.put(url, data);
     const dados = response.data;
+
+    console.log(dados);
 
     return dados;
   } catch (error) {
