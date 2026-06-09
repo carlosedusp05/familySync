@@ -273,6 +273,8 @@ export function useList() {
 
         if (!idLista) return null;
 
+        console.log(itemData);
+
         const newItem = {
           nome_item: itemData.nome_item || itemData.name || "Sem nome",
           valor_unitario:
@@ -280,7 +282,7 @@ export function useList() {
             parseFloat(itemData.price) ||
             0,
           quantidade:
-            parseInt(itemData.quantidade) || parseInt(itemData.quantity) || 1,
+            parseInt(itemData.quantidade) || parseInt(itemData.units) || 1,
           comprado: false,
           id_lista: idLista,
         };
