@@ -13,26 +13,29 @@ import { infoService } from "../services/infoService";
 const UserContext = createContext();
 
 export function UserProvider({ children }) {
-  const [userProfile, setUserProfile] = useState(null);
-  const [families, setFamilies] = useState([]);
-  const [infos, setInfos] = useState([]);
-
-  const [isLoadingUser, setIsLoadingUser] = useState(true);
-
-  const [isLoadingInfos, setIsLoadingInfos] = useState(false);
+  // Centralizar o estado evita que múltiplos "setters" assíncronos quebrem o fluxo de render
+  const [state, setState] = useState({
+    userProfile: null,
+    families: [],
+    infos: [],
+    isLoadingUser: true,
+    isLoadingInfos: false,
+  });
 
   const clearUserData = () => {
-    setUserProfile(null);
-    setFamilies([]);
-    setInfos([]);
+    setState({
+      userProfile: null,
+      families: [],
+      infos: [],
+      isLoadingUser: false,
+      isLoadingInfos: false,
+    });
   };
 
   const refreshUser = useCallback(async () => {
-    setIsLoadingUser(true);
     const token = Cookies.get("familysync_token");
 
     if (!token) {
-      setIsLoadingUser(false);
       clearUserData();
       return;
     }
@@ -41,6 +44,7 @@ export function UserProvider({ children }) {
       const decoded = jwtDecode(token);
       const userId = decoded.id_usuario;
 
+      // Executa a primeira chamada de API
       const dataResponse = await userService.getFamiliesByUser(userId);
 
       const familiaDados = dataResponse?.family || [];
@@ -48,7 +52,6 @@ export function UserProvider({ children }) {
         ...f,
         id: f.id_familia || f.id,
       }));
-      setFamilies(familiasMapeadas);
 
       const profileData = dataResponse?.user || {};
       const nomeUsuario = profileData.nome || decoded.nome || "Usuário";
@@ -59,25 +62,22 @@ export function UserProvider({ children }) {
           ? profileData.foto.startsWith("http")
             ? profileData.foto
             : `http://localhost:3000/${profileData.foto}`
-          : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-              nomeLimpo,
-            )}&background=FB923C&color=fff`;
+          : `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeLimpo)}&background=FB923C&color=fff`;
 
-      setUserProfile({
+      const userProfileObj = {
         ...profileData,
         nome: nomeLimpo,
         email: decoded.email || profileData.email,
         foto: fotoFinal,
-      });
-
-      setIsLoadingUser(false);
-      setIsLoadingUser(false);
+      };
 
       const isMobile = window.innerWidth <= 768;
+      let infosFiltradas = [];
 
+      // Em vez de quebrar o fluxo com múltiplos sets, processamos tudo em memória primeiro
       if (!isMobile) {
-        setIsLoadingInfos(true);
         try {
+          // Mantém o timeout se necessário, mas não altera o estado global ainda!
           await new Promise((resolve) => setTimeout(resolve, 2000));
           const infoResponse = await infoService.getInfosUser();
           const infosFormatadas = Array.isArray(infoResponse)
@@ -86,30 +86,30 @@ export function UserProvider({ children }) {
 
           const idsFamiliasDoUsuario = familiasMapeadas.map((f) => f.id);
 
-          const infosFiltradas = infosFormatadas.filter(
+          infosFiltradas = infosFormatadas.filter(
             (info) =>
               idsFamiliasDoUsuario.includes(info.id_familia) &&
               info.id_usuario_informacao !== null,
           );
-
-          setInfos(familiasMapeadas.length > 0 ? infosFiltradas : []);
         } catch (infoError) {
           console.error(
             "Erro ao carregar as informações familiares:",
             infoError,
           );
-          setInfos([]);
-        } finally {
-          setIsLoadingInfos(false);
         }
-      } else {
-        setInfos([]);
-        setIsLoadingInfos(false);
       }
+
+      // UM ÚNICO DISPARO: Altera o estado do app de uma vez só quando tudo estiver pronto
+      setState({
+        userProfile: userProfileObj,
+        families: familiasMapeadas,
+        infos: familiasMapeadas.length > 0 ? infosFiltradas : [],
+        isLoadingUser: false,
+        isLoadingInfos: false,
+      });
     } catch (error) {
       console.error("Erro crítico ao carregar dados do usuário:", error);
       clearUserData();
-      setIsLoadingUser(false);
     }
   }, []);
 
@@ -117,14 +117,16 @@ export function UserProvider({ children }) {
     refreshUser();
   }, [refreshUser]);
 
+  // Helpers de compatibilidade para manter o restante do seu código funcionando sem alterações
+  const setUserProfile = (val) =>
+    setState((prev) => ({ ...prev, userProfile: val }));
+  const setFamilies = (val) => setState((prev) => ({ ...prev, families: val }));
+  const setInfos = (val) => setState((prev) => ({ ...prev, infos: val }));
+
   return (
     <UserContext.Provider
       value={{
-        userProfile,
-        families,
-        infos,
-        isLoadingUser,
-        isLoadingInfos,
+        ...state,
         setUserProfile,
         setFamilies,
         setInfos,

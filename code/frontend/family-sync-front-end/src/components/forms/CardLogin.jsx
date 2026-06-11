@@ -139,7 +139,7 @@ function CardLogin({
         />
 
         <a
-          className="text-orange text-[14px] cursor-pointer text-center"
+          className="text-orange text-[14px] cursor-pointer hover:text-orange-500 transition-all text-center"
           onMouseEnter={prefetchRememberPass}
           onClick={() => navigate("/auth/recovery")}
         >
@@ -147,13 +147,20 @@ function CardLogin({
         </a>
 
         <DefaultButton
-          text="Cadastrar"
+          text="Cancelar"
           theme={false}
           border={true}
           type="button"
           onMouseEnter={prefetchRegister}
-          onClick={() => navigate("/auth/register")}
+          onClick={() => navigate("/auth/start")}
         />
+        <a
+          className="text-orange text-[12px] font-bold hover:text-orange-500 transition-all cursor-pointer text-center"
+          onMouseEnter={prefetchRememberPass}
+          onClick={() => navigate("/auth/register")}
+        >
+          Não possui conta? Cadastre-se agora
+        </a>
       </div>
     </DefaultCard>
   );

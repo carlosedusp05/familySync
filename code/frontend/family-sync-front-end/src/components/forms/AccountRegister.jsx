@@ -246,7 +246,7 @@ function AccountRegister({
               border={true}
               another_size={"w-full sm:flex-1"}
               onMouseEnter={prefetchLogin}
-              onClick={() => navigate("/auth/login")}
+              onClick={() => navigate(-1)}
             />
             <button type="submit" className="hidden" />
             <DefaultButton
