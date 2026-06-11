@@ -28,7 +28,7 @@ function CalendarView({
   return (
     <MainLayout warning={warning} showWarning={showWarning}>
       {isLoading && <LoadingOverlay />}
-      <div className="max-w-[1440px] mx-auto w-full min-h-screen lg:h-full flex flex-col lg:flex-row gap-4 lg:gap-20 p-3 md:p-8 pb-32 md:pb-8 overflow-y-auto lg:overflow-y-hidden">
+      <div className="max-w-[1440px] mx-auto w-full min-h-screen lg:h-full md:max-w-[1700px] flex flex-col lg:flex-row gap-4 lg:gap-20 p-3 md:p-8 pb-32 md:pb-8 overflow-y-auto lg:overflow-y-hidden">
         <div className="w-full lg:w-[55%] flex flex-col gap-3 md:gap-6">
           <h2 className="text-2xl md:text-4xl text-terracota md:text-white font-bold text-center lg:text-left">
             Calendário
