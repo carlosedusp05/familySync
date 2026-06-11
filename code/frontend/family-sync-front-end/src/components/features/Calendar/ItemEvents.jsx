@@ -28,7 +28,7 @@ function ItemEvents(props) {
         </div>
 
         <div className="px-4 sm:px-6 pt-2 sm:pt-3 pb-2">
-          <p className="text-terracota/90 font-medium text-[12px] sm:text-[14px] md:text-[15px] break-words leading-relaxed line-clamp-2 sm:line-clamp-none">
+          <p className="text-terracota/90 font-medium text-[12px] sm:text-[14px] md:text-[15px] lg:text-[18px] break-words leading-relaxed line-clamp-2 sm:line-clamp-none">
             {props.desc}
           </p>
         </div>

@@ -60,7 +60,6 @@
 /* CORREÇÃO DO BUG DO HOVER: Substituição do scale por box-shadow interno */
 .fc-daygrid-day-frame:hover {
   background: #ffe2ba !important;
-  box-shadow: none !important; /* Linha guia perfeita por dentro */
   cursor: pointer;
 }
 

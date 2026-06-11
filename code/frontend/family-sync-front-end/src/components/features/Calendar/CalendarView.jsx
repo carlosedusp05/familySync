@@ -1,4 +1,6 @@
 import React from "react";
+import { useState } from "react";
+import { useEffect } from "react";
 import MainLayout from "../../../layouts/MainLayout.jsx";
 import LargeCard from "../../ui/LargeCard.jsx";
 import MultEventsField from "./MultEventsFIeld.jsx";
@@ -25,24 +27,37 @@ function CalendarView({
   eventCount,
   isLoading,
 }) {
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <MainLayout warning={warning} showWarning={showWarning}>
       {isLoading && <LoadingOverlay />}
-      <div className="max-w-360 mx-auto w-full min-h-screen lg:h-full flex flex-col lg:flex-row gap-4 lg:gap-20 p-3 md:p-8 md:pb-8 overflow-y-auto lg:overflow-y-hidden ">
-        <div className="w-full lg:w-[55%] flex flex-col gap-3 md:gap-6">
-          <h2 className="text-2xl md:text-4xl text-terracota md:text-white font-bold text-center lg:text-left">
+      <div className="xl:px-55 xl:pt-5 w-full h-full flex flex-col lg:flex-row overflow-y-auto lg:overflow-y-hidden">
+        <div className="w-full lg:w-1/2 h-full flex flex-col px-4 md:px-8 lg:px-12 py-4 lg:py-8 gap-4 lg:gap-7">
+          <h2 className="text-2xl md:text-4xl lg:text-4xl text-terracota md:text-white font-bold text-center lg:text-left">
             Calendário
           </h2>
+
           <LargeCard
             color={"bg-white/95 shadow-xl rounded-[24px] md:rounded-[32px]"}
-            p={"p-3 md:p-6"}
-            size={"h-auto lg:h-[85%] xl:h-[75%] 2xl:h-[75%] w-full"}
+            p={"p-3 md:p-4 lg:px-8 lg:py-4"}
+            size={"w-full lg:w-[95%] h-auto lg:h-[90%]"}
           >
-            <div className="w-full h-full">
+            <div className="w-full h-full p-2 md:p-3 lg:p-4 overflow-y-hidden">
               <FullCalendar
                 plugins={[dayGridPlugin, interactionPlugin]}
                 initialView="dayGridMonth"
-                height="auto"
+                height={isDesktop ? "100%" : "auto"}
                 aspectRatio={1.2}
                 dateClick={handleDateClick}
                 events={eventCount}
@@ -63,21 +78,16 @@ function CalendarView({
           </LargeCard>
         </div>
 
-        <div className="w-full lg:w-[45%] flex flex-col gap-3 pb-20 md:gap-6 items-center lg:items-start">
-          <h2 className="text-2xl md:text-4xl text-terracota md:text-white font-bold text-center lg:text-left w-full">
+        <div className="w-full lg:w-1/2 h-full flex flex-col px-4 md:px-8 lg:px-8 py-4 lg:py-8 gap-4 lg:gap-10 items-center">
+          <h2 className="text-2xl md:text-4xl lg:text-4xl text-terracota md:text-white font-bold text-center w-full">
             Eventos Marcados
           </h2>
 
-          <div
-            className="flex flex-col items-center lg:items-start gap-4 overflow-y-auto overflow-x-hidden custom-scrollbar [&::-webkit-scrollbar]:w-2.5
-            [&::-webkit-scrollbar-track]:bg-transparent
-          [&::-webkit-scrollbar-thumb]:bg-[#282828]
-            [&::-webkit-scrollbar-thumb]:rounded-md max-h-100px lg:max-h-[75vh] h-full w-full px-3 py-2 JSON-scroll"
-          >
+          <div className="flex flex-col items-center gap-4 lg:gap-5 overflow-y-auto overflow-x-hidden custom-scrollbar [&::-webkit-scrollbar]:w-2.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#282828] [&::-webkit-scrollbar-thumb]:rounded-md h-full w-full lg:w-[85%] px-2 pb-20 lg:pb-0 JSON-scroll">
             {dateEvent.length > 0 ? (
               <MultEventsField events={dateEvent} onEdit={handleOpenModal} />
             ) : (
-              <div className="text-lg text-terracota font-semibold px-6 py-4 rounded-xl bg-white shadow-md text-center w-full">
+              <div className="text-lg lg:text-2xl text-terracota font-semibold px-6 lg:px-10 py-4 rounded-xl lg:rounded-2xl bg-white shadow-md text-center">
                 Sua família não tem eventos cadastrados!
               </div>
             )}
