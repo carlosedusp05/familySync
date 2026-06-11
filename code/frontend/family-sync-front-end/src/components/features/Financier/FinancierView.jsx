@@ -48,8 +48,6 @@ const getCoordinatesForPercent = (percent) => {
   return [x, y];
 };
 
-// --- SUBCOMPONENTES OTIMIZADOS ---
-
 const ChartPopup = memo(
   ({
     item,
@@ -61,12 +59,15 @@ const ChartPopup = memo(
     authorName,
     onEdit,
     onDelete,
+    alturaBarra,
   }) => {
     const nomeGasto =
       item.labelItem || item.descricao || item.description || "Gasto";
 
-    let containerClasses =
+    const baseClasses =
       "z-50 w-32 md:w-36 bg-white border border-orange-200 shadow-xl rounded-xl p-2 flex flex-col items-center pointer-events-auto";
+
+    let containerClasses = baseClasses;
     let inlineStyle = {};
 
     if (isMobile) {
@@ -77,10 +78,12 @@ const ChartPopup = memo(
         transform: "translate(-50%, -110%)",
       };
     } else {
-      containerClasses +=
-        " absolute bottom-full left-1/2 -translate-x-1/2 -mb-70";
-    }
+      const isNearTop = alturaBarra > 85;
 
+      containerClasses += isNearTop
+        ? " absolute left-1/2 -translate-x-1/2 mt-2" // Posiciona abaixo do topo
+        : " absolute left-1/2 -translate-x-1/2 -translate-y-[115%]"; // Posiciona acima (padrão)
+    }
     return (
       <motion.div
         ref={isMobile ? popupRef : null}
@@ -170,8 +173,6 @@ const BarChartItem = memo(
         onBlur={() => setHoveredIndex(null)}
         onClick={() => onClick(item)}
       >
-        {/* 👇 A mágica acontece aqui: A motion.div agora recebe 'relative' e abriga o popupNode. 
-               Assim, o pop-up sabe exatamente qual é a altura da barra colorida e flutua acima dela! */}
         <motion.div
           className="relative w-full bg-gradient-to-b from-[#FFB382] via-[#FF8C42] to-[#DFB3CD] cursor-pointer group-hover:brightness-110 rounded-t-sm shadow-md"
           initial={{ height: 0 }}
@@ -188,8 +189,6 @@ const BarChartItem = memo(
     );
   },
 );
-
-// --- COMPONENTE PRINCIPAL ---
 
 function FinancierView({
   PERIODOS,
@@ -387,6 +386,9 @@ function FinancierView({
 
   const renderPopup = useCallback(
     (item, percent, isMobile = false) => {
+      const alturaBarra =
+        valorMaximo > 0 ? (item.valorItem / valorMaximo) * 100 : 0;
+
       return (
         <ChartPopup
           item={item}
@@ -398,10 +400,18 @@ function FinancierView({
           authorName={authorName}
           onEdit={handleEditGasto}
           onDelete={handleExcluirGasto}
+          alturaBarra={alturaBarra}
         />
       );
     },
-    [clickPosition, periodo, authorName, handleEditGasto, handleExcluirGasto],
+    [
+      clickPosition,
+      periodo,
+      authorName,
+      handleEditGasto,
+      handleExcluirGasto,
+      valorMaximo,
+    ],
   );
 
   return (
@@ -655,7 +665,7 @@ function FinancierView({
                   </div>
                 )}
 
-                <div className="relative w-full h-[200px] md:h-[220px] lg:h-[240px] 2xl:h-[240px] flex">
+                <div className="relative w-full h-[200px] md:h-[220px] lg:h-[240px] 2xl:h-[370px] flex">
                   <div className="w-12 md:w-14 h-full flex flex-col justify-between pb-12 z-0 border-r border-gray-300">
                     {yAxisValues.map((val, i) => (
                       <span
