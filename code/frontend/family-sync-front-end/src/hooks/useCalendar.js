@@ -29,7 +29,6 @@ export function useCalendar({ telaInicial = false } = {}) {
 
   const familiaAtivaSalva = sessionStorage.getItem("@FamilySync:family:id");
 
-  // Regra de ouro: Se for a tela inicial E for mobile, bloqueia a requisição
   const isMobile = window.innerWidth <= 768;
   const deveCarregar = !(telaInicial && isMobile);
 
@@ -187,14 +186,14 @@ export function useCalendar({ telaInicial = false } = {}) {
   };
 
   const isGlobalLoading =
-    (isLoading && deveCarregar) || // Se não deve carregar, ignora o estado de loading do React Query
+    (isLoading && deveCarregar) ||
     deleteMutation.isPending ||
     createMutation.isPending ||
     updateMutation.isPending;
 
   return {
     dateEvent,
-    proximosEventos, // <-- Novo retorno limpo
+    proximosEventos,
     warning,
     showWarning,
     isModalOpen,
