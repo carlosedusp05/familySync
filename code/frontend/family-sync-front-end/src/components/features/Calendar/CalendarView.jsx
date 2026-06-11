@@ -28,7 +28,7 @@ function CalendarView({
   return (
     <MainLayout warning={warning} showWarning={showWarning}>
       {isLoading && <LoadingOverlay />}
-      <div className="max-w-[1440px] mx-auto w-full min-h-screen lg:h-full md:max-w-[1700px] flex flex-col lg:flex-row gap-4 lg:gap-20 p-3 md:p-8 pb-32 md:pb-8 overflow-y-auto lg:overflow-y-hidden">
+      <div className="max-w-360 mx-auto w-full min-h-screen lg:h-full flex flex-col lg:flex-row gap-4 lg:gap-20 p-3 md:p-8 md:pb-8 overflow-y-auto lg:overflow-y-hidden ">
         <div className="w-full lg:w-[55%] flex flex-col gap-3 md:gap-6">
           <h2 className="text-2xl md:text-4xl text-terracota md:text-white font-bold text-center lg:text-left">
             Calendário
@@ -72,7 +72,7 @@ function CalendarView({
             className="flex flex-col items-center lg:items-start gap-4 overflow-y-auto overflow-x-hidden custom-scrollbar [&::-webkit-scrollbar]:w-2.5
             [&::-webkit-scrollbar-track]:bg-transparent
           [&::-webkit-scrollbar-thumb]:bg-[#282828]
-            [&::-webkit-scrollbar-thumb]:rounded-md max-h-[400px] lg:max-h-[75vh] h-full w-full px-3 py-2 JSON-scroll"
+            [&::-webkit-scrollbar-thumb]:rounded-md max-h-100px lg:max-h-[75vh] h-full w-full px-3 py-2 JSON-scroll"
           >
             {dateEvent.length > 0 ? (
               <MultEventsField events={dateEvent} onEdit={handleOpenModal} />
