@@ -158,7 +158,7 @@ export function ExpenseListModal({
               Total Gasto
             </span>
             <span className="text-orange font-bold text-sm bg-orange/10 px-3 py-1 rounded-full">
-              R$ $
+              R$
               {localTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
             </span>
           </div>
@@ -234,7 +234,7 @@ export function ExpenseListModal({
             {title}
           </h2>
           <p className="text-brown-dark font-extrabold text-[36px] leading-none mt-2 break-words">
-            R$ $
+            R$
             {localTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
           </p>
         </div>
@@ -264,7 +264,7 @@ export function ExpenseListModal({
                         {nomeSemana}
                       </span>
                       <span className="text-orange font-bold text-sm bg-orange/10 px-3 py-1 rounded-full whitespace-nowrap shrink-0">
-                        R$ $
+                        R$
                         {totalSemana.toLocaleString("pt-BR", {
                           minimumFractionDigits: 2,
                         })}
@@ -361,7 +361,7 @@ export function ExpenseListModal({
 
                     <div className="flex items-center justify-end gap-4 shrink-0">
                       <span className="font-extrabold text-lg text-brown-dark whitespace-nowrap">
-                        R$ $
+                        R$
                         {valorExibicao.toLocaleString("pt-BR", {
                           minimumFractionDigits: 2,
                         })}

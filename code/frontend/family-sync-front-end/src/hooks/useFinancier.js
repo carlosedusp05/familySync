@@ -12,7 +12,7 @@ import {
 const PERIODOS = ["Dia", "Semana", "Mês", "Ano"];
 
 export function useFinancier() {
-  const [periodo, setPeriodoState] = useState("Mês");
+  const [periodo, setPeriodoState] = useState("Dia");
   const [dataFiltroDia, setDataFiltroDia] = useState(new Date());
 
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -123,7 +123,6 @@ export function useFinancier() {
     }
   }, [periodo, mesesDisponiveis, dataFiltroDia]);
 
-  // 📊 Processamento Principal corrigido para usar getLocalDate em todos os períodos
   const processedData = useMemo(() => {
     const rawList = Array.isArray(gastosAtuais) ? gastosAtuais : [];
     let chartData = [];
@@ -410,6 +409,7 @@ export function useFinancier() {
           await financeService.createFinancas(payload);
         }
         await fetchGastos();
+        setPeriodoState("Dia");
         setIsFormModalOpen(false);
         setExpenseToEdit(null);
       } catch (error) {
@@ -441,8 +441,6 @@ export function useFinancier() {
           ];
           const mesIndex = mesesStr.indexOf(item.labelItem);
 
-          // 🔴 CORREÇÃO 1: Atualiza a data de referência para o mês clicado!
-          // Isso garante que o modal abra com o cabeçalho e grade do mês correto.
           const novaDataFiltro = new Date(
             dataFiltroDia.getFullYear(),
             mesIndex,
