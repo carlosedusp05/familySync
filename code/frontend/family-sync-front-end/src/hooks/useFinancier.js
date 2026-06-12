@@ -406,11 +406,12 @@ export function useFinancier() {
         if (idToEdit) {
           await financeService.updateFinancas(idToEdit, payload);
         } else {
-          await financeService.createFinancas(payload);
+          const ds = await financeService.createFinancas(payload);
+          console.log(ds);
         }
         await fetchGastos();
-        setPeriodoState("Dia");
         setIsFormModalOpen(false);
+        setPeriodoState("Dia");
         setExpenseToEdit(null);
       } catch (error) {
         console.error("Erro ao salvar gasto:", error);
