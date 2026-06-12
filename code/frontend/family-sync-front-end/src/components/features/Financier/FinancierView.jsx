@@ -81,8 +81,8 @@ const ChartPopup = memo(
       const isNearTop = alturaBarra > 85;
 
       containerClasses += isNearTop
-        ? " absolute left-1/2 -translate-x-1/2 mt-2" // Posiciona abaixo do topo
-        : " absolute left-1/2 -translate-x-1/2 -translate-y-[115%]"; // Posiciona acima (padrão)
+        ? " absolute left-1/2 -translate-x-1/2 mt-2"
+        : " absolute left-1/2 -translate-x-1/2 -translate-y-[115%]";
     }
     return (
       <motion.div
@@ -468,7 +468,7 @@ function FinancierView({
               ))}
             </div>
 
-            <div className="text-orange font-semibold mt-4 md:mt-5 lg:mt-6 mb-4 md:mb-5 text-sm md:text-base lg:text-xl xl:text-[15px] xl:mt-2 xl:mb-2 2xl:mb-4 2xl:mt-6 2xl:text-xl relative flex justify-center w-full z-30 shrink-0">
+            <div className="text-orange font-semibold my-2  text-sm md:text-base lg:text-xl xl:text-[15px] 2xl:text-xl relative flex justify-center w-full z-30 shrink-0">
               {periodo === "Dia" || periodo === "Semana" ? (
                 <button
                   onClick={() => setIsCalendarOpen(true)}

@@ -80,7 +80,7 @@ export function ExpenseListModal({
 
         if (anoStr && mesStr && diaStr) {
           const expYear = parseInt(anoStr, 10);
-          const expMonth = parseInt(mesStr, 10) - 1; // No JS, os meses vão de 0 a 11
+          const expMonth = parseInt(mesStr, 10) - 1;
           const expDay = parseInt(diaStr, 10);
 
           if (expYear === year && expMonth === mesIndex) {
@@ -239,7 +239,7 @@ export function ExpenseListModal({
           </p>
         </div>
 
-        <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 min-h-[150px]">
+        <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 min-h-[150px] max-h-[200px] md:max-h-[400px]">
           {expenses.length === 0 ? (
             <div className="flex items-center justify-center h-full text-gray-400 font-medium text-center">
               Nenhum gasto registrado neste período.
@@ -348,7 +348,7 @@ export function ExpenseListModal({
                         {item.icone || "💰"}
                       </span>
                       <div className="flex flex-col min-w-0">
-                        <span className="font-bold capitalize text-lg leading-tight text-gray-800 truncate">
+                        <span className="font-bold capitalize text-[11px] md:text-lg leading-tight text-gray-800 truncate">
                           {nomeExibicao}
                         </span>
                         {(isDiaDaSemana || isMes) && (
@@ -360,7 +360,7 @@ export function ExpenseListModal({
                     </div>
 
                     <div className="flex items-center justify-end gap-4 shrink-0">
-                      <span className="font-extrabold text-lg text-brown-dark whitespace-nowrap">
+                      <span className="font-extrabold text-[13px] md:text-lg text-brown-dark whitespace-nowrap">
                         R$
                         {valorExibicao.toLocaleString("pt-BR", {
                           minimumFractionDigits: 2,
@@ -380,7 +380,7 @@ export function ExpenseListModal({
                             <img
                               src={pencilTerracotaIcon}
                               alt="Editar"
-                              className="h-6 w-6"
+                              className="h-4 w-4 md:h-6 md:w-6"
                             />
                           </button>
                           <button
@@ -394,7 +394,7 @@ export function ExpenseListModal({
                             <img
                               src={trashIconRed}
                               alt="Excluir"
-                              className="h-6 w-6"
+                              className="h-4 w-4 md:h-6 md:w-6"
                             />
                           </button>
                         </div>
