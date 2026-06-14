@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useMemo } from "react";
 import { familyService } from "../services/familyService";
-import { permissaoService } from "../services/permissaoService"; // 👈 Importamos o serviço de permissões aqui
+import { permissaoService } from "../services/permissaoService";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import { validateEmail } from "../utils/validators";
@@ -56,12 +56,11 @@ export function useManageFamily() {
   const [familiars, setFamiliars] = useState(INITIAL_FAMILIARS);
   const [isEditing, setIsEditing] = useState(false);
 
-  // 🔥 ESTADO NOVO: Guarda as permissões detalhadas do utilizador logado
   const [minhasPermissoes, setMinhasPermissoes] = useState({
     editar_calendario: false,
     gerenciar_listas: false,
     controlar_despesas: false,
-    alterar_informacoes: false, // Usaremos esta para ocultar o botão "Editar Informações"
+    alterar_informacoes: false,
   });
 
   const [familyData, setFamilyData] = useState({
@@ -99,7 +98,6 @@ export function useManageFamily() {
     try {
       setIsLoading(true);
 
-      // 1. Busca os dados da família
       const response = await familyService.getFamilyComplete(idFamilia);
 
       // 2. Busca as PERMISSÕES do utilizador logado na base de dados
@@ -349,6 +347,7 @@ export function useManageFamily() {
         id_familia: idFamilia,
         email: [currentEmail],
       });
+
       setCurrentEmail("");
       setErrosCampos({});
       fetchApiData();
@@ -382,7 +381,6 @@ export function useManageFamily() {
     return me ? me.isAdmin : false;
   }, [familiarsWithIsMe]);
 
-  // Se o utilizador é Admin, forçamos as permissões para true para evitar que ele próprio se bloqueie
   const permissoesFinais = isCurrentUserAdmin
     ? {
         editar_calendario: true,
@@ -459,7 +457,7 @@ export function useManageFamily() {
     setIsHoveredView,
     familiars: sortedFamiliars,
     isCurrentUserAdmin,
-    minhasPermissoes: permissoesFinais, // 🔥 Exportamos para o FrontEnd as permissões validadas!
+    minhasPermissoes: permissoesFinais,
     isPermissionsOpen,
     isDeleteOpen,
     selectedMember,

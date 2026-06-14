@@ -82,7 +82,6 @@ export const useAddFamily = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // 🛑 Validação estrita de formato de imagem
     const formatosPermitidos = ["image/png", "image/jpeg", "image/jpg"];
 
     if (!formatosPermitidos.includes(file.type)) {

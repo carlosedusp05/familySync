@@ -273,8 +273,6 @@ export function useList() {
 
         if (!idLista) return null;
 
-        console.log(itemData);
-
         const newItem = {
           nome_item: itemData.nome_item || itemData.name || "Sem nome",
           valor_unitario:
@@ -354,7 +352,6 @@ export function useList() {
     });
   }, []);
 
-  //Funcionando
   const handleDeleteList = useCallback(
     async (listId) => {
       try {
@@ -378,7 +375,6 @@ export function useList() {
     [activeListId],
   );
 
-  //Funcionando
   const handleDeleteItem = useCallback(
     async (itemId) => {
       try {
@@ -417,7 +413,6 @@ export function useList() {
     [activeListId],
   );
 
-  //Funcionando
   const handleSaveList = useCallback(
     async (data) => {
       console.log(data);
@@ -499,14 +494,12 @@ export function useList() {
           }
         }
 
-        // Cria os novos itens e atualiza o estado automaticamente
         if (data.items?.length) {
           await Promise.all(
             data.items.map((item) => handleAddItem(item, listId)),
           );
         }
 
-        // Atualiza apenas o nome da lista, se ele mudou
         if (data.nome !== undefined) {
           setLists((prev) =>
             prev.map((list) =>

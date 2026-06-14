@@ -9,7 +9,6 @@ export function useNotifications() {
   const lastNotifIdRef = useRef(null);
   const isInitialLoadRef = useRef(true);
 
-  // 1. Pegamos o userId de forma segura fora do loop de renderização
   const userId = useMemo(() => {
     const token = Cookies.get("familysync_token");
     if (!token) return null;
@@ -21,7 +20,6 @@ export function useNotifications() {
     }
   }, []);
 
-  // 2. O React Query assume todo o controle do Polling e gerenciamento de estados
   const {
     data: fetchedNotifs = [],
     isLoading,
@@ -35,44 +33,37 @@ export function useNotifications() {
       }
       return [];
     },
-    enabled: !!userId, // Só executa se o usuário estiver logado
-    refetchInterval: 10000, // Tempo do Polling inteligente (Ex: 10 segundos para ser mais leve, ou mude para 5000)
-    refetchOnWindowFocus: true, // Garante busca imediata ao voltar para a aba do app
+    enabled: !!userId,
+    refetchInterval: 10000,
+    refetchOnWindowFocus: true,
   });
 
-  // 3. Ordenamos as notificações vindas do cache de forma síncrona e performática
   const notifications = useMemo(() => {
     return [...fetchedNotifs].sort(
       (a, b) => new Date(b.data) - new Date(a.data),
     );
   }, [fetchedNotifs]);
 
-  // 4. Monitoramos a chegada de novos alertas sempre que a lista mudar
-  // 4. Monitoramos a chegada de novos alertas sempre que a lista mudar
   useEffect(() => {
     if (notifications.length > 0) {
       const currentLatest = notifications[0];
       const currentLatestId = String(currentLatest.id_notificacao);
 
-      // Se for a primeira carga absoluta de dados, apenas registra o ID atual e sai
       if (isInitialLoadRef.current) {
         lastNotifIdRef.current = currentLatestId;
         isInitialLoadRef.current = false;
         return;
       }
 
-      // MÁGICA DO ALERTA: Só dispara se o ID novo for diferente do anterior
       if (
         lastNotifIdRef.current !== null &&
         lastNotifIdRef.current !== currentLatestId
       ) {
-        // Envelopamos em um setTimeout para tirar a execução do fluxo síncrono do React
         setTimeout(() => {
           setNewAlert(currentLatest);
         }, 0);
       }
 
-      // Atualiza a referência com o último ID descoberto
       lastNotifIdRef.current = currentLatestId;
     }
   }, [notifications]);
