@@ -124,3 +124,38 @@ main img.bg-blur {
     height: 160px;
   }
 }
+
+@media (max-width: 768px) {
+  header {
+    height: 80px;
+    padding-inline: 20px;
+    padding-block: 15px;
+    justify-content: center;
+  }
+
+  header img {
+    height: 40px;
+  }
+
+  .card {
+    width: 90%;
+    max-width: 400px;
+    padding: 30px 20px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .card h1 {
+    font-size: 24px;
+  }
+
+  .card h2 {
+    font-size: 18px;
+  }
+
+  .card button {
+    width: 100%;
+    max-width: 250px;
+    margin-top: 10px;
+  }
+}

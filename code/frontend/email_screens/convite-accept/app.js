@@ -56,3 +56,11 @@ async function processarConvite() {
 }
 
 processarConvite();
+
+window.abrirAppOuSite = function () {
+  window.location.href = "familysync://dashboard";
+
+  setTimeout(() => {
+    window.location.href = "https://familysync-tcc.vercel.app/";
+  }, 2000);
+};
