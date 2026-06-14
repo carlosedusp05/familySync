@@ -77,7 +77,6 @@ function ModalList({
 
   const handleRemoveLocalItem = (itemId) => {
     setItems((prev) => prev.filter((item) => item.id_item !== itemId));
-
     setItemsDeleted((prev) => [...prev, itemId]);
   };
 
@@ -86,7 +85,6 @@ function ModalList({
       setErrors((prev) => ({ ...prev, tema_nome: true }));
       return;
     }
-
     onSave({ nome: listName, items });
   };
 
@@ -114,8 +112,6 @@ function ModalList({
       payload.items = itemsCreated;
     }
 
-    console.log(payload);
-
     onSaveEdit(payload);
 
     itemsDeleted.forEach((id) => {
@@ -124,12 +120,12 @@ function ModalList({
   };
 
   const totalPurchase = items.reduce(
-    (acc, item) => acc + item.price * item.units,
+    (acc, item) => acc + item.valor_unitario * item.quantidade,
     0,
   );
 
   const formatCurrency = (value) => {
-    if (!value) return;
+    if (value === undefined || value === null) return "0,00";
     return value.toLocaleString("pt-BR", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -146,23 +142,23 @@ function ModalList({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all p-4">
-      <div className="bg-[#FDF6E3] max-w-4xl w-full rounded-2xl p-6 md:p-8 shadow-2xl flex flex-col gap-6 border border-white/40 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/60 backdrop-blur-sm transition-all p-4 pt-23 sm:pt-4">
+      <div className="bg-[#FDF6E3] max-w-4xl w-full rounded-2xl p-5 md:p-8 shadow-2xl flex flex-col gap-4 md:gap-6 border border-white/40 max-h-[68vh] md:max-h-[85vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none] [-ms-overflow-style:none]">
         <div className="flex justify-between items-center border-b border-[#E65C00]/10 pb-3">
-          <h2 className="text-4xl font-bold text-[#E65C00] tracking-tight">
+          <h2 className="text-2xl md:text-4xl font-bold text-[#E65C00] tracking-tight">
             {isEdit ? "Editar Lista" : "Criar Nova Lista"}
           </h2>
           <button
             onClick={onClose}
-            className="text-[#E65C00]/60 hover:text-[#E65C00] transition-colors text-2xl font-bold p-1"
+            className="text-[#E65C00]/60 hover:text-[#E65C00] transition-colors text-2xl font-bold p-1 cursor-pointer"
           >
             ✕
           </button>
         </div>
 
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4 md:gap-5">
           <div className="flex flex-col gap-1.5">
-            <label className="text-[#E65C00] font-bold text-xl tracking-wider px-1">
+            <label className="text-[#E65C00] font-bold text-lg md:text-xl tracking-wider px-1">
               Tema da lista
             </label>
             <input
@@ -173,33 +169,23 @@ function ModalList({
                 if (errors.tema_nome)
                   setErrors((prev) => ({ ...prev, tema_nome: false }));
               }}
-              placeholder="Ex: Compras do Mês, Feira, Viagem..."
+              placeholder="Ex: Compras do Mês, Feira..."
               maxLength={50}
-              className={`w-full bg-white rounded-2xl h-14 px-4 text-xl indent-2 text-[#5C2B10] placeholder:text-gray-400 font-medium outline-none border transition-all shadow-sm focus:ring-2 ${
+              className={`w-full bg-white rounded-2xl h-12 md:h-14 px-4 text-base md:text-xl indent-2 text-[#5C2B10] placeholder:text-gray-400 font-medium outline-none border transition-all shadow-sm focus:ring-2 ${
                 errors.tema_nome
                   ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
                   : "border-[#FDBA74] focus:border-[#E65C00] focus:ring-[#E65C00]/20"
               }`}
               autoFocus
             />
-            <div
-              className={`overflow-hidden transition-all duration-300 ease-in-out w-full flex ${
-                errors.tema_nome
-                  ? "max-h-12 opacity-100 mt-1"
-                  : "max-h-0 opacity-0"
-              }`}
-            >
-              <span className="text-red-500 text-sm px-2 block font-medium">
-                Qual é o tema da lista? Escreva aqui em cima.
-              </span>
-            </div>
           </div>
 
+          {/* Adicionar Itens */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[#E65C00] font-bold text-xl tracking-wider px-1">
+            <label className="text-[#E65C00] font-bold text-lg md:text-xl tracking-wider px-1">
               Adicionar itens à lista
             </label>
-            <div className="flex flex-col lg:flex-row gap-3 items-start w-full">
+            <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-start w-full">
               <div className="flex-1 w-full flex flex-col">
                 <input
                   type="text"
@@ -212,38 +198,28 @@ function ModalList({
                   onKeyDown={(e) => e.key === "Enter" && handleAddLocalItem()}
                   placeholder="Nome do item..."
                   maxLength={100}
-                  className={`w-full bg-white rounded-2xl h-14 px-4 text-xl indent-2 text-[#5C2B10] placeholder:text-gray-400 font-medium outline-none border transition-all shadow-sm focus:ring-2 ${
+                  className={`w-full bg-white rounded-2xl h-12 md:h-14 px-4 text-base md:text-xl indent-2 text-[#5C2B10] placeholder:text-gray-400 font-medium outline-none border transition-all shadow-sm focus:ring-2 ${
                     errors.item_nome
                       ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
                       : "border-[#FDBA74] focus:border-[#E65C00] focus:ring-[#E65C00]/20"
                   }`}
                 />
-                <div
-                  className={`overflow-hidden transition-all duration-300 ease-in-out w-full flex ${
-                    errors.item_nome
-                      ? "max-h-12 opacity-100 mt-1"
-                      : "max-h-0 opacity-0"
-                  }`}
-                >
-                  <span className="text-red-500 text-sm px-2 block font-medium">
-                    Qual é o nome do item? Escreva aqui em cima.
-                  </span>
-                </div>
               </div>
-              <div className="flex flex-col w-full lg:w-auto">
-                <div className="flex items-center gap-2 rounded-xl h-14 px-3 shadow-md bg-white/50">
+
+              {/* Controles: Ativador de preço, Input preço e Input Quantidade */}
+              <div className="flex items-center gap-2 lg:gap-3 w-full lg:w-auto">
+                <div className="flex-1 lg:flex-initial flex items-center gap-2 rounded-xl h-12 md:h-14 px-3 shadow-md bg-white/50 min-w-0">
                   <div
                     onClick={() => setIsPurchaseList(!isPurchaseList)}
-                    title="Ativar/Desativar modo de compras"
-                    className="w-8 h-8 rounded-full border-2 border-orange flex items-center justify-center cursor-pointer transition-transform active:scale-95 shrink-0"
+                    className="w-7 h-7 md:w-8 md:h-8 rounded-full border-2 border-orange flex items-center justify-center cursor-pointer transition-transform active:scale-95 shrink-0"
                   >
                     {isPurchaseList && (
-                      <div className="w-4 h-4 bg-orange rounded-full animate-fade-in" />
+                      <div className="w-3.5 h-3.5 md:w-4 md:h-4 bg-orange rounded-full animate-fade-in" />
                     )}
                   </div>
 
                   <div
-                    className={`flex items-center bg-white rounded-lg px-2 h-8 w-50 shadow-inner border ${
+                    className={`flex-1 lg:flex-initial flex items-center bg-white rounded-lg px-2 h-8 w-24 sm:w-36 md:w-50 shadow-inner border ${
                       errors.valor ? "border-red-500" : "border-transparent"
                     }`}
                   >
@@ -255,7 +231,7 @@ function ModalList({
                       maxLength={16}
                       placeholder="R$0,00"
                       disabled={!isPurchaseList}
-                      className="w-full bg-transparent text-center text-xl text-[#E65C00] px-2 font-bold outline-none disabled:opacity-40"
+                      className="w-full bg-transparent text-center text-base md:text-xl text-[#E65C00] px-1 font-bold outline-none disabled:opacity-40"
                     />
                   </div>
 
@@ -272,61 +248,53 @@ function ModalList({
                     min="1"
                     max="999"
                     disabled={!isPurchaseList}
-                    className="w-20 h-8 bg-white rounded-lg text-center text-xl text-[#E65C00] font-bold outline-none shadow-inner disabled:opacity-40"
+                    className="w-12 md:w-20 h-8 bg-white rounded-lg text-center text-base md:text-xl text-[#E65C00] font-bold outline-none shadow-inner disabled:opacity-40"
                   />
                 </div>
-                <div
-                  className={`overflow-hidden transition-all duration-300 ease-in-out w-full flex ${
-                    errors.valor
-                      ? "max-h-12 opacity-100 mt-1"
-                      : "max-h-0 opacity-0"
-                  }`}
-                >
-                  <span className="text-red-500 text-sm px-2 block font-medium">
-                    Você esqueceu de informar o preço deste item.
-                  </span>
+
+                <div className="h-12 md:h-14 flex items-center justify-center shrink-0">
+                  <DefaultButton
+                    onClick={handleAddLocalItem}
+                    text="+"
+                    another_size={"h-11 w-11 md:h-12 md:w-12"}
+                    another_text_size={"text-2xl md:text-3xl"}
+                    another_color={"bg-brown-dark"}
+                  />
                 </div>
-              </div>
-              <div className="h-14 flex items-center justify-center self-start lg:self-auto">
-                <DefaultButton
-                  onClick={handleAddLocalItem}
-                  text="+"
-                  another_size={"h-12 w-12"}
-                  another_text_size={"text-3xl"}
-                  another_color={"bg-brown-dark"}
-                />
               </div>
             </div>
           </div>
-          <div className="border border-orange/70 rounded-xl p-3 h-70 overflow-y-auto bg-white/40 shadow-inner [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#282828] [&::-webkit-scrollbar-thumb]:rounded-md">
+          <div className="border border-orange/70 rounded-xl p-2 md:p-3 h-40 md:h-64 overflow-y-auto bg-white/40 shadow-inner [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#282828] [&::-webkit-scrollbar-thumb]:rounded-md">
             {items.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-orange-dark/70 font-medium gap-1 text-center p-4 ">
-                <span className="text-5xl">🛒</span>
-                <p className="text-xl">Nenhum item adicionado à lista ainda.</p>
+              <div className="h-full flex flex-col items-center justify-center text-orange-dark/70 font-medium gap-1 text-center p-4">
+                <span className="text-3xl md:text-5xl">🛒</span>
+                <p className="text-base md:text-xl">
+                  Nenhum item adicionado à lista.
+                </p>
               </div>
             ) : (
               <div className="flex flex-col gap-2">
                 {items.map((item) => (
                   <div
                     key={item.id_map || item.id_item}
-                    className="bg-[#FF8B40] text-white rounded-xl flex items-center justify-between px-8 py-2.5 shadow-sm transition-all hover:-translate-y-px"
+                    className="bg-[#FF8B40] text-white rounded-xl flex items-center justify-between px-3 md:px-8 py-2 md:py-2.5 shadow-sm"
                   >
-                    <span className="flex-1 font-semibold truncate pr-3 text-xl">
+                    <span className="flex-1 font-semibold truncate pr-2 text-sm md:text-xl">
                       {item.nome || item.nome_item}
                     </span>
-                    <div className="flex items-center gap-3 shrink-0">
-                      <span className="text-white/80 font-medium text-xl">
+                    <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
+                      <span className="text-white/80 font-medium text-xs md:text-xl">
                         R$ {formatCurrency(item.valor_unitario)} ×{" "}
                         {item.quantidade}
                       </span>
 
-                      <div className="bg-white text-[#E65C00] font-bold px-2.5 py-1 rounded-lg text-xl shadow-inner min-w-20 text-right">
+                      <div className="bg-white text-[#E65C00] font-bold px-2 py-0.5 md:py-1 rounded-lg text-xs md:text-xl shadow-inner text-right">
                         R${" "}
                         {formatCurrency(item.valor_unitario * item.quantidade)}
                       </div>
                       <button
                         onClick={() => handleRemoveLocalItem(item.id_item)}
-                        className="bg-[#C24100]/20 hover:bg-red-600 hover:text-white transition-colors text-white rounded-full w-7 h-7 flex items-center justify-center font-bold text-sm"
+                        className="bg-[#C24100]/20 hover:bg-red-600 hover:text-white transition-colors text-white rounded-full w-6 h-6 md:w-7 md:h-7 flex items-center justify-center font-bold text-xs md:text-sm cursor-pointer"
                       >
                         ✕
                       </button>
@@ -336,25 +304,28 @@ function ModalList({
               </div>
             )}
           </div>
+
+          {/* Rodapé fixado dentro do fluxo do modal (Total e Ações) */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2 border-t border-[#E65C00]/10">
             <div>
               {isPurchaseList && (
-                <h3 className="text-[#E65C00] font-extrabold text-xl flex items-center">
+                <h3 className="text-[#E65C00] font-extrabold text-lg md:text-xl flex items-center flex-wrap gap-1">
                   Total da compra:
-                  <span className="text-[#5C2B10] bg-white text-xl px-3 py-1 rounded-lg border border-[#FDBA74] ml-1 shadow-sm ">
+                  <span className="text-[#5C2B10] bg-white text-lg md:text-xl px-2.5 py-0.5 md:py-1 rounded-lg border border-[#FDBA74] shadow-sm">
                     R$ {formatCurrency(totalPurchase)}
                   </span>
                 </h3>
               )}
             </div>
 
-            <div className="flex gap-3 justify-end">
+            <div className="flex flex-col sm:flex-row gap-2.5 w-full sm:w-auto">
               <DefaultButton
                 onClick={onClose}
                 text="Cancelar"
                 theme={false}
-                another_padding={"px-15 py-2.5"}
-                another_text_size={"text-xl font-semibold"}
+                another_size="w-full sm:w-auto"
+                another_padding={"px-4 sm:px-12 py-2 md:py-2.5"}
+                another_text_size={"text-base md:text-xl font-semibold"}
               />
               <DefaultButton
                 onClick={function () {
@@ -365,8 +336,9 @@ function ModalList({
                   }
                 }}
                 text={isEdit ? "Salvar Alterações" : "Criar Lista"}
-                another_padding={"px-15 py-2.5"}
-                another_text_size={"text-xl font-semibold"}
+                another_size="w-full sm:w-auto"
+                another_padding={"px-4 sm:px-12 py-2 md:py-2.5"}
+                another_text_size={"text-base md:text-xl font-semibold"}
               />
             </div>
           </div>

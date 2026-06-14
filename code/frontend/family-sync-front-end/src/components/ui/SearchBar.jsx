@@ -2,7 +2,7 @@ import { searchIcon } from "../../assets";
 
 function SearchBar({ value, onChange }) {
   return (
-    <div className="flex items-center justify-center h-13 w-[88%] bg-white shadow-[12px] rounded-2xl px-5">
+    <div className="flex items-center justify-center h-10 md:h-13 w-[88%] bg-white shadow-[12px] rounded-2xl px-5">
       <input
         type="text"
         value={value}
@@ -10,7 +10,11 @@ function SearchBar({ value, onChange }) {
         placeholder="Procure aqui..."
         className="flex-1 text-xl text-black outline-none indent-5"
       />
-      <img src={searchIcon} alt="Icone de Pesquisa" className="w-8 h-8" />
+      <img
+        src={searchIcon}
+        alt="Icone de Pesquisa"
+        className="w-6 h-6 md:w-8 md:h-8"
+      />
     </div>
   );
 }

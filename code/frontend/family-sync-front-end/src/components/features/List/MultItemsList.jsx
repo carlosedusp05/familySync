@@ -53,12 +53,12 @@ function MultItemsList({
         <button
           type="button"
           onClick={() => setIsCreating(true)}
-          className="w-full bg-white/15 border-2 border-dashed border-[#D6CFC2]/40 hover:border-orange-dark hover:bg-white/25 flex flex-col items-center justify-center py-5 rounded-[25px] transition-all duration-300 group min-h-25 scale-95 hover:scale-98 active:scale-95 cursor-pointer"
+          className="w-full bg-white/15 border-2 border-dashed border-[#D6CFC2]/40 hover:border-orange-dark hover:bg-white/25 flex flex-col items-center justify-center py-3 md:py-5 rounded-[20px] md:rounded-[25px] transition-all duration-300 group min-h-[5rem] md:min-h-25 scale-95 hover:scale-98 active:scale-95 cursor-pointer"
         >
-          <span className="text-orange-dark text-6xl font-light leading-none transition-transform group-hover:scale-110">
+          <span className="text-orange-dark text-4xl md:text-6xl font-light leading-none transition-transform group-hover:scale-110">
             +
           </span>
-          <span className="text-white/60 group-hover:text-white text-xl font-medium mt-1">
+          <span className="text-white/60 group-hover:text-white text-base md:text-xl font-medium mt-1">
             Adicionar novo item
           </span>
         </button>

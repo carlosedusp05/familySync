@@ -46,7 +46,7 @@ function ItemCreationForm({ onAddItem, onCancel }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full min-h-75 bg-[#FFF8E7] flex flex-col justify-center px-6 py-8 rounded-[25px] shadow-md scale-95 transition-all duration-300 animate-fadeIn"
+      className="w-full min-h-[auto] md:min-h-75 bg-[#FFF8E7] flex flex-col justify-center px-4 py-5 md:px-6 md:py-8 rounded-[20px] md:rounded-[25px] shadow-md scale-95 transition-all duration-300 animate-fadeIn"
     >
       <div className="flex flex-col mb-2">
         <input
@@ -58,7 +58,8 @@ function ItemCreationForm({ onAddItem, onCancel }) {
             setName(e.target.value);
             if (errors.nome) setErrors({ nome: false });
           }}
-          className="text-brown-dark text-[25px] font-semibold text-center w-full bg-transparent border-b border-brown-dark/20 focus:border-orange-dark outline-none pb-1 placeholder:text-brown-dark/40"
+          /* A fonte principal caiu de 25px para 20px no mobile */
+          className="text-brown-dark text-[20px] md:text-[25px] font-semibold text-center w-full bg-transparent border-b border-brown-dark/20 focus:border-orange-dark outline-none pb-1 placeholder:text-brown-dark/40"
           autoFocus
         />
 
@@ -67,33 +68,36 @@ function ItemCreationForm({ onAddItem, onCancel }) {
             errors.nome ? "max-h-8 opacity-100 mt-1" : "max-h-0 opacity-0"
           }`}
         >
-          <span className="text-red-500 text-sm px-2 block font-medium">
+          <span className="text-red-500 text-xs md:text-sm px-2 block font-medium">
             Qual é o nome do item? Escreva aqui em cima.
           </span>
         </div>
       </div>
 
       <div
-        className="flex items-center gap-2 px-2 mb-2 mt-3 cursor-pointer w-fit group"
+        className="flex items-center gap-2 px-1 md:px-2 mb-2 mt-2 md:mt-3 cursor-pointer w-fit group"
         onClick={() => setIsPurchase(!isPurchase)}
       >
-        <div className="w-6 h-6 rounded-full border-2 border-orange-dark flex items-center justify-center transition-transform group-active:scale-95 shrink-0">
+        <div className="w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-orange-dark flex items-center justify-center transition-transform group-active:scale-95 shrink-0">
           {isPurchase && (
-            <div className="w-3 h-3 bg-orange-dark rounded-full animate-fadeIn" />
+            <div className="w-2.5 h-2.5 md:w-3 md:h-3 bg-orange-dark rounded-full animate-fadeIn" />
           )}
         </div>
-        <span className="text-orange-dark font-semibold text-[15px] select-none">
+
+        <span className="text-orange-dark font-semibold text-[14px] md:text-[15px] select-none">
           Incluir quantidade e valor
         </span>
       </div>
 
       <div
-        className={`grid grid-cols-2 gap-3 items-center w-full px-2 mb-4 transition-all duration-300 ${
+        className={`grid grid-cols-2 gap-2 md:gap-3 items-center w-full px-1 md:px-2 mb-3 md:mb-4 transition-all duration-300 ${
           !isPurchase ? "opacity-40 grayscale-20 pointer-events-none" : ""
         }`}
       >
-        <div className="flex items-center gap-1 bg-orange-dark/10 px-3 py-1.5 rounded-full">
-          <span className="text-orange-dark font-bold text-xl">Qtd:</span>
+        <div className="flex items-center gap-1 bg-orange-dark/10 px-2 md:px-3 py-1 md:py-1.5 rounded-full">
+          <span className="text-orange-dark font-bold text-base md:text-xl">
+            Qtd:
+          </span>
           <input
             type="number"
             min="1"
@@ -106,11 +110,11 @@ function ItemCreationForm({ onAddItem, onCancel }) {
                 setUnits(value);
               }
             }}
-            className="w-full bg-transparent text-orange-dark font-black text-[20px] outline-none text-center disabled:bg-transparent"
+            className="w-full bg-transparent text-orange-dark font-black text-[16px] md:text-[20px] outline-none text-center disabled:bg-transparent"
           />
         </div>
 
-        <div className="flex items-center gap-1 bg-orange-dark/10 px-3 py-1.5 rounded-full">
+        <div className="flex items-center gap-1 bg-orange-dark/10 px-2 md:px-3 py-1 md:py-1.5 rounded-full">
           <input
             type="text"
             inputMode="numeric"
@@ -119,7 +123,7 @@ function ItemCreationForm({ onAddItem, onCancel }) {
             maxLength={16}
             disabled={!isPurchase}
             onChange={handlePriceChange}
-            className="w-full bg-transparent text-orange-dark font-black text-[20px] outline-none text-center placeholder:text-orange-dark/40 disabled:bg-transparent"
+            className="w-full bg-transparent text-orange-dark font-black text-[16px] md:text-[20px] outline-none text-center placeholder:text-orange-dark/40 disabled:bg-transparent"
           />
         </div>
         <div
@@ -127,22 +131,22 @@ function ItemCreationForm({ onAddItem, onCancel }) {
             errors.valor ? "max-h-12 opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <span className="text-red-500 text-sm px-2 block font-medium">
+          <span className="text-red-500 text-xs md:text-sm px-2 block font-medium">
             Você esqueceu de informar o preço deste item.
           </span>
         </div>
       </div>
 
-      <div className="flex gap-15 justify-end w-full px-2 mt-1 text-sm font-semibold">
+      <div className="flex gap-3 md:gap-15 justify-end w-full px-1 md:px-2 mt-1 text-sm font-semibold">
         <DefaultButton
-          another_padding={"px-5 py-2"}
+          another_padding={"px-4 py-1.5 md:px-5 md:py-2"}
           type="button"
           text="Cancelar"
           onClick={handleReset}
           theme={false}
         />
         <DefaultButton
-          another_padding={"px-5 py-2"}
+          another_padding={"px-4 py-1.5 md:px-5 md:py-2"}
           type="submit"
           text="Adicionar"
         />
