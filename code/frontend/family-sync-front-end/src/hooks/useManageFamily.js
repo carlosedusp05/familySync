@@ -100,7 +100,6 @@ export function useManageFamily() {
 
       const response = await familyService.getFamilyComplete(idFamilia);
 
-      // 2. Busca as PERMISSÕES do utilizador logado na base de dados
       if (myUserId) {
         try {
           const permData = await permissaoService.getPermissaoUsuario(
