@@ -2,6 +2,7 @@ import { Suspense, useState, useEffect } from "react";
 import { Outlet, useNavigation, useLocation } from "react-router-dom";
 import LoadingOverlay from "./LoadingOverlay";
 import { familySyncTextIcon, familySyncSmallIcon } from "../../assets";
+import { splashSound } from "../../assets";
 
 function RootLayout() {
   const navigation = useNavigation();
@@ -26,9 +27,22 @@ function RootLayout() {
 
     sessionStorage.setItem("@FamilySync:splashRodou", "true");
 
+    const splashAudio = new Audio(splashSound);
+    splashAudio.volume = 0.5;
+
     let timers = [];
 
-    timers.push(setTimeout(() => setRevealText(true), 300));
+    timers.push(
+      setTimeout(() => {
+        setRevealText(true);
+        splashAudio.play().catch((error) => {
+          console.warn(
+            "Áudio bloqueado pela política de autoplay do navegador:",
+            error,
+          );
+        });
+      }, 50),
+    );
 
     const tempoTotalParaSumir = 3200;
 
@@ -43,7 +57,10 @@ function RootLayout() {
       }, tempoTotalParaSumir),
     );
 
-    return () => timers.forEach(clearTimeout);
+    return () => {
+      timers.forEach(clearTimeout);
+      splashAudio.pause();
+    };
   }, [showSplash]);
 
   return (

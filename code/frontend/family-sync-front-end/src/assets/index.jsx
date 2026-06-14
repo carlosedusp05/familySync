@@ -48,6 +48,7 @@ import settingsOrange from "./settings_orange.svg";
 import eyeWhite from "./eye_white.svg";
 import eyeMostOrange from "./eye_most_orange.svg";
 import logoutIconRed from "./logout_icon_red.svg";
+import splashSound from "./splash-sound.mp3";
 
 export {
   eyeIcon,
@@ -100,4 +101,5 @@ export {
   eyeWhite,
   eyeMostOrange,
   logoutIconRed,
+  splashSound,
 };
