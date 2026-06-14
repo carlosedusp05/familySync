@@ -1,4 +1,5 @@
 "use strict";
+import { BASE_URL } from "./config.js";
 
 const loadingOverlay = document.getElementById("loading-overlay");
 const lottieContainer = document.getElementById("lottie-container");
@@ -36,8 +37,6 @@ async function processarConvite() {
     const id_familia = payloadDecodificado.id_familia;
 
     showLoading();
-
-    const BASE_URL = "https://tcc-back-q3kw.onrender.com/v1/familysync/";
 
     await fetch(BASE_URL + `usuario-familia/emailEnviado?token=${token}`, {
       method: "POST",
