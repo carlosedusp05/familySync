@@ -47,6 +47,10 @@ async function processarConvite() {
 
     document.getElementById("familia").textContent =
       `Você foi cadastrado na família ${dadosFamilia.Response.familia[0].nome}`;
+
+    setTimeout(() => {
+      window.location.href = "familysync://dashboard";
+    }, 800);
   } catch (error) {
     document.getElementById("familia").textContent =
       "Erro ao carregar os dados da família.";
@@ -57,10 +61,6 @@ async function processarConvite() {
 
 processarConvite();
 
-window.abrirAppOuSite = function () {
-  window.location.href = "familysync://dashboard";
-
-  setTimeout(() => {
-    window.location.href = "https://familysync-tcc.vercel.app/";
-  }, 2000);
+window.abrirSite = function () {
+  window.location.href = "https://familysync-tcc.vercel.app/";
 };
