@@ -55,7 +55,7 @@ main img.bg-blur {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  align-items: start;
+  align-items: center;
 }
 
 .card h1 {

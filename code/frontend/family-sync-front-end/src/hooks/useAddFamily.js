@@ -12,10 +12,12 @@ import { viaCepService } from "../services/viaCepService.jsx";
 import { familyService } from "../services/familyService.jsx";
 import { enderecoService } from "../services/enderecoService.jsx";
 import { userService } from "../services/userService.jsx";
+import { useUser } from "../context/UserContext";
 
 export const useAddFamily = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const { refreshUser } = useUser();
 
   const [preview, setPreview] = useState(null);
   const [fotoUpload, setFotoUpload] = useState(null);
@@ -194,21 +196,47 @@ export const useAddFamily = () => {
   const handleAddMember = () => {
     if (!currentEmail.trim()) return;
 
-    const erroValidacao = validateEmail(currentEmail);
-    if (erroValidacao) {
-      setErrosCampos((prev) => ({ ...prev, membros: erroValidacao }));
+    // Permite que o usuário cole vários e-mails com vírgula e divide em blocos no state
+    const emailsList = currentEmail
+      .split(",")
+      .map((email) => email.trim().toLowerCase())
+      .filter((email) => email !== "");
+
+    if (emailsList.length === 0) return;
+
+    let erroEncontrado = null;
+    const emailsValidos = [];
+
+    for (const email of emailsList) {
+      const erroValidacao = validateEmail(email);
+      if (erroValidacao) {
+        erroEncontrado = `O e-mail "${email}" é inválido.`;
+        break;
+      }
+
+      if (!formData.membros.includes(email) && !emailsValidos.includes(email)) {
+        emailsValidos.push(email);
+      }
+    }
+
+    if (erroEncontrado) {
+      setErrosCampos((prev) => ({ ...prev, membros: erroEncontrado }));
       return;
     }
 
-    if (formData.membros.includes(currentEmail)) {
-      setErrosCampos((prev) => ({ ...prev, membros: "E-mail já adicionado" }));
+    if (emailsValidos.length === 0) {
+      setErrosCampos((prev) => ({
+        ...prev,
+        membros: "E-mail(s) já adicionado(s) anteriormente",
+      }));
       return;
     }
 
     setFormData((prev) => ({
       ...prev,
-      membros: [...prev.membros, currentEmail.toLowerCase()],
+      membros: [...prev.membros, ...emailsValidos],
     }));
+
     setCurrentEmail("");
 
     setErrosCampos((prev) => {
@@ -246,7 +274,6 @@ export const useAddFamily = () => {
       formDataEnvio.append("telefone", telefoneLimpo);
 
       formDataEnvio.append("cep", cleanCEP(formData.cep));
-
       formDataEnvio.append("logradouro", formData.logradouro);
       formDataEnvio.append("bairro", formData.bairro);
       formDataEnvio.append("complemento", formData.complemento || "");
@@ -258,15 +285,9 @@ export const useAddFamily = () => {
         formDataEnvio.append("foto", fotoUpload);
       }
 
-      console.log(
-        "Dados exatos do FormData (Tratados):",
-        Object.fromEntries(formDataEnvio.entries()),
-      );
-
       const responseFamilyCreation =
         await familyService.createFamilyEndereco(formDataEnvio);
 
-      console.log(responseFamilyCreation);
       if (
         responseFamilyCreation.StatusCode == 201 ||
         responseFamilyCreation.StatusCode == 200
@@ -282,33 +303,39 @@ export const useAddFamily = () => {
           id_familia: idFamiliaGerado,
           id_usuario: user.id_usuario,
         };
-
         await userService.createUserFamily(dadosOwnerFamily);
 
-        const dadosUserFamily = {
-          email: user.email,
-          id_familia: idFamiliaGerado,
+        sessionStorage.setItem("@FamilySync:family:id", idFamiliaGerado);
+
+        const dispararEmailsEmBackground = async () => {
+          try {
+            if (formData.membros.length > 0) {
+              for (const emailMembro of formData.membros) {
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+
+                await userService.addUserFamilyByEmail({
+                  email: [emailMembro],
+                  id_familia: idFamiliaGerado,
+                });
+              }
+            }
+          } catch (err) {
+            console.error("Erro no envio em background:", err);
+          }
         };
 
-        const promessasMembros = formData.membros.map((emailMembro) =>
-          userService.addUserFamilyByEmail({
-            email: emailMembro,
-            id_familia: idFamiliaGerado,
-          }),
-        );
+        dispararEmailsEmBackground();
 
-        await Promise.all([
-          userService.addUserFamilyByEmail(dadosUserFamily),
-          ...promessasMembros,
-        ]);
+        await refreshUser();
 
-        window.location.href = "/dashboard";
+        setIsLoading(false);
+        navigate("/dashboard");
       } else {
+        setIsLoading(false);
         setErrosCampos({ geral: responseFamilyCreation.message });
       }
     } catch (error) {
       console.log(error);
-    } finally {
       setIsLoading(false);
     }
   };

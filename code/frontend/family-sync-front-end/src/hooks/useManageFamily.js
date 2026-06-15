@@ -437,6 +437,8 @@ export function useManageFamily() {
       setIsLoading(true);
       await familyService.deleteFamilyEndereco(idFamilia);
       closeDeleteFamilyModal();
+
+      window.location.href = "/dashboard";
     } catch (error) {
       console.error("Erro ao excluir a família", error);
       alert("Falha ao excluir a família.");
